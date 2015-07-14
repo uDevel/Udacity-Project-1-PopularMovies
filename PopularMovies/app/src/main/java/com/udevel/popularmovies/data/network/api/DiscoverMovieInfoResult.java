@@ -1,4 +1,4 @@
-package com.udevel.popularmovies.data;
+package com.udevel.popularmovies.data.network.api;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by benny on 7/12/2015.
  */
-public class MovieInfo {
+public class DiscoverMovieInfoResult {
     /**
      * vote_average : 7.0
      * backdrop_path : /dkMD5qlogeRMiEixC4YNPUvax2T.jpg
@@ -24,6 +24,9 @@ public class MovieInfo {
      * video : false
      * popularity : 70.529253
      */
+
+    public static final String baseUrlForImage = "http://image.tmdb.org/t/p/";
+
     @SerializedName("vote_average")
     private double vote_average;
     @SerializedName("backdrop_path")
