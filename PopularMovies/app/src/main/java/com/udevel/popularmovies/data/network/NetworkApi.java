@@ -1,11 +1,13 @@
 package com.udevel.popularmovies.data.network;
 
+import com.squareup.okhttp.OkHttpClient;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 import com.udevel.popularmovies.data.network.api.GetMovieInfoResult;
 import com.udevel.popularmovies.data.network.api.TheMovieDBService;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 /**
  * Created by benny on 7/12/2015.
@@ -14,6 +16,7 @@ public class NetworkApi {
     private static TheMovieDBService getTheMovieDBService() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(TheMovieDBService.endPoint)
+                .setClient(new OkClient(new OkHttpClient()))
                 .build();
 
         return restAdapter.create(TheMovieDBService.class);

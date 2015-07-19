@@ -16,7 +16,7 @@ public interface TheMovieDBService {
     String apiKey = "57b70c6c3f48ee161a737bd82900ff95";
 
     @GET("/discover/movie")
-    void getMovies(@Query("sort_by") String sort, @Query("vote_count.gte") int minVote, @Query("page") int page,@Query("api_key") String key, Callback<DiscoverMovieResult> callback);
+    void getMovies(@Query("sort_by") String sort, @Query("vote_count.gte") int minVote, @Query("page") int page, @Query("api_key") String key, Callback<DiscoverMovieResult> callback);
 
     @GET("/movie/{id}")
     void getMovieById(@Path("id") int id, @Query("api_key") String key, Callback<GetMovieInfoResult> callback);

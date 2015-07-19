@@ -65,13 +65,15 @@ public class DataManager {
         return null;
     }
 
-    public static boolean saveMovies(Context context, List<Movie> movies, int page) {
+    public static List<Movie> saveMovies(Context context, List<Movie> movies, int page) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(movies);
-        return AppPreferences.saveMoviesJsonStr(context, jsonStr) && AppPreferences.saveMoviePage(context, page);
+        boolean b = AppPreferences.saveMoviesJsonStr(context, jsonStr);
+        boolean b1 = AppPreferences.saveMoviePage(context, page);
+        return b && b1 ? movies : null;
     }
 
-    public static boolean addMovies(Context context, List<Movie> movies, int page) {
+    public static List<Movie> addMovies(Context context, List<Movie> movies, int page) {
         List<Movie> origMovies = getMovies(context);
 
         if (origMovies == null) {
@@ -83,15 +85,23 @@ public class DataManager {
             }
 
             // Check if exist.
-            for (Movie movie : movies) {
+            for (int i = movies.size() - 1; i >= 0; i--) {
+                Movie movie = movies.get(i);
+                Integer index = existingMovieIdIndex.get(movie.getId());
+                if (index != null) {
+                    movies.remove(i);
+                }
+            }
+          /*  for (Movie movie : movies) {
                 Integer index = existingMovieIdIndex.get(movie.getId());
 
                 // Already exist, remove old one.
                 if (index != null) {
-                    existingMovieIdIndex.remove(movie.getId());
-                    origMovies.remove(index.intValue());
+                    Log.d("DataManager", movie.getOriginalTitle());
+                  *//*  existingMovieIdIndex.remove(movie.getId());
+                    origMovies.remove(index.intValue());*//*
                 }
-            }
+            }*/
             origMovies.addAll(movies);
         }
 
