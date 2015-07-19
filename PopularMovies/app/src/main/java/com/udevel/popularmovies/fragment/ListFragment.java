@@ -182,6 +182,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         int spanCount = currentOrientation == Configuration.ORIENTATION_LANDSCAPE ? NUM_COLUMNS_IN_LANDSCAPE : NUM_COLUMNS_IN_PORTRAIT;
 
         rv_popular_movies.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        rv_popular_movies.clearOnScrollListeners();
         rv_popular_movies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

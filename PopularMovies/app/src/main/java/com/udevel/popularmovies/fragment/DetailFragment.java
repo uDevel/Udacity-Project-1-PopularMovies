@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -40,6 +43,7 @@ public class DetailFragment extends Fragment {
     private TextView tv_release_month_date;
     private TextView tv_rating;
     private TextView tv_runtime;
+    private Toolbar tb_movie_detail;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -72,8 +76,7 @@ public class DetailFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (root == null) {
             root = setupViews(inflater, container);
@@ -83,20 +86,9 @@ public class DetailFragment extends Fragment {
                     Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.DETAIL_IMAGE_WIDTH).appendEncodedPath(movieDetailInfo.getPosterPath()).build();
                     Picasso.with(getActivity())
                             .load(uri)
-                            .into(iv_poster, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    setMovieInfoUI(movieDetailInfo);
-                                }
+                            .into(iv_poster);
+                    setMovieInfoUI(movieDetailInfo);
 
-                                @Override
-                                public void onError() {
-                                    if (getActivity() != null) {
-                                        Toast.makeText(getActivity(), "Error on getting data from Internet", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-                    tv_title.setText(movieDetailInfo.getOriginalTitle());
                 }
 
                 @Override
@@ -123,6 +115,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void setMovieInfoUI(MovieDetailInfo movieDetailInfo) {
+        tv_title.setText(movieDetailInfo.getOriginalTitle());
         tv_overview.setText(movieDetailInfo.getOverview());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -134,8 +127,8 @@ public class DetailFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tv_rating.setText(String.valueOf(movieDetailInfo.getVoteAverage()) + "/10");
-        tv_runtime.setText(String.valueOf(movieDetailInfo.getRuntime()) + " min");
+        tv_rating.setText(getString(R.string.format_avg_vote, movieDetailInfo.getVoteAverage()));
+        tv_runtime.setText(getString(R.string.format_runtime, movieDetailInfo.getRuntime()));
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
@@ -147,7 +140,30 @@ public class DetailFragment extends Fragment {
         tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
         tv_runtime = ((TextView) root.findViewById(R.id.tv_runtime));
         tv_rating = ((TextView) root.findViewById(R.id.tv_rating));
+
+        tb_movie_detail = ((Toolbar) root.findViewById(R.id.tb_movie_detail));
+        setupToolbar(tb_movie_detail);
         return root;
     }
 
+    private void setupToolbar(Toolbar tb_popular_movies) {
+        FragmentActivity activity = getActivity();
+        if (activity != null && activity instanceof AppCompatActivity) {
+            ((AppCompatActivity) activity).setSupportActionBar(tb_popular_movies);
+            ActionBar supportActionBar = ((AppCompatActivity) activity).getSupportActionBar();
+            if (supportActionBar != null) {
+                supportActionBar.setTitle(getString(R.string.title_movie_detail));
+                supportActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP);
+                tb_popular_movies.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (getActivity() != null) {
+                            getActivity().onBackPressed();
+
+                        }
+                    }
+                });
+            }
+        }
+    }
 }
