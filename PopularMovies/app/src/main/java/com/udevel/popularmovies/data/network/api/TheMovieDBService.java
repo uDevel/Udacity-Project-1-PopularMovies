@@ -19,5 +19,5 @@ public interface TheMovieDBService {
     void getMovies(@Query("sort_by") String sort, @Query("vote_count.gte") int minVote, @Query("page") int page, @Query("api_key") String key, Callback<DiscoverMovieResult> callback);
 
     @GET("/movie/{id}")
-    void getMovieById(@Path("id") int id, @Query("api_key") String key, Callback<GetMovieInfoResult> callback);
+    void getMovieById(@Path("id") int id, @Query("api_key") String key, Callback<MovieDetailInfo> callback);
 }

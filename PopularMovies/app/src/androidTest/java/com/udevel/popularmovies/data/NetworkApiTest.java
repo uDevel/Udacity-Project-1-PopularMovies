@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
-import com.udevel.popularmovies.data.network.api.GetMovieInfoResult;
+import com.udevel.popularmovies.data.network.api.MovieDetailInfo;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -80,12 +80,12 @@ public class NetworkApiTest extends AndroidTestCase {
         final CountDownLatch signal = new CountDownLatch(1);
         final int targetMovieId = 87101;
 
-        NetworkApi.getMovieById(targetMovieId, new Callback<GetMovieInfoResult>() {
+        NetworkApi.getMovieById(targetMovieId, new Callback<MovieDetailInfo>() {
             @Override
-            public void success(GetMovieInfoResult movieInfoResult, Response response) {
+            public void success(MovieDetailInfo movieDetailInfo, Response response) {
                 assertNotNull(response);
-                assertNotNull(movieInfoResult);
-                assertEquals("Response has wrong movie returned!", targetMovieId, movieInfoResult.getId());
+                assertNotNull(movieDetailInfo);
+                assertEquals("Response has wrong movie returned!", targetMovieId, movieDetailInfo.getId().intValue());
                 signal.countDown();
             }
 

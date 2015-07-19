@@ -1,17 +1,78 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.udevel.popularmovies.fragment.DetailFragment">
-
-    <ImageView
-        android:id="@+id/iv_poster"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.udevel.popularmovies.fragment.DetailFragment">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-</FrameLayout>
+        android:layout_alignParentStart="true"
+        android:layout_gravity="center"
+        android:padding="20dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        tools:text="title"/>
+
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/tv_title"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:adjustViewBounds="true"/>
+
+    <TextView
+        android:id="@+id/tv_release_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/iv_poster"
+        android:textSize="20sp"
+        tools:text="release_date"/>
+
+    <TextView
+        android:id="@+id/tv_release_month_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_release_year"
+        android:layout_toEndOf="@id/tv_release_year"
+        android:textSize="16sp"
+        tools:text="month_date"/>
+
+    <TextView
+        android:id="@+id/tv_runtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_release_year"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/iv_poster"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        tools:text="runtime"/>
+
+    <TextView
+        android:id="@+id/tv_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_runtime"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/iv_poster"
+        android:textSize="16sp"
+        tools:text="rating"/>
+
+    <TextView
+        android:id="@+id/tv_overview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/iv_poster"
+        android:fontFamily="sans-serif"
+        android:padding="20dp"
+        android:textSize="16sp"
+        tools:text="overview"/>
+</RelativeLayout>

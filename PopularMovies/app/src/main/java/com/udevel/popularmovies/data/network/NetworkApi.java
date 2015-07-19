@@ -2,7 +2,7 @@ package com.udevel.popularmovies.data.network;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
-import com.udevel.popularmovies.data.network.api.GetMovieInfoResult;
+import com.udevel.popularmovies.data.network.api.MovieDetailInfo;
 import com.udevel.popularmovies.data.network.api.TheMovieDBService;
 
 import retrofit.Callback;
@@ -31,7 +31,7 @@ public class NetworkApi {
         getTheMovieDBService().getMovies(TheMovieDBService.voteSortBy, 200, page, TheMovieDBService.apiKey, movieResultCallback);
     }
 
-    public static void getMovieById(int id, Callback<GetMovieInfoResult> movieInfoResultCallback) {
-        getTheMovieDBService().getMovieById(id, TheMovieDBService.apiKey, movieInfoResultCallback);
+    public static void getMovieById(int id, Callback<MovieDetailInfo> movieDetailInfoCallback) {
+        getTheMovieDBService().getMovieById(id, TheMovieDBService.apiKey, movieDetailInfoCallback);
     }
 }

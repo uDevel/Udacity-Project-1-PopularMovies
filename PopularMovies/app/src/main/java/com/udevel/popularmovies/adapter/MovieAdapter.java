@@ -45,10 +45,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Movie movieInfo = movieList.get(position);
-        Uri uri = Uri.parse(Movie.baseUrlForImage).buildUpon().appendPath("w185").appendEncodedPath(movieInfo.getPosterPath()).build();
-        Picasso.with(holder.iv_poster.getContext())
-                .load(uri)
-                .into(holder.iv_poster);
+        Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
+                Picasso.with(holder.iv_poster.getContext())
+                        .load(uri)
+                        .into(holder.iv_poster);
     }
 
     @Override
