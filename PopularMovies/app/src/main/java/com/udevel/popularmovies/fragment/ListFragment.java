@@ -61,7 +61,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     public static ListFragment newInstance() {
-
         return new ListFragment();
     }
 

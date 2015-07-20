@@ -214,7 +214,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         }
     }
 
-
     private void setMovieInfoGroupAlpha(float alpha) {
         tv_title.setAlpha(alpha);
         tv_release_year.setAlpha(alpha);
