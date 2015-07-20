@@ -3,6 +3,7 @@ package com.udevel.popularmovies.fragment;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +31,8 @@ import java.util.Locale;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
+    private static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
 
     private int movieId;
@@ -44,6 +47,10 @@ public class DetailFragment extends Fragment {
     private TextView tv_rating;
     private TextView tv_runtime;
     private Toolbar tb_movie_detail;
+    private AppBarLayout abl_movie_detail;
+    private LinearLayout ll_collapse;
+    private TextView tv_title_collapse;
+    private TextView tv_release_runtime_rating_collapse;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -83,6 +90,9 @@ public class DetailFragment extends Fragment {
             NetworkApi.getMovieById(movieId, new retrofit.Callback<MovieDetailInfo>() {
                 @Override
                 public void success(final MovieDetailInfo movieDetailInfo, Response response) {
+                    if (isDetached()) {
+                        return;
+                    }
                     Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.DETAIL_IMAGE_WIDTH).appendEncodedPath(movieDetailInfo.getPosterPath()).build();
                     Picasso.with(getActivity())
                             .load(uri)
@@ -93,9 +103,11 @@ public class DetailFragment extends Fragment {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    if (getActivity() != null) {
-                        Toast.makeText(getActivity(), "Error on getting data from Internet.", Toast.LENGTH_LONG).show();
+                    if (isDetached()) {
+                        return;
                     }
+
+                    Toast.makeText(getActivity(), "Error on getting data from Internet.", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -109,6 +121,14 @@ public class DetailFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (abl_movie_detail != null) {
+            abl_movie_detail.removeOnOffsetChangedListener(this);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         onFragmentInteractionListener = null;
@@ -116,6 +136,7 @@ public class DetailFragment extends Fragment {
 
     private void setMovieInfoUI(MovieDetailInfo movieDetailInfo) {
         tv_title.setText(movieDetailInfo.getOriginalTitle());
+        tv_title_collapse.setText(movieDetailInfo.getOriginalTitle());
         tv_overview.setText(movieDetailInfo.getOverview());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -129,6 +150,10 @@ public class DetailFragment extends Fragment {
         }
         tv_rating.setText(getString(R.string.format_avg_vote, movieDetailInfo.getVoteAverage()));
         tv_runtime.setText(getString(R.string.format_runtime, movieDetailInfo.getRuntime()));
+        tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
+                " " + tv_release_month_date.getText() +
+                " - " + tv_runtime.getText() +
+                " - " + tv_rating.getText());
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
@@ -140,8 +165,13 @@ public class DetailFragment extends Fragment {
         tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
         tv_runtime = ((TextView) root.findViewById(R.id.tv_runtime));
         tv_rating = ((TextView) root.findViewById(R.id.tv_rating));
-
+        abl_movie_detail = ((AppBarLayout) root.findViewById(R.id.abl_movie_detail));
         tb_movie_detail = ((Toolbar) root.findViewById(R.id.tb_movie_detail));
+        ll_collapse = ((LinearLayout) root.findViewById(R.id.ll_collapse));
+        tv_title_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_title_collapse));
+        tv_release_runtime_rating_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_release_runtime_rating_collapse));
+
+        abl_movie_detail.addOnOffsetChangedListener(this);
         setupToolbar(tb_movie_detail);
         return root;
     }
@@ -166,4 +196,29 @@ public class DetailFragment extends Fragment {
             }
         }
     }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+        iv_poster.setPivotY(iv_poster.getHeight());
+        iv_poster.setPivotX(0);
+
+        float expandPercentage = Math.min(0, (float) (i + tb_movie_detail.getHeight()) / (appBarLayout.getTotalScrollRange() - tb_movie_detail.getHeight()));
+
+        float shrink = 0.5f;
+        float scale = 1 + (expandPercentage * shrink);
+        iv_poster.setScaleY(scale);
+        iv_poster.setScaleX(scale);
+        setMovieInfoGroupAlpha(1 + expandPercentage);
+
+        ll_collapse.setVisibility(expandPercentage == -1 ? View.VISIBLE : View.GONE);
+    }
+
+    private void setMovieInfoGroupAlpha(float alpha) {
+        tv_title.setAlpha(alpha);
+        tv_release_year.setAlpha(alpha);
+        tv_release_month_date.setAlpha(alpha);
+        tv_runtime.setAlpha(alpha);
+        tv_rating.setAlpha(alpha);
+    }
+
 }
