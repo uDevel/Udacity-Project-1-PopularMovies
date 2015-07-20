@@ -93,7 +93,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     if (isDetached()) {
                         return;
                     }
-                    Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.DETAIL_IMAGE_WIDTH).appendEncodedPath(movieDetailInfo.getPosterPath()).build();
+                    Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieDetailInfo.getPosterPath()).build();
                     Picasso.with(getActivity())
                             .load(uri)
                             .into(iv_poster);
@@ -133,6 +133,23 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         super.onDetach();
         onFragmentInteractionListener = null;
     }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+        iv_poster.setPivotY(iv_poster.getHeight());
+        iv_poster.setPivotX(0);
+
+        float expandPercentage = Math.min(0, (float) (i + tb_movie_detail.getHeight()) / (appBarLayout.getTotalScrollRange() - tb_movie_detail.getHeight()));
+
+        float shrink = 0.5f;
+        float scale = 1 + (expandPercentage * shrink);
+        iv_poster.setScaleY(scale);
+        iv_poster.setScaleX(scale);
+        setMovieInfoGroupAlpha(1 + expandPercentage);
+
+        ll_collapse.setVisibility(expandPercentage <= -0.9f ? View.VISIBLE : View.GONE);
+    }
+
 
     private void setMovieInfoUI(MovieDetailInfo movieDetailInfo) {
         tv_title.setText(movieDetailInfo.getOriginalTitle());
@@ -197,21 +214,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         }
     }
 
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
-        iv_poster.setPivotY(iv_poster.getHeight());
-        iv_poster.setPivotX(0);
-
-        float expandPercentage = Math.min(0, (float) (i + tb_movie_detail.getHeight()) / (appBarLayout.getTotalScrollRange() - tb_movie_detail.getHeight()));
-
-        float shrink = 0.5f;
-        float scale = 1 + (expandPercentage * shrink);
-        iv_poster.setScaleY(scale);
-        iv_poster.setScaleX(scale);
-        setMovieInfoGroupAlpha(1 + expandPercentage);
-
-        ll_collapse.setVisibility(expandPercentage == -1 ? View.VISIBLE : View.GONE);
-    }
 
     private void setMovieInfoGroupAlpha(float alpha) {
         tv_title.setAlpha(alpha);
