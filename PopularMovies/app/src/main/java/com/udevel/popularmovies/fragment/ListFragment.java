@@ -49,6 +49,8 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class ListFragment extends Fragment implements OnMovieAdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+    public static final int LIST_POSITION_TO_MOVE_FAB = 20;
+    public static final int LIST_POSITION_TO_HIDE_FAB = 17;
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final String BUNDLE_KEY_IS_SORT_BY_POPULARITY = "BUNDLE_KEY_IS_SORT_BY_POPULARITY";
     private static final int NUM_LAST_ITEM_BEFORE_LOADING = 10;
@@ -166,13 +168,13 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     }
 
                     int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
-                    if (gridLayoutManager.findFirstVisibleItemPosition() > 20) {
+                    if (gridLayoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
                         if (dy < 0) {
                             fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy / 2)));
                         } else {
                             fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy / 2)));
                         }
-                    } else if (firstVisibleItemPosition < 17) {
+                    } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
                         fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
                     }
                 }
@@ -206,6 +208,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             @Override
             public void onClick(View v) {
                 if (rv_popular_movies != null) {
+                    rv_popular_movies.scrollToPosition(LIST_POSITION_TO_HIDE_FAB);
                     rv_popular_movies.smoothScrollToPosition(0);
                 }
             }
@@ -324,8 +327,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         if (response.getStatus() == 200 && discoverMovieResult != null) {
             saveMovieDataTask = new SaveMovieDataTask(getActivity(), currentPage);
             saveMovieDataTask.execute(discoverMovieResult);
-    /*        List<Movie> movies = updateData(discoverMovieResult, currentPage);
-            updateRecyclerView(movies);*/
         } else {
             loadingFromNetwork.set(false);
             srl_popular_movies.setRefreshing(false);
