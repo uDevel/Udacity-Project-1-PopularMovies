@@ -71,14 +71,14 @@
                 tools:text="month_date"/>
 
             <TextView
-                android:id="@+id/tv_runtime"
+                android:id="@+id/tv_popularity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_release_year"
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@id/iv_poster"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="italic"
                 tools:text="runtime"/>
 
@@ -86,11 +86,12 @@
                 android:id="@+id/tv_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_runtime"
+                android:layout_below="@id/tv_popularity"
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@id/iv_poster"
                 android:textColor="@color/white"
                 android:textSize="16sp"
+                android:textStyle="italic"
                 tools:text="rating"/>
 
             <LinearLayout
@@ -116,7 +117,7 @@
                     tools:text="title collapse"/>
 
                 <TextView
-                    android:id="@+id/tv_release_runtime_rating_collapse"
+                    android:id="@+id/tv_release_popularity_rating_collapse"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"

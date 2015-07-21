@@ -46,7 +46,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final String BUNDLE_KEY_IS_SORT_BY_POPULARITY = "BUNDLE_KEY_IS_SORT_BY_POPULARITY";
     private static final int NUM_LAST_ITEM_BEFORE_LOADING = 10;
-    private static final int MAX_PAGE_CACHE = 100;
+    private static final int MAX_PAGE_CACHE = 500;
     private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
     private static final int NUM_COLUMNS_IN_PORTRAIT = 3;
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);

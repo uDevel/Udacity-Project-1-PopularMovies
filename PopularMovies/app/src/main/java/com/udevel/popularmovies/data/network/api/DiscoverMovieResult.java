@@ -11,7 +11,7 @@ public class DiscoverMovieResult {
     @Expose
     private Integer page;
     @Expose
-    private List<Result> results = new ArrayList<Result>();
+    private List<Result> results = new ArrayList<>();
     @SerializedName("total_pages")
     @Expose
     private Integer totalPages;
@@ -85,7 +85,7 @@ public class DiscoverMovieResult {
         @SerializedName("genre_ids")
         @Expose
 
-        private List<Integer> genreIds = new ArrayList<Integer>();
+        private List<Integer> genreIds = new ArrayList<>();
         @Expose
         private Integer id;
         @SerializedName("original_language")

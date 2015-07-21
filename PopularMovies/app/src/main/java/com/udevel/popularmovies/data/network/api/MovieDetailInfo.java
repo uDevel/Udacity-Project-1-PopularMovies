@@ -19,7 +19,7 @@ public class MovieDetailInfo {
     @Expose
     private Integer budget;
     @Expose
-    private List<Genre> genres = new ArrayList<Genre>();
+    private List<Genre> genres = new ArrayList<>();
     @Expose
     private String homepage;
     @Expose
@@ -42,10 +42,10 @@ public class MovieDetailInfo {
     private String posterPath;
     @SerializedName("production_companies")
     @Expose
-    private List<ProductionCompany> productionCompanies = new ArrayList<ProductionCompany>();
+    private List<ProductionCompany> productionCompanies = new ArrayList<>();
     @SerializedName("production_countries")
     @Expose
-    private List<ProductionCountry> productionCountries = new ArrayList<ProductionCountry>();
+    private List<ProductionCountry> productionCountries = new ArrayList<>();
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
@@ -55,7 +55,7 @@ public class MovieDetailInfo {
     private Integer runtime;
     @SerializedName("spoken_languages")
     @Expose
-    private List<SpokenLanguage> spokenLanguages = new ArrayList<SpokenLanguage>();
+    private List<SpokenLanguage> spokenLanguages = new ArrayList<>();
     @Expose
     private String status;
     @Expose

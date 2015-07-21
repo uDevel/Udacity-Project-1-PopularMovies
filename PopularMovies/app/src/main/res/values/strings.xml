@@ -6,6 +6,6 @@
     <string name="action_sort">Sort order</string>
     <string name="action_sort_by_popularity">Sort by popularity</string>
     <string name="action_sort_by_rating">Sort by rating</string>
-    <string name="format_runtime"><xliff:g id="runtime">%1d</xliff:g> min</string>
-    <string name="format_avg_vote">Rating: <xliff:g id="avg_vote">%.1f</xliff:g>/10</string>
+    <string name="format_popularity">Popularity: <xliff:g id="popularity">%.2f</xliff:g></string>
+    <string name="format_avg_vote">Rating: <xliff:g id="avg_vote">%.1f</xliff:g> - <xliff:g id="avg_vote">%d</xliff:g> votes</string>
 </resources>

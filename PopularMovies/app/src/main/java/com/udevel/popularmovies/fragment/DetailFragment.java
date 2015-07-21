@@ -19,17 +19,13 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udevel.popularmovies.R;
+import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
-import com.udevel.popularmovies.data.network.NetworkApi;
-import com.udevel.popularmovies.data.network.api.MovieDetailInfo;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
     private static final String TAG = DetailFragment.class.getSimpleName();
@@ -45,7 +41,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private TextView tv_release_year;
     private TextView tv_release_month_date;
     private TextView tv_rating;
-    private TextView tv_runtime;
+    private TextView tv_popularity;
     private Toolbar tb_movie_detail;
     private AppBarLayout abl_movie_detail;
     private LinearLayout ll_collapse;
@@ -87,29 +83,16 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         // Inflate the layout for this fragment
         if (root == null) {
             root = setupViews(inflater, container);
-            NetworkApi.getMovieById(movieId, new retrofit.Callback<MovieDetailInfo>() {
-                @Override
-                public void success(final MovieDetailInfo movieDetailInfo, Response response) {
-                    if (isDetached()) {
-                        return;
-                    }
-                    Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieDetailInfo.getPosterPath()).build();
-                    Picasso.with(getActivity())
-                            .load(uri)
-                            .into(iv_poster);
-                    setMovieInfoUI(movieDetailInfo);
-
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    if (isDetached()) {
-                        return;
-                    }
-
-                    Toast.makeText(getActivity(), "Error on getting data from Internet.", Toast.LENGTH_LONG).show();
-                }
-            });
+            Movie movieById = DataManager.getMovieById(getActivity(), movieId);
+            if (movieById != null) {
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieById.getPosterPath()).build();
+                Picasso.with(getActivity())
+                        .load(uri)
+                        .into(iv_poster);
+                setMovieInfoUI(movieById);
+            } else {
+                Toast.makeText(getActivity(), "Error on getting data from Internet.", Toast.LENGTH_LONG).show();
+            }
         }
         return root;
     }
@@ -150,26 +133,25 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         ll_collapse.setVisibility(expandPercentage <= -0.9f ? View.VISIBLE : View.GONE);
     }
 
-
-    private void setMovieInfoUI(MovieDetailInfo movieDetailInfo) {
-        tv_title.setText(movieDetailInfo.getOriginalTitle());
-        tv_title_collapse.setText(movieDetailInfo.getOriginalTitle());
-        tv_overview.setText(movieDetailInfo.getOverview());
+    private void setMovieInfoUI(Movie movie) {
+        tv_title.setText(movie.getOriginalTitle());
+        tv_title_collapse.setText(movie.getOriginalTitle());
+        tv_overview.setText(movie.getOverview());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Calendar cal = Calendar.getInstance();
-            cal.setTime(format.parse(movieDetailInfo.getReleaseDate()));
+            cal.setTime(format.parse(movie.getReleaseDate()));
             tv_release_year.setText(String.valueOf(cal.get(Calendar.YEAR)));
             tv_release_month_date.setText(" " + cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) +
                     " " + cal.get(Calendar.DATE));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tv_rating.setText(getString(R.string.format_avg_vote, movieDetailInfo.getVoteAverage()));
-        tv_runtime.setText(getString(R.string.format_runtime, movieDetailInfo.getRuntime()));
+        tv_rating.setText(getString(R.string.format_avg_vote, movie.getVoteAverage(), movie.getVoteCount()));
+        tv_popularity.setText(getString(R.string.format_popularity, movie.getPopularity()));
         tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
                 " " + tv_release_month_date.getText() +
-                " - " + tv_runtime.getText() +
+                " - " + tv_popularity.getText() +
                 " - " + tv_rating.getText());
     }
 
@@ -180,13 +162,13 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_overview = ((TextView) root.findViewById(R.id.tv_overview));
         tv_release_year = ((TextView) root.findViewById(R.id.tv_release_year));
         tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
-        tv_runtime = ((TextView) root.findViewById(R.id.tv_runtime));
+        tv_popularity = ((TextView) root.findViewById(R.id.tv_popularity));
         tv_rating = ((TextView) root.findViewById(R.id.tv_rating));
         abl_movie_detail = ((AppBarLayout) root.findViewById(R.id.abl_movie_detail));
         tb_movie_detail = ((Toolbar) root.findViewById(R.id.tb_movie_detail));
         ll_collapse = ((LinearLayout) root.findViewById(R.id.ll_collapse));
         tv_title_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_title_collapse));
-        tv_release_runtime_rating_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_release_runtime_rating_collapse));
+        tv_release_runtime_rating_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_release_popularity_rating_collapse));
 
         abl_movie_detail.addOnOffsetChangedListener(this);
         setupToolbar(tb_movie_detail);
@@ -218,7 +200,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_title.setAlpha(alpha);
         tv_release_year.setAlpha(alpha);
         tv_release_month_date.setAlpha(alpha);
-        tv_runtime.setAlpha(alpha);
+        tv_popularity.setAlpha(alpha);
         tv_rating.setAlpha(alpha);
     }
 

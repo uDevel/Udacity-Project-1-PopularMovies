@@ -17,6 +17,10 @@ public class Movie {
     private String originalTitle;
     private double voteAverage;
     private String posterPath;
+    private String overview;
+    private String releaseDate;
+    private double popularity;
+    private int voteCount;
 
     public static List<Movie> convertDiscoverMovieInfoResults(List<DiscoverMovieResult.Result> discoverMovieInfoResults) {
         List<Movie> movies = new ArrayList<>(((Double) Math.ceil(discoverMovieInfoResults.size() * 1.5)).intValue());
@@ -39,6 +43,10 @@ public class Movie {
         movie.setOriginalTitle(sourceMovieInfo.getOriginalTitle());
         movie.setPosterPath(sourceMovieInfo.getPosterPath());
         movie.setVoteAverage(sourceMovieInfo.getVoteAverage());
+        movie.setOverview(sourceMovieInfo.getOverview());
+        movie.setReleaseDate(sourceMovieInfo.getReleaseDate());
+        movie.setPopularity(sourceMovieInfo.getPopularity());
+        movie.setVoteCount(sourceMovieInfo.getVoteCount());
         return movie;
     }
 
@@ -74,4 +82,35 @@ public class Movie {
         this.posterPath = posterPath;
     }
 
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(double popularity) {
+        this.popularity = popularity;
+    }
+
+    public int getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
+    }
 }
