@@ -14,32 +14,6 @@ import java.util.List;
  * Created by benny on 5/16/2015.
  */
 public class DataManager {
-/*    public static boolean saveGames(Context context, List<Game> games) {
-        Gson gson = new Gson();
-        String jsonStr = gson.toJson(games);
-        return AppPreferences.saveGamesJsonStr(context, jsonStr);
-    }
-
-    public static boolean saveGame(Context context, Game game) {
-        List<Game> games = getGames(context);
-        if (games == null) {
-            games = new ArrayList<>();
-        }
-
-        // Replace with early exit
-        for (int i = 0; i < games.size(); i++) {
-            Game tempGame = games.get(i);
-            if (tempGame.getId().equals(game.getId())) {
-                games.set(i, game);
-                return saveGames(context, games);
-            }
-        }
-
-        // Add
-        games.add(game);
-        return saveGames(context, games);
-    }*/
-
     public static List<Movie> getMovies(Context context) {
         List<Movie> Movies = null;
         String MoviesJsonStr = AppPreferences.getMoviesJsonStr(context);
@@ -68,9 +42,7 @@ public class DataManager {
     public static List<Movie> saveMovies(Context context, List<Movie> movies, int page) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(movies);
-        boolean b = AppPreferences.saveMoviesJsonStr(context, jsonStr);
-        boolean b1 = AppPreferences.saveMoviePage(context, page);
-        return b && b1 ? movies : null;
+        return AppPreferences.saveMoviesJsonStr(context, jsonStr) && AppPreferences.saveMoviePage(context, page) ? movies : null;
     }
 
     public static List<Movie> addMovies(Context context, List<Movie> movies, int page) {
@@ -92,16 +64,7 @@ public class DataManager {
                     movies.remove(i);
                 }
             }
-          /*  for (Movie movie : movies) {
-                Integer index = existingMovieIdIndex.get(movie.getId());
 
-                // Already exist, remove old one.
-                if (index != null) {
-                    Log.d("DataManager", movie.getOriginalTitle());
-                  *//*  existingMovieIdIndex.remove(movie.getId());
-                    origMovies.remove(index.intValue());*//*
-                }
-            }*/
             origMovies.addAll(movies);
         }
 

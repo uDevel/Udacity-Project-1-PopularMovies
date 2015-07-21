@@ -2,7 +2,9 @@
 <resources>
     <color name="primary">#ffc40139</color>
     <color name="primary_dark">#ffa31d34</color>
-    <color name="bg_title">#a74d0009</color>
+    <color name="accent">#2979FF</color>
     <color name="text_color_title">#ffffffff</color>
+    <color name="refresh_progress_1">@color/primary</color>
+    <color name="refresh_progress_2">@color/accent</color>
     <color name="white">#ffffffff</color>
 </resources>

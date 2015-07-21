@@ -1,10 +1,15 @@
 package com.udevel.popularmovies.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -42,7 +47,7 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ListFragment extends Fragment implements OnMovieAdapterItemClickListener {
+public class ListFragment extends Fragment implements OnMovieAdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final String BUNDLE_KEY_IS_SORT_BY_POPULARITY = "BUNDLE_KEY_IS_SORT_BY_POPULARITY";
     private static final int NUM_LAST_ITEM_BEFORE_LOADING = 10;
@@ -50,18 +55,33 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
     private static final int NUM_COLUMNS_IN_PORTRAIT = 3;
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);
-    private OnFragmentInteractionListener onFragmentInteractionListener;
     private boolean isSortByPopularity = true;
+    private OnFragmentInteractionListener onFragmentInteractionListener;
     private MovieAdapter movieAdapter;
     private Toolbar tb_popular_movies;
     private RecyclerView rv_popular_movies;
     private View root;
+    private SwipeRefreshLayout srl_popular_movies;
+    private SaveMovieDataTask saveMovieDataTask;
+    private FloatingActionButton fab_go_to_top;
+    private AppBarLayout abl_popular_movies;
 
     public ListFragment() {
     }
 
     public static ListFragment newInstance() {
         return new ListFragment();
+    }
+
+    private static List<Movie> updateData(Context context, DiscoverMovieResult discoverMovieResult, int currentPage) {
+
+        long l = System.currentTimeMillis();
+        List<Movie> movies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
+        if (currentPage == 1) {
+            return DataManager.saveMovies(context, movies, 1);
+        } else {
+            return DataManager.addMovies(context, movies, currentPage);
+        }
     }
 
     @Override
@@ -103,6 +123,15 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (saveMovieDataTask != null) {
+            saveMovieDataTask.cancel(false);
+        }
+        loadingFromNetwork.set(false);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         onFragmentInteractionListener = null;
@@ -115,65 +144,9 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         }
     }
 
-    private void getMovieListFromNetwork(boolean isRefresh) {
-        if (loadingFromNetwork.compareAndSet(false, true)) {
-            Log.d(TAG, "getMovieListFromNetwork");
-            final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
-
-            // This is to avoid over limit of String characters
-            if (currentPage > MAX_PAGE_CACHE) {
-                return;
-            }
-
-            if (isSortByPopularity) {
-                NetworkApi.getMoviesByPopularity(currentPage, new Callback<DiscoverMovieResult>() {
-                    @Override
-                    public void success(DiscoverMovieResult discoverMovieResult, Response response) {
-                        if (response.getStatus() == 200 && discoverMovieResult != null) {
-                            List<Movie> movies = updateData(discoverMovieResult, currentPage);
-                            updateRecyclerView(movies);
-                        } else {
-                            if (getActivity() != null) {
-                                Toast.makeText(getActivity(), "Unable to get movie list -" + response.getReason(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        loadingFromNetwork.set(false);
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        loadingFromNetwork.set(false);
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), "Unable to get movie list -" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            } else {
-                NetworkApi.getMoviesByRating(currentPage, new Callback<DiscoverMovieResult>() {
-                    @Override
-                    public void success(DiscoverMovieResult discoverMovieResult, Response response) {
-                        if (response.getStatus() == 200 && discoverMovieResult != null) {
-                            List<Movie> movies = updateData(discoverMovieResult, currentPage);
-                            updateRecyclerView(movies);
-                        } else {
-                            if (getActivity() != null) {
-                                Toast.makeText(getActivity(), "Unable to get movie list -" + response.getReason(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        loadingFromNetwork.set(false);
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        loadingFromNetwork.set(false);
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), "Unable to get movie list -" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        }
-
+    @Override
+    public void onRefresh() {
+        getMovieListFromNetwork(true);
     }
 
     private void setupRecyclerView() {
@@ -187,42 +160,46 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 GridLayoutManager gridLayoutManager = ((GridLayoutManager) recyclerView.getLayoutManager());
                 if (gridLayoutManager.getItemCount() > 0 && gridLayoutManager.findLastVisibleItemPosition() >= gridLayoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
-                    Log.d(TAG, "onScrolled getMovie");
                     getMovieListFromNetwork(false);
                 }
+
+                int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
+                if (firstVisibleItemPosition > 20) {
+                    if (dy < 0) {
+                        fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy / 2)));
+                    } else {
+                        fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy / 2)));
+                    }
+                } else if (firstVisibleItemPosition < 17) {
+                    fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
+                }
+                fab_go_to_top.setVisibility(View.VISIBLE);
+
             }
         });
-
-    }
-
-    private List<Movie> updateData(DiscoverMovieResult discoverMovieResult, int currentPage) {
-        if (getActivity() == null) {
-            return null;
-        }
-        List<Movie> movies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
-        if (currentPage == 1) {
-            return DataManager.saveMovies(getActivity(), movies, 1);
-        } else {
-            return DataManager.addMovies(getActivity(), movies, currentPage);
-        }
-    }
-
-    private void updateRecyclerView(List<Movie> movies) {
-        if (movieAdapter == null) {
-            movieAdapter = new MovieAdapter(movies);
-            rv_popular_movies.swapAdapter(movieAdapter, true);
-
-        } else {
-            movieAdapter.updateMovies(movies);
-        }
-        movieAdapter.setOnMovieAdapterItemClickListener(this);
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
-        View root = inflater.inflate(R.layout.fragment_main, container, false);
+        View root = inflater.inflate(R.layout.fragment_list, container, false);
         rv_popular_movies = ((RecyclerView) root.findViewById(R.id.rv_popular_movies));
         tb_popular_movies = ((Toolbar) root.findViewById(R.id.tb_popular_movies));
+        abl_popular_movies = ((AppBarLayout) root.findViewById(R.id.abl_popular_movies));
+        srl_popular_movies = ((SwipeRefreshLayout) root.findViewById(R.id.srl_popular_movies));
+        fab_go_to_top = ((FloatingActionButton) root.findViewById(R.id.fab_go_to_top));
 
+        fab_go_to_top.setVisibility(View.GONE);
+        fab_go_to_top.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (rv_popular_movies != null) {
+                    rv_popular_movies.smoothScrollToPosition(0);
+                }
+            }
+        });
+        srl_popular_movies.setColorSchemeResources(
+                R.color.refresh_progress_1,
+                R.color.refresh_progress_2);
+        srl_popular_movies.setOnRefreshListener(this);
         setupToolbar(tb_popular_movies);
         return root;
     }
@@ -272,6 +249,121 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
             }
         });
+    }
+
+    private void getMovieListFromNetwork(boolean isRefresh) {
+        if (loadingFromNetwork.compareAndSet(false, true)) {
+            Log.d(TAG, "getMovieListFromNetwork");
+            final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
+
+            // This is to avoid over limit of String characters
+            if (currentPage > MAX_PAGE_CACHE) {
+                return;
+            }
+
+            if (isSortByPopularity) {
+                NetworkApi.getMoviesByPopularity(currentPage, new Callback<DiscoverMovieResult>() {
+                    @Override
+                    public void success(DiscoverMovieResult discoverMovieResult, Response response) {
+                        processNetworkSuccessResult(discoverMovieResult, response, currentPage);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        processNetworkFailureResult(error);
+                    }
+                });
+            } else {
+                NetworkApi.getMoviesByRating(currentPage, new Callback<DiscoverMovieResult>() {
+                    @Override
+                    public void success(DiscoverMovieResult discoverMovieResult, Response response) {
+                        processNetworkSuccessResult(discoverMovieResult, response, currentPage);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        processNetworkFailureResult(error);
+                    }
+                });
+            }
+        } else {
+            srl_popular_movies.setRefreshing(false);
+        }
+
+    }
+
+    private void processNetworkFailureResult(RetrofitError error) {
+        loadingFromNetwork.set(false);
+        srl_popular_movies.setRefreshing(false);
+
+        if (getActivity() != null) {
+            Toast.makeText(getActivity(), "Unable to get movie list -" + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void processNetworkSuccessResult(DiscoverMovieResult discoverMovieResult, Response response, int currentPage) {
+        if (!isAdded() || getActivity() == null) {
+            return;
+        }
+
+        if (response.getStatus() == 200 && discoverMovieResult != null) {
+            saveMovieDataTask = new SaveMovieDataTask(getActivity(), currentPage);
+            saveMovieDataTask.execute(discoverMovieResult);
+    /*        List<Movie> movies = updateData(discoverMovieResult, currentPage);
+            updateRecyclerView(movies);*/
+        } else {
+            loadingFromNetwork.set(false);
+            srl_popular_movies.setRefreshing(false);
+            Toast.makeText(getActivity(), "Unable to get movie list -" + response.getReason(), Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    private void updateRecyclerView(List<Movie> movies) {
+        if (movieAdapter == null) {
+            movieAdapter = new MovieAdapter(movies);
+            rv_popular_movies.swapAdapter(movieAdapter, true);
+
+        } else {
+            movieAdapter.updateMovies(movies);
+        }
+        movieAdapter.setOnMovieAdapterItemClickListener(this);
+    }
+
+    private class SaveMovieDataTask extends AsyncTask<DiscoverMovieResult, Void, List<Movie>> {
+
+        private final Context context;
+        private final int currentPage;
+
+        public SaveMovieDataTask(Context context, int currentPage) {
+            this.context = context.getApplicationContext();
+            this.currentPage = currentPage;
+        }
+
+        protected List<Movie> doInBackground(DiscoverMovieResult... results) {
+            if (results.length == 1) {
+                return updateData(context, results[0], currentPage);
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(List<Movie> movies) {
+            if (!isAdded()) {
+                return;
+            }
+
+            if (movies == null) {
+                Toast.makeText(context, "Unable to save data to local storage.", Toast.LENGTH_SHORT).show();
+            } else {
+                updateRecyclerView(movies);
+            }
+
+            loadingFromNetwork.set(false);
+            srl_popular_movies.setRefreshing(false);
+            saveMovieDataTask = null;
+        }
     }
 
 }

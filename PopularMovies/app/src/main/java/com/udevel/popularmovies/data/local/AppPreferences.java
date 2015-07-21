@@ -22,12 +22,7 @@ public class AppPreferences {
     }
 
     public static boolean saveMoviesJsonStr(Context context, String savingStr) {
-    /*    String originalStr = getMoviesJsonStr(context);
-        if (originalStr == null) {*/
-            return getEditor(context).putString(KEY_MOVIES_JSON_STR, savingStr).commit();
-       /* } else {
-            return false;
-        }*/
+        return getEditor(context).putString(KEY_MOVIES_JSON_STR, savingStr).commit();
     }
 
     public static String getMoviesJsonStr(Context context) {

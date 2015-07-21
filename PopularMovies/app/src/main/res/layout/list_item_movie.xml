@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:minHeight="200dp"
             android:scaleType="centerCrop"
-            tools:src="@drawable/bg_placeholder"/>
+            tools:src="@drawable/abc_btn_check_material"/>
     </android.support.v7.widget.CardView>
 </LinearLayout>
