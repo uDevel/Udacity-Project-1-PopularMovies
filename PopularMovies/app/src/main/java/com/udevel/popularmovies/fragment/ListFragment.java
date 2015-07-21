@@ -20,6 +20,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -159,22 +160,22 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 GridLayoutManager gridLayoutManager = ((GridLayoutManager) recyclerView.getLayoutManager());
-                if (gridLayoutManager.getItemCount() > 0 && gridLayoutManager.findLastVisibleItemPosition() >= gridLayoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
-                    getMovieListFromNetwork(false);
-                }
-
-                int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
-                if (firstVisibleItemPosition > 20) {
-                    if (dy < 0) {
-                        fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy / 2)));
-                    } else {
-                        fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy / 2)));
+                if (gridLayoutManager.getItemCount() > 0) {
+                    if (gridLayoutManager.findLastVisibleItemPosition() >= gridLayoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
+                        getMovieListFromNetwork(false);
                     }
-                } else if (firstVisibleItemPosition < 17) {
-                    fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
-                }
-                fab_go_to_top.setVisibility(View.VISIBLE);
 
+                    int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
+                    if (gridLayoutManager.findFirstVisibleItemPosition() > 20) {
+                        if (dy < 0) {
+                            fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy / 2)));
+                        } else {
+                            fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy / 2)));
+                        }
+                    } else if (firstVisibleItemPosition < 17) {
+                        fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
+                    }
+                }
             }
         });
     }
@@ -187,7 +188,20 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         srl_popular_movies = ((SwipeRefreshLayout) root.findViewById(R.id.srl_popular_movies));
         fab_go_to_top = ((FloatingActionButton) root.findViewById(R.id.fab_go_to_top));
 
-        fab_go_to_top.setVisibility(View.GONE);
+        setupFab();
+        setupSwipeRefreshLayout();
+        setupToolbar();
+        return root;
+    }
+
+    private void setupFab() {
+        fab_go_to_top.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                fab_go_to_top.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
+            }
+        });
         fab_go_to_top.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,15 +210,16 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                 }
             }
         });
+    }
+
+    private void setupSwipeRefreshLayout() {
         srl_popular_movies.setColorSchemeResources(
                 R.color.refresh_progress_1,
                 R.color.refresh_progress_2);
         srl_popular_movies.setOnRefreshListener(this);
-        setupToolbar(tb_popular_movies);
-        return root;
     }
 
-    private void setupToolbar(Toolbar tb_popular_movies) {
+    private void setupToolbar() {
         FragmentActivity activity = getActivity();
         if (activity != null && activity instanceof AppCompatActivity) {
             ((AppCompatActivity) activity).setSupportActionBar(tb_popular_movies);
