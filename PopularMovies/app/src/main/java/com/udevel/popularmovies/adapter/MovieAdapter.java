@@ -1,6 +1,7 @@
 package com.udevel.popularmovies.adapter;
 
 import android.net.Uri;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,11 +25,13 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final int VIEW_TYPE_MOVIE = 0;
     public static final int VIEW_TYPE_FOOTER = 1;
     private static final String TAG = MovieAdapter.class.getSimpleName();
+    private final Fragment fragment;
     private List<Movie> movieList;
     private OnMovieAdapterItemClickListener onMovieAdapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieAdapter(List<Movie> movieList) {
+    public MovieAdapter(List<Movie> movieList, Fragment fragment) {
+        this.fragment = fragment;
         setHasStableIds(true);
         updateMovies(movieList);
     }
@@ -60,7 +63,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 MovieViewHolder movieViewHolder = (MovieViewHolder) holder;
                 Movie movieInfo = movieList.get(position);
                 Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
-                Glide.with(movieViewHolder.iv_poster.getContext())
+                Glide.with(fragment)//((MovieViewHolder) holder).iv_poster.getContext())
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()

@@ -51,7 +51,6 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                     @Override
                     public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
                         pw_main.stopSpinning();
-
                         return false;
                     }
 

@@ -60,12 +60,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);
     private boolean isSortByPopularity = true;
     private OnFragmentInteractionListener onFragmentInteractionListener;
+    private SaveMovieDataTask saveMovieDataTask;
     private MovieAdapter movieAdapter;
     private Toolbar tb_popular_movies;
     private RecyclerView rv_popular_movies;
     private View root;
     private SwipeRefreshLayout srl_popular_movies;
-    private SaveMovieDataTask saveMovieDataTask;
     private FloatingActionButton fab_go_to_top;
     private TextView tv_empty_view_error;
 
@@ -112,7 +112,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     updateRecyclerView(movies);
                 }
             } else {
-                getMovieListFromNetwork(true);
+                List<Movie> movies = DataManager.getMovies(getActivity());
+                if (movies == null || movies.isEmpty()) {
+                    getMovieListFromNetwork(true);
+                } else {
+                    updateRecyclerView(movies);
+                }
             }
         }
         setupRecyclerView();
@@ -132,6 +137,19 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             saveMovieDataTask.cancel(false);
         }
         loadingFromNetwork.set(false);
+        srl_popular_movies.setRefreshing(false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        root = null;
+        tb_popular_movies = null;
+        rv_popular_movies = null;
+        srl_popular_movies = null;
+        fab_go_to_top = null;
+        tv_empty_view_error = null;
+        movieAdapter = null;
+        super.onDestroyView();
     }
 
     @Override
@@ -360,7 +378,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     private void updateRecyclerView(List<Movie> movies) {
         if (movieAdapter == null) {
-            movieAdapter = new MovieAdapter(movies);
+            movieAdapter = new MovieAdapter(movies, this);
             rv_popular_movies.swapAdapter(movieAdapter, true);
 
         } else {
