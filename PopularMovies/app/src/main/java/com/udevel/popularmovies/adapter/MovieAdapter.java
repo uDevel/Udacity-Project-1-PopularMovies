@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.pnikosis.materialishprogress.ProgressWheel;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.listener.OnMovieAdapterItemClickListener;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -18,7 +20,9 @@ import java.util.List;
 /**
  * Created by benny on 7/12/2015.
  */
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final int VIEW_TYPE_MOVIE = 0;
+    public static final int VIEW_TYPE_FOOTER = 1;
     private static final String TAG = MovieAdapter.class.getSimpleName();
     private List<Movie> movieList;
     private OnMovieAdapterItemClickListener onMovieAdapterItemClickListener;
@@ -31,36 +35,71 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MovieAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return ViewHolder.inflate(parent, new ViewHolder.ViewHolderClickListener() {
-            @Override
-            public void onClick(View v, int adapterPosition) {
-                if (onMovieAdapterItemClickListener != null) {
-                    onMovieAdapterItemClickListener.onMovieAdapterItemClick(v, getOriginalItemId(adapterPosition));
-                }
-            }
-        });
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case VIEW_TYPE_MOVIE:
+                return MovieViewHolder.inflate(parent, new MovieViewHolder.ViewHolderClickListener() {
+                    @Override
+                    public void onClick(View v, int adapterPosition) {
+                        if (onMovieAdapterItemClickListener != null) {
+                            onMovieAdapterItemClickListener.onMovieAdapterItemClick(v, getOriginalItemId(adapterPosition));
+                        }
+                    }
+                });
+            case VIEW_TYPE_FOOTER:
+                return FooterViewHolder.inflate(parent);
+            default:
+                return null;
+        }
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Movie movieInfo = movieList.get(position);
-        Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
-                Picasso.with(holder.iv_poster.getContext())
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (getItemViewType(position)) {
+            case VIEW_TYPE_MOVIE:
+                MovieViewHolder movieViewHolder = (MovieViewHolder) holder;
+                Movie movieInfo = movieList.get(position);
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
+                Glide.with(movieViewHolder.iv_poster.getContext())
                         .load(uri)
-                        .into(holder.iv_poster);
+                        .error(R.drawable.ic_image_error)
+                        .centerCrop()
+                        .animate(R.anim.fade_in_rise)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(movieViewHolder.iv_poster);
+                break;
+            case VIEW_TYPE_FOOTER:
+                ProgressWheel pw_main = ((FooterViewHolder) holder).pw_main;
+                pw_main.spin();
+                break;
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == movieList.size()) {
+            return VIEW_TYPE_FOOTER;
+        } else {
+            return VIEW_TYPE_MOVIE;
+        }
     }
 
     @Override
     public long getItemId(int position) {
-        return movieList.get(position).getId();
+        switch (getItemViewType(position)) {
+            case VIEW_TYPE_MOVIE:
+                return movieList.get(position).getId();
+            case VIEW_TYPE_FOOTER:
+                return 1L;
+            default:
+                return 0L;
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return movieList.size();
+        return movieList.size() == 0 ? 0 : movieList.size() + 1;
     }
 
     public void setOnMovieAdapterItemClickListener(OnMovieAdapterItemClickListener onMovieAdapterItemClickListener) {
@@ -88,20 +127,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView iv_poster;
         private final ViewHolderClickListener viewHolderClickListener;
         // each data item is just a string in this case
 
-        public ViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
+        public MovieViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
             super(v);
             this.viewHolderClickListener = viewHolderClickListener;
             iv_poster = ((ImageView) v.findViewById(R.id.iv_poster));
             iv_poster.setOnClickListener(this);
         }
 
-        static ViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie, parent, false), viewHolderClickListener);
+        static MovieViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {
+            return new MovieViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie, parent, false), viewHolderClickListener);
         }
 
         @Override
@@ -111,6 +150,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         interface ViewHolderClickListener {
             void onClick(View v, int adapterPosition);
+        }
+    }
+
+    public static class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        private final ProgressWheel pw_main;
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+            pw_main = ((ProgressWheel) itemView.findViewById(R.id.pw_main));
+        }
+
+        static FooterViewHolder inflate(ViewGroup parent) {
+            return new FooterViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_footer, parent, false));
         }
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="wrap_content"
+              android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:padding="1px">
     <!-- A CardView that contains a TextView -->
@@ -11,13 +11,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
 
-        <ImageView
+        <com.udevel.popularmovies.view.PosterImageView
             android:id="@+id/iv_poster"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:minHeight="200dp"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/abc_btn_check_material"/>
+            android:scaleType="center"
+            tools:src="@drawable/ic_image_place_holder"/>
     </android.support.v7.widget.CardView>
 </LinearLayout>

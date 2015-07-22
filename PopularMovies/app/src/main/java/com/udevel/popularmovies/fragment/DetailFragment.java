@@ -17,7 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -86,8 +87,11 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             Movie movieById = DataManager.getMovieById(getActivity(), movieId);
             if (movieById != null) {
                 Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieById.getPosterPath()).build();
-                Picasso.with(getActivity())
+                Glide.with(iv_poster.getContext())
                         .load(uri)
+                        .error(R.drawable.ic_image_error)
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(iv_poster);
                 setMovieInfoUI(movieById);
             } else {

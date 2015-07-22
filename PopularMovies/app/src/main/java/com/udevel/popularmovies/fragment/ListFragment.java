@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -49,10 +48,11 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class ListFragment extends Fragment implements OnMovieAdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
-    public static final int LIST_POSITION_TO_MOVE_FAB = 20;
-    public static final int LIST_POSITION_TO_HIDE_FAB = 17;
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final String BUNDLE_KEY_IS_SORT_BY_POPULARITY = "BUNDLE_KEY_IS_SORT_BY_POPULARITY";
+    private static final int LIST_POSITION_TO_MOVE_FAB = 20;
+    private static final int LIST_POSITION_TO_HIDE_FAB = 17;
+    private static final int LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP = 80;
     private static final int NUM_LAST_ITEM_BEFORE_LOADING = 10;
     private static final int MAX_PAGE_CACHE = 500;
     private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
@@ -67,7 +67,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private SwipeRefreshLayout srl_popular_movies;
     private SaveMovieDataTask saveMovieDataTask;
     private FloatingActionButton fab_go_to_top;
-    private AppBarLayout abl_popular_movies;
+    private TextView tv_empty_view_error;
 
     public ListFragment() {
     }
@@ -154,30 +154,47 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     private void setupRecyclerView() {
         int currentOrientation = getResources().getConfiguration().orientation;
-        int spanCount = currentOrientation == Configuration.ORIENTATION_LANDSCAPE ? NUM_COLUMNS_IN_LANDSCAPE : NUM_COLUMNS_IN_PORTRAIT;
+        final int spanCount = currentOrientation == Configuration.ORIENTATION_LANDSCAPE ? NUM_COLUMNS_IN_LANDSCAPE : NUM_COLUMNS_IN_PORTRAIT;
 
-        rv_popular_movies.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
+        rv_popular_movies.setLayoutManager(layoutManager);
         rv_popular_movies.clearOnScrollListeners();
         rv_popular_movies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                GridLayoutManager gridLayoutManager = ((GridLayoutManager) recyclerView.getLayoutManager());
-                if (gridLayoutManager.getItemCount() > 0) {
-                    if (gridLayoutManager.findLastVisibleItemPosition() >= gridLayoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
+                if (layoutManager.getItemCount() > 0) {
+                    if (layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
                         getMovieListFromNetwork(false);
                     }
 
-                    int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
-                    if (gridLayoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                    if (layoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
                         if (dy < 0) {
-                            fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy / 2)));
+                            fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy)));
                         } else {
-                            fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy / 2)));
+                            fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy)));
                         }
                     } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
                         fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
                     }
                 }
+            }
+        });
+
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (movieAdapter != null) {
+                    switch (movieAdapter.getItemViewType(position)) {
+                        case MovieAdapter.VIEW_TYPE_MOVIE:
+                            return 1;
+                        case MovieAdapter.VIEW_TYPE_FOOTER:
+                            return spanCount;
+                        default:
+                            return -1;
+                    }
+                }
+                return 1;
             }
         });
     }
@@ -186,7 +203,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         View root = inflater.inflate(R.layout.fragment_list, container, false);
         rv_popular_movies = ((RecyclerView) root.findViewById(R.id.rv_popular_movies));
         tb_popular_movies = ((Toolbar) root.findViewById(R.id.tb_popular_movies));
-        abl_popular_movies = ((AppBarLayout) root.findViewById(R.id.abl_popular_movies));
+        tv_empty_view_error = ((TextView) root.findViewById(R.id.tv_empty_view_error));
         srl_popular_movies = ((SwipeRefreshLayout) root.findViewById(R.id.srl_popular_movies));
         fab_go_to_top = ((FloatingActionButton) root.findViewById(R.id.fab_go_to_top));
 
@@ -208,7 +225,9 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             @Override
             public void onClick(View v) {
                 if (rv_popular_movies != null) {
-                    rv_popular_movies.scrollToPosition(LIST_POSITION_TO_HIDE_FAB);
+                    if (((GridLayoutManager) rv_popular_movies.getLayoutManager()).findFirstCompletelyVisibleItemPosition() > LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP) {
+                        rv_popular_movies.scrollToPosition(LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP);
+                    }
                     rv_popular_movies.smoothScrollToPosition(0);
                 }
             }
@@ -315,7 +334,9 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         srl_popular_movies.setRefreshing(false);
 
         if (getActivity() != null) {
-            Toast.makeText(getActivity(), "Unable to get movie list -" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, error.getMessage());
+            Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
+            tv_empty_view_error.setVisibility(View.VISIBLE);
         }
     }
 
@@ -330,8 +351,9 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         } else {
             loadingFromNetwork.set(false);
             srl_popular_movies.setRefreshing(false);
-            Toast.makeText(getActivity(), "Unable to get movie list -" + response.getReason(), Toast.LENGTH_SHORT).show();
-
+            Log.e(TAG, response.getReason());
+            Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+            tv_empty_view_error.setVisibility(View.VISIBLE);
         }
 
     }
@@ -379,6 +401,14 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             loadingFromNetwork.set(false);
             srl_popular_movies.setRefreshing(false);
             saveMovieDataTask = null;
+            tv_empty_view_error.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            loadingFromNetwork.set(false);
+            srl_popular_movies.setRefreshing(false);
         }
     }
 

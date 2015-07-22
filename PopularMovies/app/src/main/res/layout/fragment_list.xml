@@ -3,6 +3,14 @@
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/tv_empty_view_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/msg_error_data_connection_error"
+        android:visibility="invisible"/>
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/abl_popular_movies"
         android:layout_width="match_parent"
@@ -28,7 +36,7 @@
             android:id="@+id/rv_popular_movies"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbarStyle="insideOverlay"
+            android:clipChildren="false"
             android:scrollbars="vertical"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
