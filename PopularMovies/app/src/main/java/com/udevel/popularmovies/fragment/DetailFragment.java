@@ -87,7 +87,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             Movie movieById = DataManager.getMovieById(getActivity(), movieId);
             if (movieById != null) {
                 Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieById.getPosterPath()).build();
-                Glide.with(iv_poster.getContext())
+                Glide.with(this)
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
@@ -174,6 +174,15 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_title_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_title_collapse));
         tv_release_runtime_rating_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_release_popularity_rating_collapse));
 
+        iv_poster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Movie movieById = DataManager.getMovieById(getActivity(), movieId);
+                if (movieById != null && onFragmentInteractionListener != null) {
+                    onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER, movieById.getPosterPath());
+                }
+            }
+        });
         abl_movie_detail.addOnOffsetChangedListener(this);
         setupToolbar(tb_movie_detail);
         return root;

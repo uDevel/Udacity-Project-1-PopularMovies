@@ -12,6 +12,7 @@ public class Movie {
     public static final String BASE_URL_FOR_IMAGE = DiscoverMovieResult.BASE_URL_FOR_IMAGE;
     public static final String DETAIL_IMAGE_WIDTH = "w342";
     public static final String THUMBNAIL_IMAGE_WIDTH = "w185";
+    public static final String FULLSIZE_IMAGE_WIDTH = "original";
 
     private int id;
     private String originalTitle;

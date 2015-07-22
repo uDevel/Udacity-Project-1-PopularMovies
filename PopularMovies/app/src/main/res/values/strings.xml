@@ -9,4 +9,6 @@
     <string name="format_popularity">Popularity: <xliff:g id="popularity">%.2f</xliff:g></string>
     <string name="format_avg_vote">Rating: <xliff:g id="avg_vote">%.1f</xliff:g> - <xliff:g id="avg_vote">%d</xliff:g> votes</string>
     <string name="msg_error_data_connection_error">Data connection error.\nPlease try again later.</string>
+    <string name="title_activity_poster_fullscreen">PosterFullscreenActivity</string>
+    <string name="hello_world">Hello world!</string>
 </resources>
