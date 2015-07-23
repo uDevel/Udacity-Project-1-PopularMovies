@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -68,6 +69,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private SwipeRefreshLayout srl_popular_movies;
     private FloatingActionButton fab_go_to_top;
     private TextView tv_empty_view_error;
+    private View cl_root;
 
     public ListFragment() {
     }
@@ -103,20 +105,16 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             // Only auto fetch when new.
             if (savedInstanceState != null) {
                 isSortByPopularity = savedInstanceState.getBoolean(BUNDLE_KEY_IS_SORT_BY_POPULARITY);
-                List<Movie> movies = DataManager.getMovies(getActivity());
-                if (movies == null || movies.isEmpty()) {
-                    getMovieListFromNetwork(true);
-                } else {
-                    updateRecyclerView(movies);
-                }
-            } else {
-                List<Movie> movies = DataManager.getMovies(getActivity());
-                if (movies == null || movies.isEmpty()) {
-                    getMovieListFromNetwork(true);
-                } else {
-                    updateRecyclerView(movies);
-                }
             }
+
+            List<Movie> movies = DataManager.getMovies(getActivity());
+            if (movies == null || movies.isEmpty()) {
+                getMovieListFromNetwork(true);
+            } else {
+                updateRecyclerView(movies);
+                checkIfNewerUpdate();
+            }
+
         }
         setupRecyclerView();
         return root;
@@ -154,6 +152,81 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     public void onDetach() {
         super.onDetach();
         onFragmentInteractionListener = null;
+    }
+
+    private void checkIfNewerUpdate() {
+        if (isSortByPopularity) {
+            NetworkApi.getMoviesByPopularity(1, new Callback<DiscoverMovieResult>() {
+                @Override
+                public void success(DiscoverMovieResult discoverMovieResult, Response response) {
+                    if (!isAdded() || getActivity() == null) {
+                        return;
+                    }
+
+                    if (response.getStatus() == 200 && discoverMovieResult != null) {
+                        List<Movie> newFetchedMovies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
+                        List<Movie> existingMovies = DataManager.getMovies(getActivity());
+                        if (newFetchedMovies != null && existingMovies != null) {
+                            if (newFetchedMovies.size() > existingMovies.size()) {
+                                showSnackBar();
+                            } else {
+                                for (int i = 0; i < newFetchedMovies.size(); i++) {
+                                    if (newFetchedMovies.get(i).getId() != existingMovies.get(i).getId()) {
+                                        showSnackBar();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    // Do show error for this silent check.
+                }
+            });
+        } else {
+            NetworkApi.getMoviesByRating(1, new Callback<DiscoverMovieResult>() {
+                @Override
+                public void success(DiscoverMovieResult discoverMovieResult, Response response) {
+                    if (response.getStatus() == 200 && discoverMovieResult != null) {
+                        List<Movie> newFetchedMovies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
+                        List<Movie> existingMovies = DataManager.getMovies(getActivity());
+                        if (newFetchedMovies != null && existingMovies != null) {
+                            if (newFetchedMovies.size() > existingMovies.size()) {
+                                showSnackBar();
+                            } else {
+                                for (int i = 0; i < newFetchedMovies.size(); i++) {
+                                    if (newFetchedMovies.get(i).getId() != existingMovies.get(i).getId()) {
+                                        showSnackBar();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    // Do show error for this silent check.
+                }
+            });
+        }
+    }
+
+    private void showSnackBar() {
+        Snackbar.make(cl_root, R.string.msg_movies_update_available, Snackbar.LENGTH_LONG)
+                .setAction(R.string.action_refresh, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        srl_popular_movies.setRefreshing(true);
+                        onRefresh();
+                    }
+                })
+                .show(); // Don’t forget to show!
     }
 
     @Override
@@ -216,6 +289,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
         View root = inflater.inflate(R.layout.fragment_list, container, false);
+        cl_root = root.findViewById(R.id.cl_root);
         rv_popular_movies = ((RecyclerView) root.findViewById(R.id.rv_popular_movies));
         tb_popular_movies = ((Toolbar) root.findViewById(R.id.tb_popular_movies));
         tv_empty_view_error = ((TextView) root.findViewById(R.id.tv_empty_view_error));
@@ -306,7 +380,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private void getMovieListFromNetwork(boolean isRefresh) {
         if (loadingFromNetwork.compareAndSet(false, true)) {
             final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
-            Log.d(TAG, "getMovieListFromNetwork: " + currentPage);
 
             // This is to avoid over limit of String characters
             if (currentPage > MAX_PAGE_CACHE) {
