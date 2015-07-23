@@ -230,7 +230,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     private void showSnackBar() {
-        Snackbar.make(cl_root, R.string.msg_movies_update_available, Snackbar.LENGTH_LONG)
+        Snackbar.make(cl_root, R.string.msg_movies_update_available, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_refresh, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

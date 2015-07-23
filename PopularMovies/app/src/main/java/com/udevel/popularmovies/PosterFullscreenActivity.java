@@ -55,6 +55,8 @@ public class PosterFullscreenActivity extends AppCompatActivity {
     }
 
     private void loadPoster() {
+        iv_poster.setVisibility(View.INVISIBLE);
+
         pw_main.spin();
         Glide.with(this)
                 .load(posterUri)
@@ -73,19 +75,18 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
                                 int backgroundColor = p.getMutedColor(getResources().getColor(R.color.dark_gray));
-                                fl_root.setBackgroundColor(backgroundColor);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     reveal();
-                                } else {
-                                    iv_poster.setVisibility(View.VISIBLE);
                                 }
+                                fl_root.setBackgroundColor(backgroundColor);
+                                iv_poster.setVisibility(View.VISIBLE);
                             }
                         });
                         return false;
                     }
                 })
                 .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(iv_poster);
     }
 
@@ -94,21 +95,16 @@ public class PosterFullscreenActivity extends AppCompatActivity {
         fl_root = findViewById(R.id.fl_root);
         iv_poster = ((ImageView) findViewById(R.id.iv_poster));
         pw_main = ((ProgressWheel) findViewById(R.id.pw_main));
-
-        iv_poster.setVisibility(View.INVISIBLE);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reveal() {
-        View targetView = this.iv_poster;
+        View targetView = fl_root;
         int cx = (targetView.getLeft() + targetView.getRight()) / 2;
         int cy = (targetView.getTop() + targetView.getBottom()) / 2;
 
         int finalRadius = Math.max(targetView.getWidth(), targetView.getHeight());
-
         Animator anim = ViewAnimationUtils.createCircularReveal(targetView, cx, cy, 0, finalRadius);
-
-        targetView.setVisibility(View.VISIBLE);
         anim.start();
     }
 }
