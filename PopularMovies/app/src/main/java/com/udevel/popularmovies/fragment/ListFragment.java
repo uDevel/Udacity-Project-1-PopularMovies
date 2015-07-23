@@ -154,6 +154,18 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         onFragmentInteractionListener = null;
     }
 
+    @Override
+    public void onMovieAdapterItemClick(View v, int movieId) {
+        if (onFragmentInteractionListener != null) {
+            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, movieId);
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        getMovieListFromNetwork(true);
+    }
+
     private void checkIfNewerUpdate() {
         if (isSortByPopularity) {
             NetworkApi.getMoviesByPopularity(1, new Callback<DiscoverMovieResult>() {
@@ -227,18 +239,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     }
                 })
                 .show(); // Don’t forget to show!
-    }
-
-    @Override
-    public void onMovieAdapterItemClick(View v, int movieId) {
-        if (onFragmentInteractionListener != null) {
-            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, movieId);
-        }
-    }
-
-    @Override
-    public void onRefresh() {
-        getMovieListFromNetwork(true);
     }
 
     private void setupRecyclerView() {
