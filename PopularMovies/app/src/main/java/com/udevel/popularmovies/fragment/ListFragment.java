@@ -1,5 +1,7 @@
 package com.udevel.popularmovies.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -205,7 +207,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                                 }
                             }
                         }
-
                     }
                 }
 
@@ -249,6 +250,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         rv_popular_movies.setLayoutManager(layoutManager);
         rv_popular_movies.clearOnScrollListeners();
         rv_popular_movies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            private boolean isFabAllowedToShow;
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    isFabAllowedToShow = newState == RecyclerView.SCROLL_STATE_SETTLING;
+            }
+
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (layoutManager.getItemCount() > 0) {
@@ -256,15 +263,30 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                         getMovieListFromNetwork(false);
                     }
 
-                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    if (layoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
-                        if (dy < 0) {
-                            fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy)));
-                        } else {
-                            fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy)));
+                    if (isFabAllowedToShow) {
+                        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                        if (layoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
+                            if (dy < 0) {
+                                fab_go_to_top.animate().scaleX(1f).scaleY(1f).setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+                                        fab_go_to_top.setVisibility(View.VISIBLE);
+                                    }
+                                }).start();
+                                // fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy)));
+                            } else {
+                                fab_go_to_top.animate().scaleX(0f).scaleY(0f).setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        fab_go_to_top.setVisibility(View.GONE);
+                                    }
+                                }).start();
+
+                                //fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy)));
+                            }
+                        } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
+                            //  fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
                         }
-                    } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
-                        fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
                     }
                 }
             }
@@ -303,13 +325,17 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     private void setupFab() {
-        fab_go_to_top.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      /*  fab_go_to_top.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 fab_go_to_top.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
             }
-        });
+        });*/
+        fab_go_to_top.setScaleX(0f);
+        fab_go_to_top.setScaleY(0f);
+        fab_go_to_top.setVisibility(View.GONE);
+
         fab_go_to_top.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
