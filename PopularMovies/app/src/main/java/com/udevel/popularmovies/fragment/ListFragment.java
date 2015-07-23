@@ -77,8 +77,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     private static List<Movie> updateData(Context context, DiscoverMovieResult discoverMovieResult, int currentPage) {
-
-        long l = System.currentTimeMillis();
         List<Movie> movies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
         if (currentPage == 1) {
             return DataManager.saveMovies(context, movies, 1);
@@ -275,7 +273,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private void setupSpinner(FragmentActivity activity) {
         View spinnerContainer = LayoutInflater.from(activity).inflate(R.layout.spinner_actionbar, tb_popular_movies, false);
         ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        lp.gravity = Gravity.RIGHT;
+        lp.gravity = Gravity.END;
         tb_popular_movies.addView(spinnerContainer, lp);
         final String[] stringArray = activity.getResources().getStringArray(R.array.spinner_items_array);
         SpinnerAdapter adapter = new SpinnerAdapter(Arrays.asList(stringArray));

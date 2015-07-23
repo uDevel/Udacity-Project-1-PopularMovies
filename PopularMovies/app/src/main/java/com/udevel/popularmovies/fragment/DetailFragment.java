@@ -141,7 +141,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_title.setText(movie.getOriginalTitle());
         tv_title_collapse.setText(movie.getOriginalTitle());
         tv_overview.setText(movie.getOverview());
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         try {
             Calendar cal = Calendar.getInstance();
             cal.setTime(format.parse(movie.getReleaseDate()));

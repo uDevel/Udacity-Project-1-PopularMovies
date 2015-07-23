@@ -6,11 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/v_reveal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <com.pnikosis.materialishprogress.ProgressWheel
         android:id="@+id/pw_main"
         android:layout_width="30dp"
@@ -25,8 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:elevation="10dp"
+        android:contentDescription="@string/cd_cannot_get_movie_poster"
+        android:elevation="8dp"
         android:outlineProvider="bounds"
         android:scaleType="center"
+        tools:ignore="UnusedAttribute"
         tools:src="@drawable/ic_image_error"/>
 </FrameLayout>

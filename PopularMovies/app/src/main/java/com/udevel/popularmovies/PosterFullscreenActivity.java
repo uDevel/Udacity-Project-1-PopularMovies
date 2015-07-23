@@ -26,11 +26,11 @@ public class PosterFullscreenActivity extends AppCompatActivity {
     private ImageView iv_poster;
     private ProgressWheel pw_main;
     private View fl_root;
-    private View v_reveal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         if (getIntent() != null) {
             String posterPath = getIntent().getStringExtra(ARG_KEY_POSTER_PATH);
@@ -39,19 +39,26 @@ public class PosterFullscreenActivity extends AppCompatActivity {
             }
         }
         setupViews();
-        loadPoster();
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Glide.clear(iv_poster);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        loadPoster();
     }
 
     private void loadPoster() {
         pw_main.spin();
         Glide.with(this)
-                .load(posterUri).asBitmap()
+                .load(posterUri)
+                .asBitmap()
                 .error(R.drawable.ic_image_error)
                 .listener(new RequestListener<Uri, Bitmap>() {
                     @Override
@@ -65,13 +72,12 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         pw_main.stopSpinning();
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
-                                int tempColor = p.getMutedColor(getResources().getColor(R.color.dark_gray));
-                                /*fl_root.setBackgroundColor(tempColor);*/
-                                v_reveal.setBackgroundColor(tempColor);
+                                int backgroundColor = p.getMutedColor(getResources().getColor(R.color.dark_gray));
+                                fl_root.setBackgroundColor(backgroundColor);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     reveal();
                                 } else {
-                                    // Implement this feature without material design
+                                    iv_poster.setVisibility(View.VISIBLE);
                                 }
                             }
                         });
@@ -79,7 +85,6 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                     }
                 })
                 .fitCenter()
-                .animate(R.anim.fade_in_rise)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(iv_poster);
     }
@@ -89,12 +94,13 @@ public class PosterFullscreenActivity extends AppCompatActivity {
         fl_root = findViewById(R.id.fl_root);
         iv_poster = ((ImageView) findViewById(R.id.iv_poster));
         pw_main = ((ProgressWheel) findViewById(R.id.pw_main));
-        v_reveal = findViewById(R.id.v_reveal);
+
+        iv_poster.setVisibility(View.INVISIBLE);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reveal() {
-        View targetView = this.v_reveal;
+        View targetView = this.iv_poster;
         int cx = (targetView.getLeft() + targetView.getRight()) / 2;
         int cy = (targetView.getTop() + targetView.getBottom()) / 2;
 
