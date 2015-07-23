@@ -17,6 +17,7 @@ import com.udevel.popularmovies.data.local.entity.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by benny on 7/12/2015.
@@ -60,7 +61,14 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case VIEW_TYPE_MOVIE:
+
                 MovieViewHolder movieViewHolder = (MovieViewHolder) holder;
+
+                // This is avoid double loading of animation and image.
+                if (movieViewHolder.position.getAndSet(position) == position) {
+                    return;
+                }
+
                 Movie movieInfo = movieList.get(position);
                 Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
                 Glide.with(fragment)//((MovieViewHolder) holder).iv_poster.getContext())
@@ -133,6 +141,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView iv_poster;
         private final ViewHolderClickListener viewHolderClickListener;
+        private AtomicInteger position = new AtomicInteger(-1);
         // each data item is just a string in this case
 
         public MovieViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {

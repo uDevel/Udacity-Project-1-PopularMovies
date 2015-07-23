@@ -4,18 +4,11 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:padding="1px">
-    <!-- A CardView that contains a TextView -->
-    <android.support.v7.widget.CardView
-        android:id="@+id/cv_content"
+
+    <com.udevel.popularmovies.view.PosterImageView
+        android:id="@+id/iv_poster"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
-
-        <com.udevel.popularmovies.view.PosterImageView
-            android:id="@+id/iv_poster"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="center"
-            tools:src="@drawable/ic_image_error"/>
-    </android.support.v7.widget.CardView>
+        android:scaleType="center"
+        tools:src="@drawable/ic_image_error"/>
 </LinearLayout>

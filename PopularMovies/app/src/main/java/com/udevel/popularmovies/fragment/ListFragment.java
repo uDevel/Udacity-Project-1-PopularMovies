@@ -25,7 +25,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.MovieAdapter;
 import com.udevel.popularmovies.adapter.SpinnerAdapter;
@@ -139,10 +138,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         }
         loadingFromNetwork.set(false);
         srl_popular_movies.setRefreshing(false);
-        FragmentActivity activity = getActivity();
-        if (activity != null) {
-            Glide.get(activity.getApplicationContext()).clearMemory();
-        }
     }
 
     @Override
@@ -154,10 +149,6 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         fab_go_to_top = null;
         tv_empty_view_error = null;
         movieAdapter = null;
-        FragmentActivity activity = getActivity();
-        if (activity != null) {
-            Glide.get(activity.getApplicationContext()).clearMemory();
-        }
         super.onDestroyView();
     }
 
@@ -213,12 +204,11 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             public int getSpanSize(int position) {
                 if (movieAdapter != null) {
                     switch (movieAdapter.getItemViewType(position)) {
-                        case MovieAdapter.VIEW_TYPE_MOVIE:
-                            return 1;
                         case MovieAdapter.VIEW_TYPE_FOOTER:
                             return spanCount;
+                        case MovieAdapter.VIEW_TYPE_MOVIE:
                         default:
-                            return -1;
+                            return 1;
                     }
                 }
                 return 1;
@@ -317,8 +307,8 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     private void getMovieListFromNetwork(boolean isRefresh) {
         if (loadingFromNetwork.compareAndSet(false, true)) {
-            Log.d(TAG, "getMovieListFromNetwork");
             final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
+            Log.d(TAG, "getMovieListFromNetwork: " + currentPage);
 
             // This is to avoid over limit of String characters
             if (currentPage > MAX_PAGE_CACHE) {
@@ -389,11 +379,10 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         if (movieAdapter == null) {
             movieAdapter = new MovieAdapter(movies, this);
             rv_popular_movies.swapAdapter(movieAdapter, true);
-
+            movieAdapter.setOnMovieAdapterItemClickListener(this);
         } else {
             movieAdapter.updateMovies(movies);
         }
-        movieAdapter.setOnMovieAdapterItemClickListener(this);
     }
 
     private class SaveMovieDataTask extends AsyncTask<DiscoverMovieResult, Void, List<Movie>> {
@@ -408,12 +397,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
         protected List<Movie> doInBackground(DiscoverMovieResult... results) {
             if (results.length == 1) {
-                final long l = System.nanoTime();
-                List<Movie> movies = updateData(context, results[0], currentPage);
-                long l1 = (System.nanoTime() - l) / 1000000;
-                Log.d(TAG, "ms:" + l1 + " - " + (l1 / currentPage) + " page: " + currentPage);
-
-                return movies;
+                return updateData(context, results[0], currentPage);
             }
 
             return null;

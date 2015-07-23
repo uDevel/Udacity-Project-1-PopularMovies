@@ -27,6 +27,10 @@ public class NetworkApi {
         return theMovieDBServiceCache;
     }
 
+    public static void clearServiceCache() {
+        theMovieDBServiceCache = null;
+    }
+
     public static void getMoviesByPopularity(int page, Callback<DiscoverMovieResult> movieResultCallback) {
         getTheMovieDBService().getMovies(TheMovieDBService.popularSortBy, 0, page, TheMovieDBService.apiKey, movieResultCallback);
     }
