@@ -13,13 +13,18 @@ import retrofit.client.OkClient;
  * Created by benny on 7/12/2015.
  */
 public class NetworkApi {
-    private static TheMovieDBService getTheMovieDBService() {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(TheMovieDBService.endPoint)
-                .setClient(new OkClient(new OkHttpClient()))
-                .build();
+    private static TheMovieDBService theMovieDBServiceCache;
 
-        return restAdapter.create(TheMovieDBService.class);
+    private static TheMovieDBService getTheMovieDBService() {
+        if (theMovieDBServiceCache == null) {
+            RestAdapter restAdapter = new RestAdapter.Builder()
+                    .setEndpoint(TheMovieDBService.endPoint)
+                    .setClient(new OkClient(new OkHttpClient()))
+                    .build();
+            theMovieDBServiceCache = restAdapter.create(TheMovieDBService.class);
+        }
+
+        return theMovieDBServiceCache;
     }
 
     public static void getMoviesByPopularity(int page, Callback<DiscoverMovieResult> movieResultCallback) {

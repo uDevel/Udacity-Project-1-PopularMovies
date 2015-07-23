@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.MovieAdapter;
 import com.udevel.popularmovies.adapter.SpinnerAdapter;
@@ -138,6 +139,10 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         }
         loadingFromNetwork.set(false);
         srl_popular_movies.setRefreshing(false);
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            Glide.get(activity.getApplicationContext()).clearMemory();
+        }
     }
 
     @Override
@@ -149,6 +154,10 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         fab_go_to_top = null;
         tv_empty_view_error = null;
         movieAdapter = null;
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            Glide.get(activity.getApplicationContext()).clearMemory();
+        }
         super.onDestroyView();
     }
 
@@ -399,7 +408,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
         protected List<Movie> doInBackground(DiscoverMovieResult... results) {
             if (results.length == 1) {
-                return updateData(context, results[0], currentPage);
+                final long l = System.nanoTime();
+                List<Movie> movies = updateData(context, results[0], currentPage);
+                long l1 = (System.nanoTime() - l) / 1000000;
+                Log.d(TAG, "ms:" + l1 + " - " + (l1 / currentPage) + " page: " + currentPage);
+
+                return movies;
             }
 
             return null;

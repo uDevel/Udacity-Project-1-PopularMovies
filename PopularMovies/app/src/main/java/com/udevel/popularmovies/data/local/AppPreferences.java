@@ -21,16 +21,16 @@ public class AppPreferences {
         return getSharedPreferences(context).edit();
     }
 
-    public static boolean saveMoviesJsonStr(Context context, String savingStr) {
-        return getEditor(context).putString(KEY_MOVIES_JSON_STR, savingStr).commit();
+    public static void saveMoviesJsonStr(Context context, String savingStr) {
+        getEditor(context).putString(KEY_MOVIES_JSON_STR, savingStr).apply();
     }
 
     public static String getMoviesJsonStr(Context context) {
         return getSharedPreferences(context).getString(KEY_MOVIES_JSON_STR, null);
     }
 
-    public static boolean saveMoviePage(Context context, int page) {
-        return getEditor(context).putInt(KEY_MOVIES_PAGE, page).commit();
+    public static void saveMoviePage(Context context, int page) {
+        getEditor(context).putInt(KEY_MOVIES_PAGE, page).apply();
     }
 
     public static int getMoviePage(Context context) {

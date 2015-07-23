@@ -1,11 +1,15 @@
 package com.udevel.popularmovies;
 
+import android.animation.Animator;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -22,6 +26,7 @@ public class PosterFullscreenActivity extends AppCompatActivity {
     private ImageView iv_poster;
     private ProgressWheel pw_main;
     private View fl_root;
+    private View v_reveal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +39,13 @@ public class PosterFullscreenActivity extends AppCompatActivity {
             }
         }
         setupViews();
+        loadPoster();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        loadPoster();
     }
 
     private void loadPoster() {
@@ -59,8 +65,14 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         pw_main.stopSpinning();
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
-                                int darkVibrantColor = p.getVibrantColor(getResources().getColor(R.color.primary));
-                                fl_root.setBackgroundColor(darkVibrantColor);
+                                int tempColor = p.getMutedColor(getResources().getColor(R.color.dark_gray));
+                                /*fl_root.setBackgroundColor(tempColor);*/
+                                v_reveal.setBackgroundColor(tempColor);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    reveal();
+                                } else {
+                                    // Implement this feature without material design
+                                }
                             }
                         });
                         return false;
@@ -77,5 +89,20 @@ public class PosterFullscreenActivity extends AppCompatActivity {
         fl_root = findViewById(R.id.fl_root);
         iv_poster = ((ImageView) findViewById(R.id.iv_poster));
         pw_main = ((ProgressWheel) findViewById(R.id.pw_main));
+        v_reveal = findViewById(R.id.v_reveal);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void reveal() {
+        View targetView = this.v_reveal;
+        int cx = (targetView.getLeft() + targetView.getRight()) / 2;
+        int cy = (targetView.getTop() + targetView.getBottom()) / 2;
+
+        int finalRadius = Math.max(targetView.getWidth(), targetView.getHeight());
+
+        Animator anim = ViewAnimationUtils.createCircularReveal(targetView, cx, cy, 0, finalRadius);
+
+        targetView.setVisibility(View.VISIBLE);
+        anim.start();
     }
 }

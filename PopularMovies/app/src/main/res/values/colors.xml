@@ -7,4 +7,5 @@
     <color name="refresh_progress_1">@color/primary</color>
     <color name="refresh_progress_2">@color/accent</color>
     <color name="white">#ffffffff</color>
+    <color name="dark_gray">#4a4a4a</color>
 </resources>

@@ -42,7 +42,9 @@ public class DataManager {
     public static List<Movie> saveMovies(Context context, List<Movie> movies, int page) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(movies);
-        return AppPreferences.saveMoviesJsonStr(context, jsonStr) && AppPreferences.saveMoviePage(context, page) ? movies : null;
+        AppPreferences.saveMoviesJsonStr(context, jsonStr);
+        AppPreferences.saveMoviePage(context, page);
+        return movies;
     }
 
     public static List<Movie> addMovies(Context context, List<Movie> movies, int page) {
