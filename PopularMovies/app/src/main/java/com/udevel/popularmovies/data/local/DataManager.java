@@ -50,25 +50,28 @@ public class DataManager {
     public static List<Movie> addMovies(Context context, List<Movie> movies, int page) {
         List<Movie> origMovies = getMovies(context);
 
-        if (origMovies == null) {
-            origMovies = movies;
-        } else {
-            SparseArray<Integer> existingMovieIdIndex = new SparseArray<>(origMovies.size());
-            for (int i = 0; i < origMovies.size(); i++) {
-                existingMovieIdIndex.put(origMovies.get(i).getId(), i);
-            }
-
-            // Check if exist.
-            for (int i = movies.size() - 1; i >= 0; i--) {
-                Movie movie = movies.get(i);
-                Integer index = existingMovieIdIndex.get(movie.getId());
-                if (index != null) {
-                    movies.remove(i);
-                }
-            }
-
-            origMovies.addAll(movies);
+        if (movies == null) {
+            return origMovies;
         }
+
+        if (origMovies == null) {
+            return movies;
+        }
+        SparseArray<Integer> existingMovieIdIndex = new SparseArray<>(origMovies.size());
+        for (int i = 0; i < origMovies.size(); i++) {
+            existingMovieIdIndex.put(origMovies.get(i).getId(), i);
+        }
+
+        // Check if exist.
+        for (int i = movies.size() - 1; i >= 0; i--) {
+            Movie movie = movies.get(i);
+            Integer index = existingMovieIdIndex.get(movie.getId());
+            if (index != null) {
+                movies.remove(i);
+            }
+        }
+
+        origMovies.addAll(movies);
 
         return saveMovies(context, origMovies, page);
     }

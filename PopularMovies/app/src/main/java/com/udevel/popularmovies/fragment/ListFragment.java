@@ -54,7 +54,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private static final int LIST_POSITION_TO_MOVE_FAB = 20;
     private static final int LIST_POSITION_TO_HIDE_FAB = 17;
     private static final int LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP = 80;
-    private static final int NUM_LAST_ITEM_BEFORE_LOADING = 10;
+    private static final int NUM_LAST_ITEM_BEFORE_LOADING = 19;
     private static final int MAX_PAGE_CACHE = 500;
     private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
     private static final int NUM_COLUMNS_IN_PORTRAIT = 3;
@@ -259,12 +259,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     if (layoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
                         if (dy < 0) {
-                            fab_go_to_top.setTranslationY(Math.max(0, fab_go_to_top.getTranslationY() + ((float) dy)));
+                            fab_go_to_top.setVisibility(View.VISIBLE);
                         } else {
-                            fab_go_to_top.setY(Math.min(((View) fab_go_to_top.getParent()).getHeight(), fab_go_to_top.getY() + ((float) dy)));
+                            fab_go_to_top.setVisibility(View.GONE);
                         }
                     } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
-                        fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
+                        fab_go_to_top.setVisibility(View.GONE);
                     }
                 }
             }
@@ -303,13 +303,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     private void setupFab() {
-        fab_go_to_top.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                fab_go_to_top.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                fab_go_to_top.setY(((View) fab_go_to_top.getParent()).getHeight());
-            }
-        });
+        fab_go_to_top.setVisibility(View.GONE);
         fab_go_to_top.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -495,7 +489,9 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         protected void onCancelled() {
             super.onCancelled();
             loadingFromNetwork.set(false);
-            srl_popular_movies.setRefreshing(false);
+            if (srl_popular_movies != null) {
+                srl_popular_movies.setRefreshing(false);
+            }
         }
     }
 
