@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cd_fab_popular_movies">Jump to top</string>
+    <string name="cd_cannot_get_movie_poster">Cannot get movie poster</string>
+</resources>
