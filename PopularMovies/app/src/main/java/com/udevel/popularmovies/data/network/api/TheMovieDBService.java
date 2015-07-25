@@ -13,7 +13,9 @@ public interface TheMovieDBService {
     String endPoint = "https://api.themoviedb.org/3";
     String popularSortBy = "popularity.desc";
     String voteSortBy = "vote_average.desc";
-    String apiKey = "57b70c6c3f48ee161a737bd82900ff95";
+
+    //TODO update api key
+    String apiKey = //Update api key;
 
     @GET("/discover/movie")
     void getMovies(@Query("sort_by") String sort, @Query("vote_count.gte") int minVote, @Query("page") int page, @Query("api_key") String key, Callback<DiscoverMovieResult> callback);
