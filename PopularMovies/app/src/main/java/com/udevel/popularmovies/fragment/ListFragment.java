@@ -20,7 +20,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -58,6 +57,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     private static final int MAX_PAGE_CACHE = 500;
     private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
     private static final int NUM_COLUMNS_IN_PORTRAIT = 3;
+    private static final int MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING = 200;  // This allows api to return meaningful data instead of 1-vote wonders.
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);
     private boolean isSortByPopularity = true;
     private OnFragmentInteractionListener onFragmentInteractionListener;
@@ -199,7 +199,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                 }
             });
         } else {
-            NetworkApi.getMoviesByRating(1, new Callback<DiscoverMovieResult>() {
+            NetworkApi.getMoviesByRating(1, MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING, new Callback<DiscoverMovieResult>() {
                 @Override
                 public void success(DiscoverMovieResult discoverMovieResult, Response response) {
                     if (response.getStatus() == 200 && discoverMovieResult != null) {
@@ -393,7 +393,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     }
                 });
             } else {
-                NetworkApi.getMoviesByRating(currentPage, new Callback<DiscoverMovieResult>() {
+                NetworkApi.getMoviesByRating(currentPage, MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING, new Callback<DiscoverMovieResult>() {
                     @Override
                     public void success(DiscoverMovieResult discoverMovieResult, Response response) {
                         processNetworkSuccessResult(discoverMovieResult, response, currentPage);

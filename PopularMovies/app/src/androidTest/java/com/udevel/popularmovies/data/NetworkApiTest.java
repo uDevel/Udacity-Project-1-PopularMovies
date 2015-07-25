@@ -55,7 +55,7 @@ public class NetworkApiTest extends AndroidTestCase {
     public void testGetMoviesByRating() throws Exception {
         final CountDownLatch signal = new CountDownLatch(1);
 
-        NetworkApi.getMoviesByRating(1, new Callback<DiscoverMovieResult>() {
+        NetworkApi.getMoviesByRating(1, 200, new Callback<DiscoverMovieResult>() {
             @Override
             public void success(DiscoverMovieResult discoverMovieResult, Response response) {
                 assertNotNull(response);

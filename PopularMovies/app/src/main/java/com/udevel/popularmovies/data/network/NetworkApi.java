@@ -36,8 +36,8 @@ public class NetworkApi {
     }
 
     // Minimum vote count is needed in order to have meaningful list.
-    public static void getMoviesByRating(int page, Callback<DiscoverMovieResult> movieResultCallback) {
-        getTheMovieDBService().getMovies(TheMovieDBService.voteSortBy, 200, page, TheMovieDBService.apiKey, movieResultCallback);
+    public static void getMoviesByRating(int page, int minimumVoteCount, Callback<DiscoverMovieResult> movieResultCallback) {
+        getTheMovieDBService().getMovies(TheMovieDBService.voteSortBy, minimumVoteCount, page, TheMovieDBService.apiKey, movieResultCallback);
     }
 
     public static void getMovieById(int id, Callback<MovieDetailInfo> movieDetailInfoCallback) {
