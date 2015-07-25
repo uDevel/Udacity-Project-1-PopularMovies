@@ -12,7 +12,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     private static final String TAG_LIST_FRAGMENT = "TAG_LIST_FRAGMENT";
     private static final String TAG_DETAIL_FRAGMENT = "TAG_DETAIL_FRAGMENT";
-    private static final String TAG_POSTER_VIEW_FRAGMENT = "TAG_POSTER_VIEW_FRAGMENT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

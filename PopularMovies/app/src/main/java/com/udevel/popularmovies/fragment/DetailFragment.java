@@ -102,12 +102,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (abl_movie_detail != null) {

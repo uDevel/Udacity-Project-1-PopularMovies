@@ -117,10 +117,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.onMovieAdapterItemClickListener = onMovieAdapterItemClickListener;
     }
 
-    public void removeOnMovieAdapterItemClickListener() {
-        this.onMovieAdapterItemClickListener = null;
-    }
-
     private int getOriginalItemId(int position) {
         return movieList.get(position).getId();
     }
