@@ -9,22 +9,30 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.udevel.popularmovies.R;
+import com.udevel.popularmovies.adapter.SpinnerAdapter;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -74,6 +82,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             movieId = getArguments().getInt(ARG_KEY_MOVIE_ID);
         }
@@ -99,6 +108,23 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             }
         }
         return root;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_movie_detail, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_favorite_toggle:
+                item.getIcon().setColorFilter();
+                break;
+        }
+        return true;
+
     }
 
     @Override
@@ -178,19 +204,19 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             }
         });
         abl_movie_detail.addOnOffsetChangedListener(this);
-        setupToolbar(tb_movie_detail);
+        setupToolbar();
         return root;
     }
 
-    private void setupToolbar(Toolbar tb_popular_movies) {
+    private void setupToolbar() {
         FragmentActivity activity = getActivity();
         if (activity != null && activity instanceof AppCompatActivity) {
-            ((AppCompatActivity) activity).setSupportActionBar(tb_popular_movies);
+            ((AppCompatActivity) activity).setSupportActionBar(tb_movie_detail);
             ActionBar supportActionBar = ((AppCompatActivity) activity).getSupportActionBar();
             if (supportActionBar != null) {
                 supportActionBar.setTitle(getString(R.string.title_movie_detail));
                 supportActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP);
-                tb_popular_movies.setNavigationOnClickListener(new View.OnClickListener() {
+                tb_movie_detail.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (getActivity() != null) {
