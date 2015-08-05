@@ -264,12 +264,12 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     if (layoutManager.findFirstVisibleItemPosition() > LIST_POSITION_TO_MOVE_FAB) {
                         if (dy < 0) {
-                            fab_go_to_top.setVisibility(View.VISIBLE);
+                            fab_go_to_top.show();
                         } else {
-                            fab_go_to_top.setVisibility(View.GONE);
+                            fab_go_to_top.hide();
                         }
                     } else if (firstVisibleItemPosition < LIST_POSITION_TO_HIDE_FAB) {
-                        fab_go_to_top.setVisibility(View.GONE);
+                        fab_go_to_top.hide();
                     }
                 }
             }
