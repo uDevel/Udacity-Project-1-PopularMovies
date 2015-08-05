@@ -78,9 +78,9 @@ public class DataManager {
         return saveMovies(context, origMovies, page, movieListType);
     }
 
-    public static List<Movie> getFavouriteMovies(Context context) {
+    public static List<Movie> getFavoriteMovies(Context context) {
         List<Movie> movies = null;
-        String MoviesJsonStr = AppPreferences.getFavouriteMoviesJsonStr(context);
+        String MoviesJsonStr = AppPreferences.getFavoriteMoviesJsonStr(context);
         if (MoviesJsonStr != null) {
             Gson gson = new Gson();
             Type collectionType = new TypeToken<List<Movie>>() {
@@ -91,35 +91,47 @@ public class DataManager {
         return movies;
     }
 
-    private static List<Movie> saveFavouriteMovies(Context context, List<Movie> movies) {
+    public static List<Movie> saveFavoriteMovies(Context context, List<Movie> movies) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(movies);
-        AppPreferences.setFavouriteMoviesJsonStr(context, jsonStr);
+        AppPreferences.setFavoriteMoviesJsonStr(context, jsonStr);
         return movies;
     }
 
-    public static void addFavouriteMovie(Context context, Movie movie) {
-        List<Movie> favouriteMovies = getFavouriteMovies(context);
+    public static void addFavoriteMovie(Context context, Movie movie) {
+        List<Movie> favouriteMovies = getFavoriteMovies(context);
 
         if (favouriteMovies == null) {
             favouriteMovies = new ArrayList<>();
         }
 
         favouriteMovies.add(movie);
-        saveFavouriteMovies(context, favouriteMovies);
+        saveFavoriteMovies(context, favouriteMovies);
     }
 
-    public static void removeFavouriteMovie(Context context, Movie movie) {
-        List<Movie> favouriteMovies = getFavouriteMovies(context);
+    public static void removeFavoriteMovie(Context context, Movie movie) {
+        List<Movie> favouriteMovies = getFavoriteMovies(context);
 
         if (favouriteMovies != null) {
             for (Movie favouriteMovie : favouriteMovies) {
                 if (favouriteMovie.getId() == movie.getId()) {
                     favouriteMovies.remove(favouriteMovie);
-                    saveFavouriteMovies(context, favouriteMovies);
+                    saveFavoriteMovies(context, favouriteMovies);
                     return;
                 }
             }
         }
+    }
+
+    public static Movie getFavoriteMovieById(Context context, int targetId) {
+        List<Movie> movies = getFavoriteMovies(context);
+        if (movies != null) {
+            for (Movie movie : movies) {
+                if (movie.getId() == targetId) {
+                    return movie;
+                }
+            }
+        }
+        return null;
     }
 }

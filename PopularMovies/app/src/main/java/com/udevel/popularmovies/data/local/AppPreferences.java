@@ -43,11 +43,11 @@ public class AppPreferences {
         return getSharedPreferences(context).getString(KEY_MOVIES_JSON_STR, null);
     }
 
-    public static void setFavouriteMoviesJsonStr(Context context, String savingStr) {
+    public static void setFavoriteMoviesJsonStr(Context context, String savingStr) {
         getEditor(context).putString(KEY_FAVOURITE_MOVIES_JSON_STR, savingStr).apply();
     }
 
-    public static String getFavouriteMoviesJsonStr(Context context) {
+    public static String getFavoriteMoviesJsonStr(Context context) {
         return getSharedPreferences(context).getString(KEY_FAVOURITE_MOVIES_JSON_STR, null);
     }
 

@@ -105,9 +105,15 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
             Context context = inflater.getContext();
             movieListType = AppPreferences.getLastMovieListType(context);
-            List<Movie> movies = DataManager.getMovies(context);
+            List<Movie> movies;
+            if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                movies = DataManager.getFavoriteMovies(context);
+            } else {
+                movies = DataManager.getMovies(context);
+            }
+
             if (movies == null || movies.isEmpty()) {
-                getMovieListFromNetwork(true);
+                getMovieList(true);
             } else {
                 updateRecyclerView(movies);
                 checkIfNewerUpdate();
@@ -133,6 +139,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         tb_popular_movies = null;
         rv_popular_movies = null;
         srl_popular_movies = null;
+        movieListType = 0;
         fab_go_to_top = null;
         tv_empty_view = null;
         movieAdapter = null;
@@ -155,7 +162,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     @Override
     public void onRefresh() {
         refreshSnackbar = null;
-        getMovieListFromNetwork(true);
+        getMovieList(true);
     }
 
     private void checkIfNewerUpdate() {
@@ -251,7 +258,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (layoutManager.getItemCount() > 0) {
                     if (layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
-                        getMovieListFromNetwork(false);
+                        getMovieList(false);
                     }
 
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
@@ -362,13 +369,14 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
                 if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_POPULARITY]) && movieListType != Movie.MOVIE_LIST_TYPE_POPULARITY) {
                     movieListType = Movie.MOVIE_LIST_TYPE_POPULARITY;
-                    getMovieListFromNetwork(true);
+                    getMovieList(true);
                 } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_RATING]) && movieListType != Movie.MOVIE_LIST_TYPE_RATING) {
                     movieListType = Movie.MOVIE_LIST_TYPE_RATING;
-                    getMovieListFromNetwork(true);
+                    getMovieList(true);
                 } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE]) && movieListType != Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
                     movieListType = Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE;
-                    getMovieListFromNetwork(true);
+                    AppPreferences.setLastMovieListType(getActivity(), movieListType);
+                    getMovieList(true);
                 }
             }
 
@@ -379,7 +387,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         });
     }
 
-    private void getMovieListFromNetwork(boolean isRefresh) {
+    private void getMovieList(boolean isRefresh) {
         if (loadingFromNetwork.compareAndSet(false, true)) {
             final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
 
@@ -417,7 +425,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
                     });
                     break;
                 case Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE:
-                    List<Movie> movies = DataManager.getFavouriteMovies(getActivity());
+                    List<Movie> movies = DataManager.getFavoriteMovies(getActivity());
                     updateRecyclerView(movies);
                     loadingFromNetwork.set(false);
                     srl_popular_movies.setRefreshing(false);
@@ -467,11 +475,11 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     private void updateRecyclerView(List<Movie> movies) {
         if (movieAdapter == null) {
-            movieAdapter = new MovieAdapter(movies, this);
+            movieAdapter = new MovieAdapter(movies, this, movieListType);
             rv_popular_movies.swapAdapter(movieAdapter, true);
             movieAdapter.setOnMovieAdapterItemClickListener(this);
         } else {
-            movieAdapter.updateMovies(movies);
+            movieAdapter.updateMovies(movies, movieListType);
         }
     }
 

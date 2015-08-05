@@ -9,31 +9,27 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.udevel.popularmovies.R;
-import com.udevel.popularmovies.adapter.SpinnerAdapter;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
@@ -41,6 +37,8 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
 
     private int movieId;
+    private Movie movie;
+    private boolean starred;
 
     private OnFragmentInteractionListener onFragmentInteractionListener;
     private TextView tv_title;
@@ -93,38 +91,40 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         // Inflate the layout for this fragment
         if (root == null) {
             root = setupViews(inflater, container);
-            Movie movieById = DataManager.getMovieById(getActivity(), movieId);
-            if (movieById != null) {
-                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieById.getPosterPath()).build();
+
+            movie = DataManager.getMovieById(getActivity(), movieId);
+
+            List<Movie> favoriteMovies = DataManager.getFavoriteMovies(getActivity());
+            if (favoriteMovies != null) {
+                for (int i = 0; i < favoriteMovies.size(); i++) {
+                    if (favoriteMovies.get(i).getId() == movieId) {
+                        if (movie != null) {
+                            // Assume normal movie storage is newer, update to favorite list storage.
+                            favoriteMovies.set(i, movie);
+                            DataManager.saveFavoriteMovies(getActivity(), favoriteMovies);
+                        } else {
+                            movie = favoriteMovies.get(i);
+                        }
+                        starred = true;
+                        break;
+                    }
+                }
+            }
+
+            if (movie != null) {
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
                 Glide.with(this)
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(iv_poster);
-                setMovieInfoUI(movieById);
+                setMovieInfoUI();
             } else {
                 Toast.makeText(getActivity(), "Error on getting data from Internet.", Toast.LENGTH_LONG).show();
             }
         }
         return root;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_movie_detail, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_favorite_toggle:
-                item.getIcon().setColorFilter();
-                break;
-        }
-        return true;
-
     }
 
     @Override
@@ -139,6 +139,39 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     public void onDetach() {
         super.onDetach();
         onFragmentInteractionListener = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_movie_detail, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.menu_favorite_toggle);
+        if (item != null) {
+            item.setIcon(starred ? R.drawable.ic_star_filtered : R.drawable.ic_star_outline);
+            item.setTitle(starred ? R.string.menu_item_star : R.string.menu_item_unstar);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_favorite_toggle:
+                starred = !starred;
+                getActivity().invalidateOptionsMenu();
+                if (starred) {
+                    DataManager.addFavoriteMovie(getActivity(), movie);
+                } else {
+                    DataManager.removeFavoriteMovie(getActivity(), movie);
+                }
+                break;
+        }
+        return true;
+
     }
 
     @Override
@@ -157,7 +190,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         ll_collapse.setVisibility(expandPercentage <= -0.9f ? View.VISIBLE : View.GONE);
     }
 
-    private void setMovieInfoUI(Movie movie) {
+    private void setMovieInfoUI() {
         tv_title.setText(movie.getOriginalTitle());
         tv_title_collapse.setText(movie.getOriginalTitle());
         tv_overview.setText(movie.getOverview());

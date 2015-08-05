@@ -27,14 +27,15 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final int VIEW_TYPE_FOOTER = 1;
     private static final String TAG = MovieAdapter.class.getSimpleName();
     private final Fragment fragment;
+    private boolean showFooter = true;
     private List<Movie> movieList;
     private OnMovieAdapterItemClickListener onMovieAdapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieAdapter(List<Movie> movieList, Fragment fragment) {
+    public MovieAdapter(List<Movie> movieList, Fragment fragment, int movieListType) {
         this.fragment = fragment;
         setHasStableIds(true);
-        updateMovies(movieList);
+        updateMovies(movieList, movieListType);
     }
 
     // Create new views (invoked by the layout manager)
@@ -88,7 +89,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if (position == movieList.size()) {
+        if (showFooter && position == movieList.size()) {
             return VIEW_TYPE_FOOTER;
         } else {
             return VIEW_TYPE_MOVIE;
@@ -110,7 +111,11 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return movieList.size() == 0 ? 0 : movieList.size() + 1;
+        if (showFooter) {
+            return movieList.size() == 0 ? 0 : movieList.size() + 1;
+        } else {
+            return movieList.size();
+        }
     }
 
     public void setOnMovieAdapterItemClickListener(OnMovieAdapterItemClickListener onMovieAdapterItemClickListener) {
@@ -121,13 +126,14 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return movieList.get(position).getId();
     }
 
-    public void updateMovies(List<Movie> movieList) {
+    public void updateMovies(List<Movie> movieList, int movieListType) {
         if (movieList == null) {
             this.movieList = new ArrayList<>();
         } else {
             this.movieList = movieList;
         }
 
+        showFooter = movieListType != Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE;
         notifyDataSetChanged();
     }
 
