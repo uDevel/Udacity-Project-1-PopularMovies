@@ -12,6 +12,9 @@ public class Movie {
     public static final String BASE_URL_FOR_IMAGE = DiscoverMovieResult.BASE_URL_FOR_IMAGE;
     public static final String THUMBNAIL_IMAGE_WIDTH = "w185";
     public static final String FULLSIZE_IMAGE_WIDTH = "original";
+    public static final int MOVIE_LIST_TYPE_POPULARITY = 0;
+    public static final int MOVIE_LIST_TYPE_RATING = 1;
+    public static final int MOVIE_LIST_TYPE_LOCAL_FAVOURITE = 2;
 
     private int id;
     private String originalTitle;
