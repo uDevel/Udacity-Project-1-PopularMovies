@@ -161,7 +161,10 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
 
     @Override
     public void onRefresh() {
-        refreshSnackbar = null;
+        if (refreshSnackbar != null) {
+            refreshSnackbar.dismiss();
+            refreshSnackbar = null;
+        }
         getMovieList(true);
     }
 
