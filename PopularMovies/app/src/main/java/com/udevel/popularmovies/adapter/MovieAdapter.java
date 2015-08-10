@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.udevel.popularmovies.R;
-import com.udevel.popularmovies.adapter.listener.OnMovieAdapterItemClickListener;
+import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.entity.Movie;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final Fragment fragment;
     private boolean showFooter = true;
     private List<Movie> movieList;
-    private OnMovieAdapterItemClickListener onMovieAdapterItemClickListener;
+    private AdapterItemClickListener adapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MovieAdapter(List<Movie> movieList, Fragment fragment, int movieListType) {
@@ -46,8 +46,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 return MovieViewHolder.inflate(parent, new MovieViewHolder.ViewHolderClickListener() {
                     @Override
                     public void onClick(View v, int adapterPosition) {
-                        if (onMovieAdapterItemClickListener != null) {
-                            onMovieAdapterItemClickListener.onMovieAdapterItemClick(v, getOriginalItemId(adapterPosition));
+                        if (adapterItemClickListener != null) {
+                            adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL, v, getOriginalItemId(adapterPosition));
                         }
                     }
                 });
@@ -118,8 +118,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public void setOnMovieAdapterItemClickListener(OnMovieAdapterItemClickListener onMovieAdapterItemClickListener) {
-        this.onMovieAdapterItemClickListener = onMovieAdapterItemClickListener;
+    public void setAdapterItemClickListener(AdapterItemClickListener adapterItemClickListener) {
+        this.adapterItemClickListener = adapterItemClickListener;
     }
 
     private int getOriginalItemId(int position) {

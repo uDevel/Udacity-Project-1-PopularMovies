@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.MovieAdapter;
 import com.udevel.popularmovies.adapter.SpinnerAdapter;
-import com.udevel.popularmovies.adapter.listener.OnMovieAdapterItemClickListener;
+import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.AppPreferences;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -47,7 +47,7 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ListFragment extends Fragment implements OnMovieAdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class ListFragment extends Fragment implements AdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final int LIST_POSITION_TO_MOVE_FAB = 20;
     private static final int LIST_POSITION_TO_HIDE_FAB = 17;
@@ -153,9 +153,11 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
     }
 
     @Override
-    public void onMovieAdapterItemClick(View v, int movieId) {
-        if (onFragmentInteractionListener != null) {
-            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, movieId);
+    public void adapterItemClick(String action, View v, Object data) {
+        if (action.equals(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL) && data instanceof Integer) {
+            if (onFragmentInteractionListener != null) {
+                onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, ((Integer) data).intValue());
+            }
         }
     }
 
@@ -480,7 +482,7 @@ public class ListFragment extends Fragment implements OnMovieAdapterItemClickLis
         if (movieAdapter == null) {
             movieAdapter = new MovieAdapter(movies, this, movieListType);
             rv_popular_movies.swapAdapter(movieAdapter, true);
-            movieAdapter.setOnMovieAdapterItemClickListener(this);
+            movieAdapter.setAdapterItemClickListener(this);
         } else {
             movieAdapter.updateMovies(movies, movieListType);
         }

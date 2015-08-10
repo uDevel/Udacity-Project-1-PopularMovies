@@ -5,7 +5,11 @@
     <color name="accent">#2979FF</color>
     <color name="refresh_progress_1">@color/primary</color>
     <color name="refresh_progress_2">@color/accent</color>
+
     <color name="white">#ffffffff</color>
     <color name="dark_gray">#4a4a4a</color>
+    <color name="light_gray">#dfdfdf</color>
+    <color name="transparent">#00000000</color>
     <color name="star_filter">#ffed00</color>
+    <color name="selector_color">@color/light_gray</color>
 </resources>

@@ -8,7 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,14 +26,25 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.udevel.popularmovies.R;
+import com.udevel.popularmovies.Utils;
+import com.udevel.popularmovies.adapter.MovieDetailAdapter;
+import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
+import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
+import com.udevel.popularmovies.data.network.NetworkApi;
+import com.udevel.popularmovies.data.network.api.TrailersResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
     private static final String TAG = DetailFragment.class.getSimpleName();
@@ -38,13 +52,13 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
     private int movieId;
     private Movie movie;
+    private List<YouTubeTrailer> youTubeTrailerList;
     private boolean starred;
 
     private OnFragmentInteractionListener onFragmentInteractionListener;
     private TextView tv_title;
     private ImageView iv_poster;
     private View root;
-    private TextView tv_overview;
     private TextView tv_release_year;
     private TextView tv_release_month_date;
     private TextView tv_rating;
@@ -54,6 +68,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private LinearLayout ll_collapse;
     private TextView tv_title_collapse;
     private TextView tv_release_runtime_rating_collapse;
+    private RecyclerView rv_movie_detail;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -193,7 +208,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private void setMovieInfoUI() {
         tv_title.setText(movie.getOriginalTitle());
         tv_title_collapse.setText(movie.getOriginalTitle());
-        tv_overview.setText(movie.getOverview());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         try {
             Calendar cal = Calendar.getInstance();
@@ -210,13 +224,44 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 " " + tv_release_month_date.getText() +
                 " - " + tv_popularity.getText() +
                 " - " + tv_rating.getText());
+
+        updateMovieDetailRecyclerView();
+        NetworkApi.getMovieTrailers(movieId, new Callback<TrailersResult>() {
+            @Override
+            public void success(TrailersResult trailersResult, Response response) {
+                if (trailersResult != null) {
+                    List<TrailersResult.Result> results = trailersResult.getResults();
+                    if (results != null) {
+                        youTubeTrailerList = new ArrayList<>();
+                        for (TrailersResult.Result result : results) {
+                            if (result.getSite().toLowerCase().equals(YouTubeTrailer.SITE_NAME)) {
+                                YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
+                                youTubeTrailer.setKey(result.getKey());
+                                youTubeTrailer.setName(result.getName());
+                                youTubeTrailerList.add(youTubeTrailer);
+                            }
+                        }
+                        updateMovieDetailRecyclerView();
+                    }
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (error != null) {
+                    Log.e(TAG, error.getResponse().getReason());
+                }
+                // TODO show error.
+            }
+        });
+
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
         iv_poster = ((ImageView) root.findViewById(R.id.iv_poster));
         tv_title = ((TextView) root.findViewById(R.id.tv_title));
-        tv_overview = ((TextView) root.findViewById(R.id.tv_overview));
+        rv_movie_detail = ((RecyclerView) root.findViewById(R.id.rv_movie_detail));
         tv_release_year = ((TextView) root.findViewById(R.id.tv_release_year));
         tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
         tv_popularity = ((TextView) root.findViewById(R.id.tv_popularity));
@@ -259,6 +304,30 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     }
                 });
             }
+        }
+    }
+
+    private void updateMovieDetailRecyclerView() {
+        if (rv_movie_detail != null) {
+            if (rv_movie_detail.getLayoutManager() == null) {
+                rv_movie_detail.setLayoutManager(new LinearLayoutManager(getActivity()));
+            }
+
+            MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
+            if (adapter == null) {
+                adapter = new MovieDetailAdapter(movie, youTubeTrailerList, this);
+                rv_movie_detail.setAdapter(adapter);
+            } else {
+                adapter.updateMovieDetail(movie, youTubeTrailerList);
+            }
+            adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
+                @Override
+                public void adapterItemClick(String action, View v, Object data) {
+                    if (action.equals(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER) && data instanceof String) {
+                        startActivity(Utils.getYouTubeIntent(getActivity().getPackageManager(), ((String) data)));
+                    }
+                }
+            });
         }
     }
 

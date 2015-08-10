@@ -30,7 +30,6 @@ public class Movie {
         for (int i = 0; i < discoverMovieInfoResults.size(); i++) {
             DiscoverMovieResult.Result sourceMovieInfo = discoverMovieInfoResults.get(i);
             movies.add(convertDiscoverMovieInfoResult(sourceMovieInfo));
-
         }
 
         return movies;

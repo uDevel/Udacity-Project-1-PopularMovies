@@ -5,7 +5,9 @@ import android.util.Log;
 
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
-import com.udevel.popularmovies.data.network.api.MovieDetailInfo;
+import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
+import com.udevel.popularmovies.data.network.api.ReviewsResult;
+import com.udevel.popularmovies.data.network.api.TrailersResult;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -75,17 +77,64 @@ public class NetworkApiTest extends AndroidTestCase {
         assertTrue(true);
     }
 
-
     public void testGetMovieById() throws Exception {
         final CountDownLatch signal = new CountDownLatch(1);
         final int targetMovieId = 87101;
 
-        NetworkApi.getMovieById(targetMovieId, new Callback<MovieDetailInfo>() {
+        NetworkApi.getMovieById(targetMovieId, new Callback<MovieDetailInfoResult>() {
             @Override
-            public void success(MovieDetailInfo movieDetailInfo, Response response) {
+            public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
                 assertNotNull(response);
-                assertNotNull(movieDetailInfo);
-                assertEquals("Response has wrong movie returned!", targetMovieId, movieDetailInfo.getId().intValue());
+                assertNotNull(movieDetailInfoResult);
+                assertEquals("Response has wrong movie returned!", targetMovieId, movieDetailInfoResult.getId().intValue());
+                signal.countDown();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                assertFalse(true);
+                signal.countDown();
+            }
+        });
+        signal.await(30, TimeUnit.SECONDS);
+        assertTrue(true);
+    }
+
+    public void testGetMovieTrailers() throws Exception {
+        final CountDownLatch signal = new CountDownLatch(1);
+        final int targetMovieId = 87101;
+
+        NetworkApi.getMovieTrailers(targetMovieId, new Callback<TrailersResult>() {
+
+            @Override
+            public void success(TrailersResult trailersResult, Response response) {
+                assertNotNull(trailersResult);
+                assertNotNull(trailersResult.getResults());
+                assertTrue(trailersResult.getResults().size() > 1);
+                signal.countDown();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                assertFalse(true);
+                signal.countDown();
+            }
+        });
+        signal.await(30, TimeUnit.SECONDS);
+        assertTrue(true);
+    }
+
+    public void testGetMovieReviews() throws Exception {
+        final CountDownLatch signal = new CountDownLatch(1);
+        final int targetMovieId = 119450;
+
+        NetworkApi.getMovieReviews(targetMovieId, new Callback<ReviewsResult>() {
+
+            @Override
+            public void success(ReviewsResult reviewsResult, Response response) {
+                assertNotNull(reviewsResult);
+                assertNotNull(reviewsResult.getResults());
+                assertTrue(reviewsResult.getResults().size() > 1);
                 signal.countDown();
             }
 
