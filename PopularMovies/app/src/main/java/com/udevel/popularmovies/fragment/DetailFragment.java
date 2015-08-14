@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,8 +32,10 @@ import com.udevel.popularmovies.adapter.MovieDetailAdapter;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
+import com.udevel.popularmovies.data.local.entity.Review;
 import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 import com.udevel.popularmovies.data.network.NetworkApi;
+import com.udevel.popularmovies.data.network.api.ReviewsResult;
 import com.udevel.popularmovies.data.network.api.TrailersResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
@@ -53,6 +56,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private int movieId;
     private Movie movie;
     private List<YouTubeTrailer> youTubeTrailerList;
+    private List<Review> reviewList;
     private boolean starred;
 
     private OnFragmentInteractionListener onFragmentInteractionListener;
@@ -226,6 +230,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 " - " + tv_rating.getText());
 
         updateMovieDetailRecyclerView();
+
         NetworkApi.getMovieTrailers(movieId, new Callback<TrailersResult>() {
             @Override
             public void success(TrailersResult trailersResult, Response response) {
@@ -236,10 +241,39 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                         for (TrailersResult.Result result : results) {
                             if (result.getSite().toLowerCase().equals(YouTubeTrailer.SITE_NAME)) {
                                 YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
+                                youTubeTrailer.setId(result.getId());
                                 youTubeTrailer.setKey(result.getKey());
                                 youTubeTrailer.setName(result.getName());
                                 youTubeTrailerList.add(youTubeTrailer);
                             }
+                        }
+                        updateMovieDetailRecyclerView();
+                    }
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (error != null) {
+                    Log.e(TAG, error.getResponse().getReason());
+                }
+                // TODO show error.
+            }
+        });
+        NetworkApi.getMovieReviews(movieId, new Callback<ReviewsResult>() {
+            @Override
+            public void success(ReviewsResult trailersResult, Response response) {
+                if (trailersResult != null) {
+                    List<ReviewsResult.Result> results = trailersResult.getResults();
+                    if (results != null) {
+                        reviewList = new ArrayList<>();
+                        for (ReviewsResult.Result result : results) {
+                            Review review = new Review();
+                            review.setId(result.getId());
+                            review.setAuthor(result.getAuthor());
+                            review.setContent(result.getContent());
+                            reviewList.add(review);
+
                         }
                         updateMovieDetailRecyclerView();
                     }
@@ -315,16 +349,21 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
             if (adapter == null) {
-                adapter = new MovieDetailAdapter(movie, youTubeTrailerList, this);
+                adapter = new MovieDetailAdapter(movie, youTubeTrailerList, reviewList, this);
                 rv_movie_detail.setAdapter(adapter);
             } else {
-                adapter.updateMovieDetail(movie, youTubeTrailerList);
+                adapter.updateMovieDetail(movie, youTubeTrailerList, reviewList);
             }
             adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
                 @Override
                 public void adapterItemClick(String action, View v, Object data) {
                     if (action.equals(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER) && data instanceof String) {
                         startActivity(Utils.getYouTubeIntent(getActivity().getPackageManager(), ((String) data)));
+                    } else if (action.equals(AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG) && data instanceof Review) {
+                        FragmentManager fm = getChildFragmentManager();
+                        ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
+                        dialogFragment.show(fm, "Review Dialog");
+                        //  Toast.makeText(getActivity(), ((Review) data).getContent(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });

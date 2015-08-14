@@ -101,11 +101,12 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (root == null) {
-            root = setupViews(inflater, container);
-
             Context context = inflater.getContext();
             movieListType = AppPreferences.getLastMovieListType(context);
+
+            root = setupViews(inflater, container);
             List<Movie> movies;
+
             if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
                 movies = DataManager.getFavoriteMovies(context);
             } else {
@@ -263,6 +264,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (layoutManager.getItemCount() > 0) {
                     if (layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
+
                         getMovieList(false);
                     }
 
@@ -357,6 +359,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         SpinnerAdapter adapter = new SpinnerAdapter(Arrays.asList(stringArray));
         Spinner spinner = (Spinner) spinnerContainer.findViewById(R.id.sp_main);
         spinner.setAdapter(adapter);
+        spinner.setSelection(movieListType, false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

@@ -13,4 +13,6 @@
     <string name="msg_movies_update_available">New list available</string>
     <string name="menu_item_star">Add to favorite</string>
     <string name="menu_item_unstar">Remove from favorite</string>
+    <string name="reviewed_by">reviewed by <xliff:g name="name">%s</xliff:g></string>
+    <string name="title_review_dialogfragment">Review</string>
 </resources>

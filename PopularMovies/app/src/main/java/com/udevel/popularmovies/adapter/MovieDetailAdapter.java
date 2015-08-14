@@ -14,6 +14,7 @@ import com.pnikosis.materialishprogress.ProgressWheel;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.entity.Movie;
+import com.udevel.popularmovies.data.local.entity.Review;
 import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 
 import java.util.List;
@@ -24,19 +25,21 @@ import java.util.List;
 public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int VIEW_TYPE_MOVIE_OVERVIEW = 0;
     public static final int VIEW_TYPE_TRAILER = 1;
-    public static final int VIEW_TYPE_FOOTER = 2;
+    public static final int VIEW_TYPE_REVIEW = 2;
+    public static final int VIEW_TYPE_FOOTER = 3;
     private static final String TAG = MovieDetailAdapter.class.getSimpleName();
     private final Fragment fragment;
     private boolean showFooter = true;
     private Movie movie;
     private List<YouTubeTrailer> youTubeTrailerList;
+    private List<Review> reviewList;
     private AdapterItemClickListener adapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailerList, Fragment fragment) {
+    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList, Fragment fragment) {
         this.fragment = fragment;
-        // setHasStableIds(true);
-        updateMovieDetail(movie, youTubeTrailerList);
+        setHasStableIds(true);
+        updateMovieDetail(movie, youTubeTrailerList, reviewList);
     }
 
     // Create new views (invoked by the layout manager)
@@ -49,12 +52,22 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 return TrailerViewHolder.inflate(parent, new ViewHolderClickListener() {
                     @Override
                     public void onClick(View v, int adapterPosition) {
-                        if (youTubeTrailerList != null) {
-                            YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPostion(adapterPosition);
-                            if (youTubeTrailer != null) {
-                                if (adapterItemClickListener != null) {
-                                    adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER, v, youTubeTrailer.getUrl());
-                                }
+                        YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(adapterPosition);
+                        if (youTubeTrailer != null) {
+                            if (adapterItemClickListener != null) {
+                                adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER, v, youTubeTrailer.getUrl());
+                            }
+                        }
+                    }
+                });
+            case VIEW_TYPE_REVIEW:
+                return ReviewViewHolder.inflate(parent, new ViewHolderClickListener() {
+                    @Override
+                    public void onClick(View v, int adapterPosition) {
+                        Review review = getReviewFromAdapterPosition(adapterPosition);
+                        if (review != null) {
+                            if (adapterItemClickListener != null) {
+                                adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG, v, review);
                             }
                         }
                     }
@@ -75,7 +88,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 break;
             case VIEW_TYPE_TRAILER:
                 TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
-                YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPostion(position);
+                YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(position);
                 trailerViewHolder.tv_trailer_name.setText(youTubeTrailer.getName());
                 String thumbnailUrl = youTubeTrailer.getThumbnailUrl();
                 Glide.with(fragment)
@@ -84,6 +97,12 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .error(R.drawable.ic_image_error)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(trailerViewHolder.iv_trailer_thumbnail);
+                break;
+            case VIEW_TYPE_REVIEW:
+                ReviewViewHolder reviewViewHolder = (ReviewViewHolder) holder;
+                Review review = getReviewFromAdapterPosition(position);
+                reviewViewHolder.tv_review.setText(review.getContent());
+                reviewViewHolder.tv_reviewer.setText(fragment.getString(R.string.reviewed_by, review.getAuthor()));
                 break;
             case VIEW_TYPE_FOOTER:
                 ProgressWheel pw_main = ((FooterViewHolder) holder).pw_main;
@@ -96,8 +115,12 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemViewType(int position) {
         if (position == 0) {
             return VIEW_TYPE_MOVIE_OVERVIEW;
-        } else {
+        } else if (youTubeTrailerList != null && position < youTubeTrailerList.size() + 1) {
             return VIEW_TYPE_TRAILER;
+        } else if (reviewList != null) {
+            return VIEW_TYPE_REVIEW;
+        } else {
+            return VIEW_TYPE_MOVIE_OVERVIEW;
         }
        /* if (showFooter && position == movieList.size()) {
             return VIEW_TYPE_FOOTER;
@@ -112,10 +135,13 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case VIEW_TYPE_MOVIE_OVERVIEW:
                 return 0L;
             case VIEW_TYPE_TRAILER:
-                YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPostion(position);
-                return youTubeTrailer.getKey().hashCode();
+                YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(position);
+                return youTubeTrailer.getId().hashCode();
+            case VIEW_TYPE_REVIEW:
+                Review review = getReviewFromAdapterPosition(position);
+                return review.getId().hashCode();
             case VIEW_TYPE_FOOTER:
-                return 2L;
+                return 1L;
             default:
                 return 0L;
         }
@@ -124,7 +150,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return 1 + (youTubeTrailerList != null ? youTubeTrailerList.size() : 0);
+        return 1 +
+                (youTubeTrailerList != null ? youTubeTrailerList.size() : 0) +
+                (reviewList != null ? reviewList.size() : 0);
       /*  if (showFooter) {
             return movieList.size() == 0 ? 0 : movieList.size() + 1;
         } else {
@@ -132,17 +160,22 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }*/
     }
 
-    private YouTubeTrailer getYouTubeTrailerFromAdapterPostion(int position) {
+    private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
         return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 1);
+    }
+
+    private Review getReviewFromAdapterPosition(int position) {
+        return reviewList == null ? null : reviewList.get(position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()));
     }
 
     public void setAdapterItemClickListener(AdapterItemClickListener adapterItemClickListener) {
         this.adapterItemClickListener = adapterItemClickListener;
     }
 
-    public void updateMovieDetail(Movie movie, List<YouTubeTrailer> youTubeTrailerList) {
+    public void updateMovieDetail(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList) {
         this.movie = movie;
         this.youTubeTrailerList = youTubeTrailerList;
+        this.reviewList = reviewList;
 
         notifyDataSetChanged();
     }
@@ -179,6 +212,32 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         static TrailerViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {
             return new TrailerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_detail_trailer, parent, false),
+                    viewHolderClickListener);
+        }
+
+        @Override
+        public void onClick(View v) {
+            viewHolderClickListener.onClick(v, getAdapterPosition());
+        }
+    }
+
+    public static class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final TextView tv_review;
+        private final TextView tv_reviewer;
+        private final ViewHolderClickListener viewHolderClickListener;
+
+        public ReviewViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
+            super(v);
+            this.viewHolderClickListener = viewHolderClickListener;
+
+            tv_review = ((TextView) v.findViewById(R.id.tv_review));
+            tv_reviewer = ((TextView) v.findViewById(R.id.tv_reviewer));
+            v.setOnClickListener(this);
+
+        }
+
+        static ReviewViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {
+            return new ReviewViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_detail_review, parent, false),
                     viewHolderClickListener);
         }
 
