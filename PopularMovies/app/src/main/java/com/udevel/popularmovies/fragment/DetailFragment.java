@@ -254,10 +254,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             @Override
             public void failure(RetrofitError error) {
-                if (error != null) {
-                    Log.e(TAG, error.getResponse().getReason());
-                }
-                // TODO show error.
+                Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
             }
         });
         NetworkApi.getMovieReviews(movieId, new Callback<ReviewsResult>() {
@@ -282,10 +279,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             @Override
             public void failure(RetrofitError error) {
-                if (error != null) {
-                    Log.e(TAG, error.getResponse().getReason());
-                }
-                // TODO show error.
+                Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
             }
         });
 
