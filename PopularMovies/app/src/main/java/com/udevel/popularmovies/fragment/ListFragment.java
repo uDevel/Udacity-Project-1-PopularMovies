@@ -70,6 +70,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private TextView tv_empty_view;
     private View cl_root;
     private Snackbar refreshSnackbar;
+    private Toast errorToast;
 
     public ListFragment() {
     }
@@ -454,7 +455,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
         if (getActivity() != null) {
             Log.e(TAG, error.getMessage());
-            Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
+            if(errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
+                errorToast = Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG);
+                errorToast.show();
+            }
             tv_empty_view.setText(getText(R.string.msg_error_data_connection_error));
             tv_empty_view.setVisibility(View.VISIBLE);
             rv_popular_movies.setVisibility(View.INVISIBLE);
@@ -473,7 +477,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             loadingFromNetwork.set(false);
             srl_popular_movies.setRefreshing(false);
             Log.e(TAG, response.getReason());
-            Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+            if(errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
+                errorToast = Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG);
+                errorToast.show();
+            }
             tv_empty_view.setText(getText(R.string.msg_error_data_connection_error));
             tv_empty_view.setVisibility(View.VISIBLE);
             rv_popular_movies.setVisibility(View.INVISIBLE);

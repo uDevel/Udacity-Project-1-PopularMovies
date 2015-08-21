@@ -225,7 +225,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_rating.setText(getString(R.string.format_avg_vote, movie.getVoteAverage(), movie.getVoteCount()));
         tv_popularity.setText(getString(R.string.format_popularity, movie.getPopularity()));
         tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
-                " " + tv_release_month_date.getText() +
+                "" + tv_release_month_date.getText() +
                 " - " + tv_popularity.getText() +
                 " - " + tv_rating.getText());
 
