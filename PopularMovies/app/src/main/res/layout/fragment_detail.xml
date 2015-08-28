@@ -1,144 +1,160 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                 xmlns:tools="http://schemas.android.com/tools"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"
-                                                 tools:context="com.udevel.popularmovies.fragment.DetailFragment">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.udevel.popularmovies.fragment.DetailFragment">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/abl_movie_detail"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_movie_detail"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/abl_movie_detail"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="107dp"
-            android:paddingBottom="16dp"
-            android:paddingEnd="16dp"
-            android:paddingStart="16dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-            <ImageView
-                android:id="@+id/iv_poster"
-                android:layout_width="100dp"
-                android:layout_height="150dp"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="16dp"
-                android:contentDescription="@string/cd_cannot_get_movie_poster"
-                android:elevation="8dp"
-                android:outlineProvider="bounds"
-                android:scaleType="center"
-                tools:ignore="UnusedAttribute"/>
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_toEndOf="@id/iv_poster"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:text="titleasdfasdfasdfas"/>
-
-            <TextView
-                android:id="@+id/tv_release_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_title"
-                android:layout_marginTop="8dp"
-                android:layout_toEndOf="@id/iv_poster"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                tools:text="release_date"/>
-
-            <TextView
-                android:id="@+id/tv_release_month_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/tv_release_year"
-                android:layout_toEndOf="@id/tv_release_year"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                tools:text="month_date"/>
-
-            <TextView
-                android:id="@+id/tv_popularity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_release_year"
-                android:layout_marginTop="8dp"
-                android:layout_toEndOf="@id/iv_poster"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="italic"
-                tools:text="runtime"/>
-
-            <TextView
-                android:id="@+id/tv_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_popularity"
-                android:layout_marginTop="8dp"
-                android:layout_toEndOf="@id/iv_poster"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="italic"
-                tools:text="rating"/>
-
-            <LinearLayout
-                android:id="@+id/ll_collapse"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb_movie_detail"
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:layout_alignBottom="@id/iv_poster"
-                android:layout_marginStart="-50dp"
-                android:layout_toEndOf="@id/iv_poster"
-                android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible">
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_scrollFlags="scroll"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="107dp"
+                android:paddingBottom="16dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+                <ImageView
+                    android:id="@+id/iv_poster"
+                    android:layout_width="100dp"
+                    android:layout_height="150dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/cd_cannot_get_movie_poster"
+                    android:elevation="8dp"
+                    android:outlineProvider="bounds"
+                    android:scaleType="center"
+                    tools:ignore="UnusedAttribute"/>
 
                 <TextView
-                    android:id="@+id/tv_title_collapse"
+                    android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:singleLine="true"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_toEndOf="@id/iv_poster"
+                    android:ellipsize="end"
+                    android:maxLines="2"
                     android:textColor="@color/white"
-                    android:textSize="26dp"
-                    tools:text="title collapse"/>
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    tools:text="titleasdfasdfasdfas"/>
 
                 <TextView
-                    android:id="@+id/tv_release_popularity_rating_collapse"
+                    android:id="@+id/tv_release_year"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-condensed"
-                    android:singleLine="true"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_title"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/iv_poster"
                     android:textColor="@color/white"
-                    android:textSize="16dp"
-                    tools:text="tv_release_runtime_rating_collapse"/>
-            </LinearLayout>
-        </RelativeLayout>
-    </android.support.design.widget.AppBarLayout>
+                    android:textSize="20sp"
+                    tools:text="release_date"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_movie_detail"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-</android.support.design.widget.CoordinatorLayout>
+                <TextView
+                    android:id="@+id/tv_release_month_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/tv_release_year"
+                    android:layout_toEndOf="@id/tv_release_year"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="month_date"/>
+
+                <TextView
+                    android:id="@+id/tv_popularity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_release_year"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/iv_poster"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    tools:text="runtime"/>
+
+                <TextView
+                    android:id="@+id/tv_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_popularity"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/iv_poster"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    tools:text="rating"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_collapse"
+                    android:layout_width="match_parent"
+                    android:layout_height="75dp"
+                    android:layout_alignBottom="@id/iv_poster"
+                    android:layout_marginStart="-50dp"
+                    android:layout_toEndOf="@id/iv_poster"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tv_title_collapse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="26dp"
+                        tools:text="title collapse"/>
+
+                    <TextView
+                        android:id="@+id/tv_release_popularity_rating_collapse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-condensed"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="16dp"
+                        tools:text="tv_release_runtime_rating_collapse"/>
+                </LinearLayout>
+            </RelativeLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_movie_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <TextView
+            android:id="@+id/tv_instruction"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/primary"
+            android:gravity="center"
+            android:text="@string/msg_pick_a_movie"
+            tools:visibility="visible"
+            android:visibility="gone"/>
+    </android.support.design.widget.CoordinatorLayout>
+</FrameLayout>

@@ -1,7 +1,9 @@
 package com.udevel.popularmovies.adapter;
 
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +19,24 @@ import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.data.local.entity.Review;
 import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by benny on 7/12/2015.
  */
 public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final int VIEW_TYPE_MOVIE_OVERVIEW = 0;
-    public static final int VIEW_TYPE_TRAILER = 1;
-    public static final int VIEW_TYPE_REVIEW = 2;
-    public static final int VIEW_TYPE_FOOTER = 3;
+    public static final int VIEW_TYPE_MOVIE_INFO = 0;
+    public static final int VIEW_TYPE_MOVIE_OVERVIEW = 1;
+    public static final int VIEW_TYPE_TRAILER = 2;
+    public static final int VIEW_TYPE_REVIEW = 3;
+    public static final int VIEW_TYPE_FOOTER = 4;
     private static final String TAG = MovieDetailAdapter.class.getSimpleName();
     private final Fragment fragment;
+    private final boolean isShowingMovieInfo;
     private boolean showFooter = true;
     private Movie movie;
     private List<YouTubeTrailer> youTubeTrailerList;
@@ -36,16 +44,19 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private AdapterItemClickListener adapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList, Fragment fragment) {
+    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList, Fragment fragment, boolean isShowingMovieInfo) {
         this.fragment = fragment;
         setHasStableIds(true);
         updateMovieDetail(movie, youTubeTrailerList, reviewList);
+        this.isShowingMovieInfo = isShowingMovieInfo;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
+            case VIEW_TYPE_MOVIE_INFO:
+                return MovieInfoViewHolder.inflate(parent);
             case VIEW_TYPE_MOVIE_OVERVIEW:
                 return MovieOverviewViewHolder.inflate(parent);
             case VIEW_TYPE_TRAILER:
@@ -82,6 +93,34 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
+            case VIEW_TYPE_MOVIE_INFO:
+                MovieInfoViewHolder movieInfoViewHolder = (MovieInfoViewHolder) holder;
+                movieInfoViewHolder.tv_title.setText(movie.getOriginalTitle());
+                movieInfoViewHolder.tv_release_popularity_rating.setText(movie.getOverview());
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+                Calendar cal = Calendar.getInstance();
+                try {
+                    cal.setTime(format.parse(movie.getReleaseDate()));
+
+                } catch (ParseException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+                movieInfoViewHolder.tv_release_popularity_rating.setText(String.valueOf(cal.get(Calendar.YEAR)) +
+                        " " + cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) +
+                        " " + cal.get(Calendar.DATE) +
+                        " - " + fragment.getString(R.string.format_popularity, movie.getPopularity()) +
+                        " - " + fragment.getString(R.string.format_avg_vote, movie.getVoteAverage(), movie.getVoteCount()));
+
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
+                Glide.with(fragment)
+                        .load(uri)
+                        .error(R.drawable.ic_image_error)
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(movieInfoViewHolder.iv_poster);
+                break;
             case VIEW_TYPE_MOVIE_OVERVIEW:
                 MovieOverviewViewHolder movieOverviewViewHolder = (MovieOverviewViewHolder) holder;
                 movieOverviewViewHolder.tv_overview.setText(movie.getOverview());
@@ -113,7 +152,13 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if(isShowingMovieInfo){
+            position--;
+        }
+
+        if (position == -1) {
+            return VIEW_TYPE_MOVIE_INFO;
+        } else if (position == 0) {
             return VIEW_TYPE_MOVIE_OVERVIEW;
         } else if (youTubeTrailerList != null && position < youTubeTrailerList.size() + 1) {
             return VIEW_TYPE_TRAILER;
@@ -122,18 +167,15 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else {
             return VIEW_TYPE_MOVIE_OVERVIEW;
         }
-       /* if (showFooter && position == movieList.size()) {
-            return VIEW_TYPE_FOOTER;
-        } else {
-            return VIEW_TYPE_MOVIE;
-        }*/
     }
 
     @Override
     public long getItemId(int position) {
         switch (getItemViewType(position)) {
-            case VIEW_TYPE_MOVIE_OVERVIEW:
+            case VIEW_TYPE_MOVIE_INFO:
                 return 0L;
+            case VIEW_TYPE_MOVIE_OVERVIEW:
+                return 1L;
             case VIEW_TYPE_TRAILER:
                 YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(position);
                 return youTubeTrailer.getId().hashCode();
@@ -141,7 +183,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 Review review = getReviewFromAdapterPosition(position);
                 return review.getId().hashCode();
             case VIEW_TYPE_FOOTER:
-                return 1L;
+                return 2L;
             default:
                 return 0L;
         }
@@ -150,22 +192,18 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return 1 +
+        return (isShowingMovieInfo ? 1 : 0) + // For movie info
+                1 + //For overview
                 (youTubeTrailerList != null ? youTubeTrailerList.size() : 0) +
                 (reviewList != null ? reviewList.size() : 0);
-      /*  if (showFooter) {
-            return movieList.size() == 0 ? 0 : movieList.size() + 1;
-        } else {
-            return movieList.size();
-        }*/
     }
 
     private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
-        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 1);
+        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 1 - (isShowingMovieInfo ? 1 : 0));
     }
 
     private Review getReviewFromAdapterPosition(int position) {
-        return reviewList == null ? null : reviewList.get(position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()));
+        return reviewList == null ? null : reviewList.get(position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()) - (isShowingMovieInfo ? 1 : 0));
     }
 
     public void setAdapterItemClickListener(AdapterItemClickListener adapterItemClickListener) {
@@ -182,6 +220,23 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     interface ViewHolderClickListener {
         void onClick(View v, int adapterPosition);
+    }
+
+    public static class MovieInfoViewHolder extends RecyclerView.ViewHolder {
+        private final TextView tv_title;
+        private final ImageView iv_poster;
+        private final TextView tv_release_popularity_rating;
+
+        public MovieInfoViewHolder(View v) {
+            super(v);
+            iv_poster = ((ImageView) v.findViewById(R.id.iv_poster));
+            tv_release_popularity_rating = ((TextView) v.findViewById(R.id.tv_release_popularity_rating));
+            tv_title = ((TextView) v.findViewById(R.id.tv_title));
+        }
+
+        static MovieInfoViewHolder inflate(ViewGroup parent) {
+            return new MovieInfoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_detail_info, parent, false));
+        }
     }
 
     public static class MovieOverviewViewHolder extends RecyclerView.ViewHolder {

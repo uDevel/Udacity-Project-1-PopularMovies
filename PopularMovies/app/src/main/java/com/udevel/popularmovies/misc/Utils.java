@@ -1,4 +1,4 @@
-package com.udevel.popularmovies;
+package com.udevel.popularmovies.misc;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;

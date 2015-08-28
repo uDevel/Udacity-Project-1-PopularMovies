@@ -84,7 +84,7 @@ public class NetworkApi {
     }
 
     public static void getMovieById(int id, Callback<MovieDetailInfoResult> movieDetailInfoCallback) {
-        getTheMovieDBService().getMovieById(id, TheMovieDBService.apiKey, movieDetailInfoCallback);
+        getTheMovieDBService().getMovieById(id, TheMovieDBService.apiKey, TheMovieDBService.appendTrailersAndReviews, movieDetailInfoCallback);
     }
 
     public static void getMovieTrailers(int id, Callback<TrailersResult> movieTrailersCallback) {

@@ -1,4 +1,4 @@
-package com.udevel.popularmovies;
+package com.udevel.popularmovies.activity;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.pnikosis.materialishprogress.ProgressWheel;
+import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.data.local.entity.Movie;
 
 public class PosterFullscreenActivity extends AppCompatActivity {

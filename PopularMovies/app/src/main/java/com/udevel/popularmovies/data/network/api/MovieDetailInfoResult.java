@@ -70,6 +70,10 @@ public class MovieDetailInfoResult {
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+    @Expose
+    private Trailers trailers;
+    @Expose
+    private Reviews reviews;
 
     /**
      * @return The adult
@@ -421,6 +425,22 @@ public class MovieDetailInfoResult {
         this.voteCount = voteCount;
     }
 
+    public Trailers getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(Trailers trailers) {
+        this.trailers = trailers;
+    }
+
+    public Reviews getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Reviews reviews) {
+        this.reviews = reviews;
+    }
+
     public class ProductionCompany {
 
         @Expose
@@ -638,6 +658,252 @@ public class MovieDetailInfoResult {
          */
         public void setName(String name) {
             this.name = name;
+        }
+
+    }
+
+    public class Reviews {
+
+        @Expose
+        private Integer page;
+        @Expose
+        private List<Result> results = new ArrayList<Result>();
+        @SerializedName("total_pages")
+        @Expose
+        private Integer totalPages;
+        @SerializedName("total_results")
+        @Expose
+        private Integer totalResults;
+
+        /**
+         * @return The page
+         */
+        public Integer getPage() {
+            return page;
+        }
+
+        /**
+         * @param page The page
+         */
+        public void setPage(Integer page) {
+            this.page = page;
+        }
+
+        /**
+         * @return The results
+         */
+        public List<Result> getResults() {
+            return results;
+        }
+
+        /**
+         * @param results The results
+         */
+        public void setResults(List<Result> results) {
+            this.results = results;
+        }
+
+        /**
+         * @return The totalPages
+         */
+        public Integer getTotalPages() {
+            return totalPages;
+        }
+
+        /**
+         * @param totalPages The total_pages
+         */
+        public void setTotalPages(Integer totalPages) {
+            this.totalPages = totalPages;
+        }
+
+        /**
+         * @return The totalResults
+         */
+        public Integer getTotalResults() {
+            return totalResults;
+        }
+
+        /**
+         * @param totalResults The total_results
+         */
+        public void setTotalResults(Integer totalResults) {
+            this.totalResults = totalResults;
+        }
+
+        public class Result {
+
+            @Expose
+            private String id;
+            @Expose
+            private String author;
+            @Expose
+            private String content;
+            @Expose
+            private String url;
+
+            /**
+             * @return The id
+             */
+            public String getId() {
+                return id;
+            }
+
+            /**
+             * @param id The id
+             */
+            public void setId(String id) {
+                this.id = id;
+            }
+
+            /**
+             * @return The author
+             */
+            public String getAuthor() {
+                return author;
+            }
+
+            /**
+             * @param author The author
+             */
+            public void setAuthor(String author) {
+                this.author = author;
+            }
+
+            /**
+             * @return The content
+             */
+            public String getContent() {
+                return content;
+            }
+
+            /**
+             * @param content The content
+             */
+            public void setContent(String content) {
+                this.content = content;
+            }
+
+            /**
+             * @return The url
+             */
+            public String getUrl() {
+                return url;
+            }
+
+            /**
+             * @param url The url
+             */
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+        }
+
+    }
+
+    public class Trailers {
+
+        @Expose
+        private List<Object> quicktime = new ArrayList<Object>();
+        @Expose
+        private List<Youtube> youtube = new ArrayList<Youtube>();
+
+        /**
+         * @return The quicktime
+         */
+        public List<Object> getQuicktime() {
+            return quicktime;
+        }
+
+        /**
+         * @param quicktime The quicktime
+         */
+        public void setQuicktime(List<Object> quicktime) {
+            this.quicktime = quicktime;
+        }
+
+        /**
+         * @return The youtube
+         */
+        public List<Youtube> getYoutube() {
+            return youtube;
+        }
+
+        /**
+         * @param youtube The youtube
+         */
+        public void setYoutube(List<Youtube> youtube) {
+            this.youtube = youtube;
+        }
+
+    }
+
+    public class Youtube {
+
+        @Expose
+        private String name;
+        @Expose
+        private String size;
+        @Expose
+        private String source;
+        @Expose
+        private String type;
+
+        /**
+         * @return The name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name The name
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return The size
+         */
+        public String getSize() {
+            return size;
+        }
+
+        /**
+         * @param size The size
+         */
+        public void setSize(String size) {
+            this.size = size;
+        }
+
+        /**
+         * @return The source
+         */
+        public String getSource() {
+            return source;
+        }
+
+        /**
+         * @param source The source
+         */
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        /**
+         * @return The type
+         */
+        public String getType() {
+            return type;
+        }
+
+        /**
+         * @param type The type
+         */
+        public void setType(String type) {
+            this.type = type;
         }
 
     }

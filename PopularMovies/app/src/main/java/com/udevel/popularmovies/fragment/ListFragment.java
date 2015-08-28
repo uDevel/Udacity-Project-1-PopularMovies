@@ -51,11 +51,9 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final int LIST_POSITION_TO_MOVE_FAB = 20;
     private static final int LIST_POSITION_TO_HIDE_FAB = 17;
-    private static final int LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP = 80;
+    private static final int LIST_POSITION_JUMP_TO_FOR_GO_TO_TOP = 17;
     private static final int NUM_LAST_ITEM_BEFORE_LOADING = 19;
     private static final int MAX_PAGE_CACHE = 500;
-    private static final int NUM_COLUMNS_IN_LANDSCAPE = 5;
-    private static final int NUM_COLUMNS_IN_PORTRAIT = 3;
     private static final int MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING = 200;  // This allows api to return meaningful data instead of 1-vote wonders.
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);
     private int movieListType;
@@ -89,12 +87,12 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            onFragmentInteractionListener = (OnFragmentInteractionListener) activity;
+            onFragmentInteractionListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -254,8 +252,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     }
 
     private void setupRecyclerView() {
-        int currentOrientation = getResources().getConfiguration().orientation;
-        final int spanCount = currentOrientation == Configuration.ORIENTATION_LANDSCAPE ? NUM_COLUMNS_IN_LANDSCAPE : NUM_COLUMNS_IN_PORTRAIT;
+        final int spanCount = getResources().getInteger(R.integer.grid_span_count);
 
         final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         rv_popular_movies.setLayoutManager(layoutManager);
@@ -489,7 +486,6 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                 rv_popular_movies.setVisibility(View.INVISIBLE);
             }
         }
-
     }
 
     private void updateRecyclerView(List<Movie> movies) {
@@ -499,6 +495,15 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             movieAdapter.setAdapterItemClickListener(this);
         } else {
             movieAdapter.updateMovies(movies, movieListType);
+        }
+    }
+
+    public void setListType(int listType) {
+        if (root != null) {
+            Spinner spinner = (Spinner) root.findViewById(R.id.sp_main);
+            if (spinner != null) {
+                spinner.setSelection(listType);
+            }
         }
     }
 

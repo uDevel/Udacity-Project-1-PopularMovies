@@ -9,9 +9,8 @@ public class YouTubeTrailer {
     private static final String URL_YOUTUBE_THUMBNAIL = "https://img.youtube.com/vi/";
     private static final String URL_YOUTUBE_THUMBNAIL_SIZE_FULLSIZE = "/0.jpg";
     private static final String URL_YOUTUBE_THUMBNAIL_SIZE_LARGE = "/1.jpg";
-    private String key;
+    private String size;
     private String name;
-    private String url;
     private String id;
 
     public String getId() {
@@ -22,12 +21,12 @@ public class YouTubeTrailer {
         this.id = id;
     }
 
-    public String getKey() {
-        return key;
+    public String getSize() {
+        return size;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setSize(String size) {
+        this.size = size;
     }
 
     public String getName() {
@@ -39,10 +38,10 @@ public class YouTubeTrailer {
     }
 
     public String getUrl() {
-        return URL_YOUTUBE_WATCH + key;
+        return URL_YOUTUBE_WATCH + id;
     }
 
     public String getThumbnailUrl() {
-        return URL_YOUTUBE_THUMBNAIL + key + URL_YOUTUBE_THUMBNAIL_SIZE_LARGE;
+        return URL_YOUTUBE_THUMBNAIL + id + URL_YOUTUBE_THUMBNAIL_SIZE_LARGE;
     }
 }

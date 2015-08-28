@@ -9,6 +9,7 @@ import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
 import com.udevel.popularmovies.data.network.api.ReviewsResult;
 import com.udevel.popularmovies.data.network.api.TrailersResult;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -86,6 +87,11 @@ public class NetworkApiTest extends AndroidTestCase {
             public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
                 assertNotNull(response);
                 assertNotNull(movieDetailInfoResult);
+                MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
+                assertNotNull(trailers);
+                List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
+                assertNotNull(youtubes);
+                assertTrue(youtubes.size() > 0);
                 assertEquals("Response has wrong movie returned!", targetMovieId, movieDetailInfoResult.getId().intValue());
                 signal.countDown();
             }
