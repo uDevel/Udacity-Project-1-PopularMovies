@@ -31,7 +31,7 @@
             android:id="@+id/tv_author"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
+            android:gravity="center_horizontal"
             android:textSize="14sp"
             tools:text="author"/>
     </LinearLayout>

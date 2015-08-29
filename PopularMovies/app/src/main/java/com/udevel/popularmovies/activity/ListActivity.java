@@ -2,6 +2,7 @@ package com.udevel.popularmovies.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,8 @@ import android.widget.Spinner;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.SpinnerAdapter;
 import com.udevel.popularmovies.data.local.AppPreferences;
+import com.udevel.popularmovies.data.local.DataManager;
+import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.fragment.DetailFragment;
 import com.udevel.popularmovies.fragment.ListFragment;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
@@ -35,13 +38,18 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
             Toolbar tb_main = (Toolbar) findViewById(R.id.tb_main);
             setSupportActionBar(tb_main);
             setupSpinner(tb_main);
-        }
-        if (savedInstanceState == null) {
-            if (isTwoPanes) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fl_fragment_holder, DetailFragment.newInstance(-1), TAG_DETAIL_FRAGMENT)
-                        .commit();
+
+            int lastMovieIdDetailViewed = AppPreferences.getLastMovieIdDetailViewed(this);
+            if (lastMovieIdDetailViewed != -1) {
+                Movie movieById = DataManager.getMovieById(this, lastMovieIdDetailViewed);
+                if (movieById != null) {
+                    showDetailFragment(lastMovieIdDetailViewed);
+                }
+            }
+        } else {
+            Fragment detailFragment = getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
+            if (detailFragment != null) {
+                getSupportFragmentManager().beginTransaction().remove(detailFragment).commit();
             }
         }
     }
@@ -67,27 +75,8 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
 
                 ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_list);
                 if (listFragment != null) {
-                    listFragment.setListType(position);
+                    listFragment.setMovieListType(position);
                 }
-/*
-                    if (refreshSnackbar != null) {
-                        refreshSnackbar.dismiss();
-                        refreshSnackbar = null;
-                    }
-
-                    String displayingText = ((TextView) view).getText().toString();
-
-                    if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_POPULARITY]) && movieListType != Movie.MOVIE_LIST_TYPE_POPULARITY) {
-                        movieListType = Movie.MOVIE_LIST_TYPE_POPULARITY;
-                        getMovieList(true);
-                    } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_RATING]) && movieListType != Movie.MOVIE_LIST_TYPE_RATING) {
-                        movieListType = Movie.MOVIE_LIST_TYPE_RATING;
-                        getMovieList(true);
-                    } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE]) && movieListType != Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
-                        movieListType = Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE;
-                        AppPreferences.setLastMovieListType(getActivity(), movieListType);
-                        getMovieList(true);
-                    }*/
             }
 
             @Override
@@ -103,10 +92,7 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
             case OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL:
                 if (asset != null && asset instanceof Integer) {
                     if (isTwoPanes) {
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fl_fragment_holder, DetailFragment.newInstance((int) asset), TAG_DETAIL_FRAGMENT)
-                                .commit();
+                        showDetailFragment((int) asset);
                     } else {
                         Intent intent = DetailActivity.createIntent(this, (int) asset);
                         startActivity(intent);
@@ -114,5 +100,16 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
                     break;
                 }
         }
+    }
+
+    private void showDetailFragment(int movieId) {
+        View tv_instruction = findViewById(R.id.tv_instruction);
+        if (tv_instruction != null) {
+            tv_instruction.setVisibility(View.GONE);
+        }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_fragment_holder, DetailFragment.newInstance(movieId), TAG_DETAIL_FRAGMENT)
+                .commit();
     }
 }

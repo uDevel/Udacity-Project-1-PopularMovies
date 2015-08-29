@@ -44,10 +44,10 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private AdapterItemClickListener adapterItemClickListener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList, Fragment fragment, boolean isShowingMovieInfo) {
+    public MovieDetailAdapter(Movie movie, Fragment fragment, boolean isShowingMovieInfo) {
         this.fragment = fragment;
         setHasStableIds(true);
-        updateMovieDetail(movie, youTubeTrailerList, reviewList);
+        updateMovieDetail(movie);
         this.isShowingMovieInfo = isShowingMovieInfo;
     }
 
@@ -136,6 +136,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .error(R.drawable.ic_image_error)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(trailerViewHolder.iv_trailer_thumbnail);
+                trailerViewHolder.iv_hd.setVisibility(youTubeTrailer.isHD() ? View.VISIBLE : View.GONE);
                 break;
             case VIEW_TYPE_REVIEW:
                 ReviewViewHolder reviewViewHolder = (ReviewViewHolder) holder;
@@ -152,7 +153,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if(isShowingMovieInfo){
+        if (isShowingMovieInfo) {
             position--;
         }
 
@@ -210,10 +211,10 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.adapterItemClickListener = adapterItemClickListener;
     }
 
-    public void updateMovieDetail(Movie movie, List<YouTubeTrailer> youTubeTrailerList, List<Review> reviewList) {
+    public void updateMovieDetail(Movie movie) {
         this.movie = movie;
-        this.youTubeTrailerList = youTubeTrailerList;
-        this.reviewList = reviewList;
+        this.youTubeTrailerList = movie.getYouTubeTrailers();
+        this.reviewList = movie.getReviews();
 
         notifyDataSetChanged();
     }
@@ -256,12 +257,14 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         private final TextView tv_trailer_name;
         private final ImageView iv_trailer_thumbnail;
         private final ViewHolderClickListener viewHolderClickListener;
+        private final ImageView iv_hd;
 
         public TrailerViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
             super(v);
             this.viewHolderClickListener = viewHolderClickListener;
             tv_trailer_name = ((TextView) v.findViewById(R.id.tv_trailer_name));
             iv_trailer_thumbnail = ((ImageView) v.findViewById(R.id.iv_trailer_thumbnail));
+            iv_hd = ((ImageView) v.findViewById(R.id.iv_hd));
             v.setOnClickListener(this);
         }
 

@@ -24,6 +24,8 @@ public class Movie {
     private String releaseDate;
     private double popularity;
     private int voteCount;
+    private List<YouTubeTrailer> youTubeTrailers;
+    private List<Review> reviews;
 
     public static List<Movie> convertDiscoverMovieInfoResults(List<DiscoverMovieResult.Result> discoverMovieInfoResults) {
         List<Movie> movies = new ArrayList<>(((Double) Math.ceil(discoverMovieInfoResults.size() * 1.5)).intValue());
@@ -114,5 +116,21 @@ public class Movie {
 
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public List<YouTubeTrailer> getYouTubeTrailers() {
+        return youTubeTrailers;
+    }
+
+    public void setYouTubeTrailers(List<YouTubeTrailer> youTubeTrailers) {
+        this.youTubeTrailers = youTubeTrailers;
     }
 }

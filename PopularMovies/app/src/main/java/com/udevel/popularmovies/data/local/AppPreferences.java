@@ -15,6 +15,7 @@ public class AppPreferences {
     private static final String KEY_MOVIES_JSON_STR = "KEY_MOVIES_JSON_STR";
     private static final String KEY_MOVIES_PAGE = "KEY_MOVIES_PAGE";
     private static final String KEY_LAST_MOVIE_LIST_TYPE = "KEY_LAST_MOVIE_LIST_TYPE";
+    private static final String KEY_LAST_MOVIE_ID_DETAIL_VIEWED = "KEY_LAST_MOVIE_ID_DETAIL_VIEWED";
     private static final int DEF_VALUE_MOVIE_PAGE = 1;
     private static final int DEF_VALUE_MOVIE_TYPE = Movie.MOVIE_LIST_TYPE_POPULARITY;
 
@@ -57,6 +58,14 @@ public class AppPreferences {
 
     public static int getMoviePage(Context context) {
         return getSharedPreferences(context).getInt(KEY_MOVIES_PAGE, DEF_VALUE_MOVIE_PAGE);
+    }
+
+    public static void setLastMovieIdDetailViewed(Context context, int id) {
+        getEditor(context).putInt(KEY_LAST_MOVIE_ID_DETAIL_VIEWED, id).apply();
+    }
+
+    public static int getLastMovieIdDetailViewed(Context context) {
+        return getSharedPreferences(context).getInt(KEY_LAST_MOVIE_ID_DETAIL_VIEWED, -1);
     }
 
 }

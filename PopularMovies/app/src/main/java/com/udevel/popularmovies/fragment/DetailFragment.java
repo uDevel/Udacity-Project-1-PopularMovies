@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,13 +28,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.MovieDetailAdapter;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
+import com.udevel.popularmovies.data.local.AppPreferences;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.data.local.entity.Review;
 import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
-import com.udevel.popularmovies.data.network.api.ReviewsResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 import com.udevel.popularmovies.misc.Utils;
 
@@ -53,13 +52,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
 
-    private int movieId = -1;
-    private Movie movie;
-    private List<YouTubeTrailer> youTubeTrailerList;
-    private List<Review> reviewList;
-    private boolean starred;
-
-    private OnFragmentInteractionListener onFragmentInteractionListener;
     private TextView tv_title;
     private ImageView iv_poster;
     private View root;
@@ -73,8 +65,11 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private TextView tv_title_collapse;
     private TextView tv_release_runtime_rating_collapse;
     private RecyclerView rv_movie_detail;
-    private TextView tv_instruction;
     private boolean hasToolbar;
+    private OnFragmentInteractionListener onFragmentInteractionListener;
+    private int movieId = -1;
+    private boolean starred;
+    private Movie movie;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -136,7 +131,9 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
         inflater.inflate(R.menu.menu_movie_detail, menu);
+
     }
 
     @Override
@@ -144,9 +141,11 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         super.onPrepareOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.menu_favorite_toggle);
         if (item != null) {
+            item.setVisible(movie != null);
             item.setIcon(starred ? R.drawable.ic_star_filtered : R.drawable.ic_star_outline);
             item.setTitle(starred ? R.string.menu_item_star : R.string.menu_item_unstar);
         }
+
     }
 
     @Override
@@ -168,28 +167,10 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
     public void setMovie(int movieId) {
         this.movieId = movieId;
-        movie = DataManager.getMovieById(getActivity(), movieId);
-        List<Movie> favoriteMovies = DataManager.getFavoriteMovies(getActivity());
-        if (favoriteMovies != null) {
-            for (int i = 0; i < favoriteMovies.size(); i++) {
-                if (favoriteMovies.get(i).getId() == movieId) {
-                    if (movie != null) {
-                        // Assume normal movie storage is newer, update to favorite list storage.
-                        favoriteMovies.set(i, movie);
-                        DataManager.saveFavoriteMovies(getActivity(), favoriteMovies);
-                    } else {
-                        movie = favoriteMovies.get(i);
-                    }
-                    starred = true;
-                    break;
-                }
-            }
-        }
-
-        if (movie != null) {
-            setMovieInfoUI();
-        } else {
-            tv_instruction.setVisibility(View.VISIBLE);
+        setMovieInfoUI();
+        Context context = getContext();
+        if (context != null) {
+            AppPreferences.setLastMovieIdDetailViewed(context, movieId);
         }
     }
 
@@ -217,7 +198,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
         tv_popularity = ((TextView) root.findViewById(R.id.tv_popularity));
         tv_rating = ((TextView) root.findViewById(R.id.tv_rating));
-        tv_instruction = ((TextView) root.findViewById(R.id.tv_instruction));
         abl_movie_detail = ((AppBarLayout) root.findViewById(R.id.abl_movie_detail));
 
         hasToolbar = abl_movie_detail != null;
@@ -268,45 +248,29 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     }
 
     private void setMovieInfoUI() {
-        if (hasToolbar) {
-            Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
-            Glide.with(this)
-                    .load(uri)
-                    .error(R.drawable.ic_image_error)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(iv_poster);
-            tv_title.setText(movie.getOriginalTitle());
-            tv_title_collapse.setText(movie.getOriginalTitle());
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            try {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(format.parse(movie.getReleaseDate()));
-                tv_release_year.setText(String.valueOf(cal.get(Calendar.YEAR)));
-                tv_release_month_date.setText(" " + cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) +
-                        " " + cal.get(Calendar.DATE));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            tv_rating.setText(getString(R.string.format_avg_vote, movie.getVoteAverage(), movie.getVoteCount()));
-            tv_popularity.setText(getString(R.string.format_popularity, movie.getPopularity()));
-            tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
-                    "" + tv_release_month_date.getText() +
-                    " - " + tv_popularity.getText() +
-                    " - " + tv_rating.getText());
-        }
-
-        updateMovieDetailRecyclerView();
-
         NetworkApi.getMovieById(movieId, new Callback<MovieDetailInfoResult>() {
             @Override
             public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
+                if (getActivity() == null) {
+                    return;
+                }
+
                 if (movieDetailInfoResult != null) {
+                    movie = new Movie();
+                    movie.setId(movieDetailInfoResult.getId());
+                    movie.setOriginalTitle(movieDetailInfoResult.getOriginalTitle());
+                    movie.setOverview(movieDetailInfoResult.getOverview());
+                    movie.setPopularity(movieDetailInfoResult.getPopularity());
+                    movie.setPosterPath(movieDetailInfoResult.getPosterPath());
+                    movie.setReleaseDate(movieDetailInfoResult.getReleaseDate());
+                    movie.setVoteAverage(movieDetailInfoResult.getVoteAverage());
+                    movie.setVoteCount(movieDetailInfoResult.getVoteCount());
+
                     MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
                     if (trailers != null) {
                         List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
                         if (youtubes != null) {
-                            youTubeTrailerList = new ArrayList<>();
+                            List<YouTubeTrailer> youTubeTrailerList = new ArrayList<>();
                             for (MovieDetailInfoResult.Youtube youtube : youtubes) {
 
                                 YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
@@ -314,8 +278,8 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                                 youTubeTrailer.setSize(youtube.getSize());
                                 youTubeTrailer.setName(youtube.getName());
                                 youTubeTrailerList.add(youTubeTrailer);
-
                             }
+                            movie.setYouTubeTrailers(youTubeTrailerList);
                         }
                     }
 
@@ -323,7 +287,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     if (reviews != null) {
                         List<MovieDetailInfoResult.Reviews.Result> results = reviews.getResults();
                         if (results != null) {
-                            reviewList = new ArrayList<>();
+                            List<Review> reviewList = new ArrayList<>();
                             for (MovieDetailInfoResult.Reviews.Result result : results) {
                                 Review review = new Review();
                                 review.setId(result.getId());
@@ -331,18 +295,79 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                                 review.setContent(result.getContent());
                                 reviewList.add(review);
                             }
+                            movie.setReviews(reviewList);
                         }
                     }
+
+                    // Update local storage if it's a favorite movie.
+                    Context context = getContext();
+                    if (context != null) {
+                        Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+                        if (favoriteMovieById != null) {
+                            DataManager.addFavoriteMovie(context, movie);
+                        }
+                    }
+                    if (hasToolbar) {
+                        setMovieInfoUIToolbar();
+                    }
+
+                    updateMovieDetailRecyclerView();
+                    getActivity().invalidateOptionsMenu();
                 }
-                updateMovieDetailRecyclerView();
 
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+                if (isDetached()) {
+                    return;
+                }
+                // Try to get find movie from favorite storage
+                Context context = getContext();
+                if (context != null) {
+                    Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+                    if (favoriteMovieById != null) {
+                        movie = favoriteMovieById;
+                        if (hasToolbar) {
+                            setMovieInfoUIToolbar();
+                        }
+
+                        updateMovieDetailRecyclerView();
+                        getActivity().invalidateOptionsMenu();
+                    } else {
+                        Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         });
+    }
+
+    private void setMovieInfoUIToolbar() {
+        Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
+        Glide.with(this)
+                .load(uri)
+                .error(R.drawable.ic_image_error)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(iv_poster);
+        tv_title.setText(movie.getOriginalTitle());
+        tv_title_collapse.setText(movie.getOriginalTitle());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(format.parse(movie.getReleaseDate()));
+            tv_release_year.setText(String.valueOf(cal.get(Calendar.YEAR)));
+            tv_release_month_date.setText(" " + cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) +
+                    " " + cal.get(Calendar.DATE));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        tv_rating.setText(getString(R.string.format_avg_vote, movie.getVoteAverage(), movie.getVoteCount()));
+        tv_popularity.setText(getString(R.string.format_popularity, movie.getPopularity()));
+        tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
+                "" + tv_release_month_date.getText() +
+                " - " + tv_popularity.getText() +
+                " - " + tv_rating.getText());
     }
 
     private void updateMovieDetailRecyclerView() {
@@ -353,10 +378,10 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
             if (adapter == null) {
-                adapter = new MovieDetailAdapter(movie, youTubeTrailerList, reviewList, this, !hasToolbar);
+                adapter = new MovieDetailAdapter(movie, this, !hasToolbar);
                 rv_movie_detail.setAdapter(adapter);
             } else {
-                adapter.updateMovieDetail(movie, youTubeTrailerList, reviewList);
+                adapter.updateMovieDetail(movie);
             }
             adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
                 @Override

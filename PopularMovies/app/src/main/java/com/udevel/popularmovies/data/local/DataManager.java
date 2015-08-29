@@ -9,7 +9,9 @@ import com.udevel.popularmovies.data.local.entity.Movie;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by benny on 5/16/2015.
@@ -78,59 +80,65 @@ public class DataManager {
         return saveMovies(context, origMovies, page, movieListType);
     }
 
-    public static List<Movie> getFavoriteMovies(Context context) {
-        List<Movie> movies = null;
+    public static Map<Integer, Movie> getFavoriteMovieMap(Context context) {
+        Map<Integer, Movie> movieMap = null;
         String MoviesJsonStr = AppPreferences.getFavoriteMoviesJsonStr(context);
         if (MoviesJsonStr != null) {
             Gson gson = new Gson();
-            Type collectionType = new TypeToken<List<Movie>>() {
+            Type collectionType = new TypeToken<Map<Integer, Movie>>() {
             }.getType();
-            movies = gson.fromJson(MoviesJsonStr, collectionType);
+            movieMap = gson.fromJson(MoviesJsonStr, collectionType);
         }
 
-        return movies;
+        return movieMap;
     }
 
-    public static List<Movie> saveFavoriteMovies(Context context, List<Movie> movies) {
+    public static List<Movie> getFavoriteMovieList(Context context) {
+        Map<Integer, Movie> favoriteMovies = DataManager.getFavoriteMovieMap(context);
+        if (favoriteMovies != null) {
+            return new ArrayList<>(favoriteMovies.values());
+        } else {
+            return null;
+        }
+    }
+
+    public static Map<Integer, Movie> saveFavoriteMovieMap(Context context, Map<Integer, Movie> movieMap) {
         Gson gson = new Gson();
-        String jsonStr = gson.toJson(movies);
+        String jsonStr = gson.toJson(movieMap);
         AppPreferences.setFavoriteMoviesJsonStr(context, jsonStr);
-        return movies;
+        return movieMap;
     }
 
     public static void addFavoriteMovie(Context context, Movie movie) {
-        List<Movie> favouriteMovies = getFavoriteMovies(context);
+        Map<Integer, Movie> favoriteMovies = getFavoriteMovieMap(context);
 
-        if (favouriteMovies == null) {
-            favouriteMovies = new ArrayList<>();
+        if (favoriteMovies == null) {
+            favoriteMovies = new HashMap<>();
         }
 
-        favouriteMovies.add(movie);
-        saveFavoriteMovies(context, favouriteMovies);
+        favoriteMovies.put(movie.getId(), movie);
+        saveFavoriteMovieMap(context, favoriteMovies);
     }
 
     public static void removeFavoriteMovie(Context context, Movie movie) {
-        List<Movie> favouriteMovies = getFavoriteMovies(context);
+        if (movie == null) {
+            return;
+        }
 
-        if (favouriteMovies != null) {
-            for (Movie favouriteMovie : favouriteMovies) {
-                if (favouriteMovie.getId() == movie.getId()) {
-                    favouriteMovies.remove(favouriteMovie);
-                    saveFavoriteMovies(context, favouriteMovies);
-                    return;
-                }
+        Map<Integer, Movie> favoriteMovies = getFavoriteMovieMap(context);
+
+        if (favoriteMovies != null) {
+            if (favoriteMovies.containsKey(movie.getId())) {
+                favoriteMovies.remove(movie.getId());
+                saveFavoriteMovieMap(context, favoriteMovies);
             }
         }
     }
 
     public static Movie getFavoriteMovieById(Context context, int targetId) {
-        List<Movie> movies = getFavoriteMovies(context);
-        if (movies != null) {
-            for (Movie movie : movies) {
-                if (movie.getId() == targetId) {
-                    return movie;
-                }
-            }
+        Map<Integer, Movie> favoriteMovies = getFavoriteMovieMap(context);
+        if (favoriteMovies != null) {
+            return favoriteMovies.get(targetId);
         }
         return null;
     }

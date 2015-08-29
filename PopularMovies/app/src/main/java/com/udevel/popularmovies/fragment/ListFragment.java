@@ -1,8 +1,6 @@
 package com.udevel.popularmovies.fragment;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -69,6 +67,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private View cl_root;
     private Snackbar refreshSnackbar;
     private Toast errorToast;
+    private boolean hasToolbar;
 
     public ListFragment() {
     }
@@ -100,14 +99,14 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (root == null) {
-            Context context = inflater.getContext();
+            Context context = getContext();
             movieListType = AppPreferences.getLastMovieListType(context);
 
             root = setupViews(inflater, container);
             List<Movie> movies;
 
             if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
-                movies = DataManager.getFavoriteMovies(context);
+                movies = DataManager.getFavoriteMovieList(context);
             } else {
                 movies = DataManager.getMovies(context);
             }
@@ -306,9 +305,13 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         srl_popular_movies = ((SwipeRefreshLayout) root.findViewById(R.id.srl_popular_movies));
         fab_go_to_top = ((FloatingActionButton) root.findViewById(R.id.fab_go_to_top));
 
+        hasToolbar = tb_popular_movies != null;
         setupFab();
         setupSwipeRefreshLayout();
-        setupToolbar();
+
+        if (hasToolbar) {
+            setupToolbar();
+        }
         return root;
     }
 
@@ -371,19 +374,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                     refreshSnackbar = null;
                 }
 
-                String displayingText = ((TextView) view).getText().toString();
-
-                if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_POPULARITY]) && movieListType != Movie.MOVIE_LIST_TYPE_POPULARITY) {
-                    movieListType = Movie.MOVIE_LIST_TYPE_POPULARITY;
-                    getMovieList(true);
-                } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_RATING]) && movieListType != Movie.MOVIE_LIST_TYPE_RATING) {
-                    movieListType = Movie.MOVIE_LIST_TYPE_RATING;
-                    getMovieList(true);
-                } else if (displayingText.equals(stringArray[Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE]) && movieListType != Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
-                    movieListType = Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE;
-                    AppPreferences.setLastMovieListType(getActivity(), movieListType);
-                    getMovieList(true);
-                }
+                setMovieListType(position);
             }
 
             @Override
@@ -431,7 +422,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                     });
                     break;
                 case Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE:
-                    List<Movie> movies = DataManager.getFavoriteMovies(getActivity());
+                    List<Movie> movies = DataManager.getFavoriteMovieList(getContext());
                     updateRecyclerView(movies);
                     loadingFromNetwork.set(false);
                     srl_popular_movies.setRefreshing(false);
@@ -452,7 +443,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
         if (getActivity() != null) {
             Log.e(TAG, error.getMessage());
-            if(errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
+            if (errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
                 errorToast = Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG);
                 errorToast.show();
             }
@@ -476,7 +467,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             loadingFromNetwork.set(false);
             srl_popular_movies.setRefreshing(false);
             Log.e(TAG, response.getReason());
-            if(errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
+            if (errorToast == null || errorToast.getView() == null || !errorToast.getView().isShown()) {
                 errorToast = Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG);
                 errorToast.show();
             }
@@ -498,12 +489,11 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         }
     }
 
-    public void setListType(int listType) {
-        if (root != null) {
-            Spinner spinner = (Spinner) root.findViewById(R.id.sp_main);
-            if (spinner != null) {
-                spinner.setSelection(listType);
-            }
+    public void setMovieListType(int listType) {
+        if (movieListType != listType) {
+            movieListType = listType;
+            AppPreferences.setLastMovieListType(getActivity(), movieListType);
+            getMovieList(true);
         }
     }
 

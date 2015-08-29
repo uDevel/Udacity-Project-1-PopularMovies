@@ -2,6 +2,7 @@ package com.udevel.popularmovies.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -27,6 +28,14 @@ public class DetailActivity extends AppCompatActivity implements OnFragmentInter
         setContentView(R.layout.activity_detail);
         DetailFragment detailFragment = ((DetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_detail));
         detailFragment.setMovie(movieId);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            onBackPressed();
+        }
     }
 
     @Override
