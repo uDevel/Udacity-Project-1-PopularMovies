@@ -212,9 +212,13 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 iv_poster.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Movie movieById = DataManager.getMovieById(getActivity(), movieId);
-                        if (movieById != null && onFragmentInteractionListener != null) {
-                            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER, movieById.getPosterPath());
+                        if (movie != null) {
+                            String posterPath = movie.getPosterPath();
+                            if (posterPath != null) {
+                                if (onFragmentInteractionListener != null) {
+                                    onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER, posterPath);
+                                }
+                            }
                         }
                     }
                 });
@@ -305,6 +309,9 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                         Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
                         if (favoriteMovieById != null) {
                             DataManager.addFavoriteMovie(context, movie);
+                            starred = true;
+                        } else {
+                            starred = false;
                         }
                     }
                     if (hasToolbar) {
@@ -328,6 +335,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
                     if (favoriteMovieById != null) {
                         movie = favoriteMovieById;
+                        starred = true;
                         if (hasToolbar) {
                             setMovieInfoUIToolbar();
                         }
@@ -335,6 +343,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                         updateMovieDetailRecyclerView();
                         getActivity().invalidateOptionsMenu();
                     } else {
+                        starred = false;
                         Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
                     }
                 }

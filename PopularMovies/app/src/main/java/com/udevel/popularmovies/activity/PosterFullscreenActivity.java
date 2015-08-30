@@ -2,6 +2,7 @@ package com.udevel.popularmovies.activity;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -67,6 +69,8 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                     @Override
                     public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
                         pw_main.stopSpinning();
+                        onBackPressed();
+                        Toast.makeText(pw_main.getContext(), R.string.msg_error_data_connection_error, Toast.LENGTH_LONG).show();
                         return false;
                     }
 
