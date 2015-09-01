@@ -12,6 +12,7 @@ package com.udevel.popularmovies.fragment.listener;
  */
 public interface OnFragmentInteractionListener {
     String ACTION_OPEN_MOVIE_DETAIL = "ACTION_OPEN_MOVIE_DETAIL";
+    String ACTION_CLOSE_MOVIE_DETAIL = "ACTION_CLOSE_MOVIE_DETAIL";
     String ACTION_OPEN_FULLSCREEN_POSTER = "ACTION_OPEN_FULLSCREEN_POSTER";
 
     void onFragmentInteraction(String action, Object asset);

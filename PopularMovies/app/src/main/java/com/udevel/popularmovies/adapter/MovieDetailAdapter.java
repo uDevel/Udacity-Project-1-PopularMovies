@@ -29,24 +29,26 @@ import java.util.Locale;
  * Created by benny on 7/12/2015.
  */
 public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final int VIEW_TYPE_MOVIE_INFO = 0;
-    public static final int VIEW_TYPE_MOVIE_OVERVIEW = 1;
-    public static final int VIEW_TYPE_TRAILER = 2;
-    public static final int VIEW_TYPE_REVIEW = 3;
-    public static final int VIEW_TYPE_FOOTER = 4;
+    private static final int VIEW_TYPE_MOVIE_INFO = 0;
+    private static final int VIEW_TYPE_MOVIE_OVERVIEW = 1;
+    private static final int VIEW_TYPE_TRAILER = 2;
+    private static final int VIEW_TYPE_REVIEW = 3;
+    private static final int VIEW_TYPE_SEPARATOR = 4;
+
     private static final String TAG = MovieDetailAdapter.class.getSimpleName();
     private final Fragment fragment;
     private final boolean isShowingMovieInfo;
-    private boolean showFooter = true;
     private Movie movie;
     private List<YouTubeTrailer> youTubeTrailerList;
     private List<Review> reviewList;
     private AdapterItemClickListener adapterItemClickListener;
+    private boolean hasTrailers;
+    private boolean hasReviews;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MovieDetailAdapter(Movie movie, Fragment fragment, boolean isShowingMovieInfo) {
         this.fragment = fragment;
-        setHasStableIds(true);
+
         updateMovieDetail(movie);
         this.isShowingMovieInfo = isShowingMovieInfo;
     }
@@ -56,7 +58,16 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_MOVIE_INFO:
-                return MovieInfoViewHolder.inflate(parent);
+                return MovieInfoViewHolder.inflate(parent,new ViewHolderClickListener() {
+                    @Override
+                    public void onClick(View v, int adapterPosition) {
+                        if (movie.getPosterPath() != null) {
+                            if (adapterItemClickListener != null) {
+                                adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_POSTER_FULLSCREEN, v, movie.getPosterPath());
+                            }
+                        }
+                    }
+                });
             case VIEW_TYPE_MOVIE_OVERVIEW:
                 return MovieOverviewViewHolder.inflate(parent);
             case VIEW_TYPE_TRAILER:
@@ -83,8 +94,8 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         }
                     }
                 });
-            case VIEW_TYPE_FOOTER:
-                return FooterViewHolder.inflate(parent);
+            case VIEW_TYPE_SEPARATOR:
+                return SeparatorViewHolder.inflate(parent);
             default:
                 return null;
         }
@@ -144,10 +155,6 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 reviewViewHolder.tv_review.setText(review.getContent());
                 reviewViewHolder.tv_reviewer.setText(fragment.getString(R.string.reviewed_by, review.getAuthor()));
                 break;
-            case VIEW_TYPE_FOOTER:
-                ProgressWheel pw_main = ((FooterViewHolder) holder).pw_main;
-                pw_main.spin();
-                break;
         }
     }
 
@@ -161,32 +168,16 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return VIEW_TYPE_MOVIE_INFO;
         } else if (position == 0) {
             return VIEW_TYPE_MOVIE_OVERVIEW;
-        } else if (youTubeTrailerList != null && position < youTubeTrailerList.size() + 1) {
+        } else if (hasTrailers && position == 1) {
+            return VIEW_TYPE_SEPARATOR;
+        } else if (hasTrailers && position < youTubeTrailerList.size() + 2) {    // 1 for overview, 1 for separator
             return VIEW_TYPE_TRAILER;
-        } else if (reviewList != null) {
+        } else if (hasReviews && position == (hasTrailers ? youTubeTrailerList.size() + 2 : 1)) {
+            return VIEW_TYPE_SEPARATOR;
+        } else if (hasReviews) {
             return VIEW_TYPE_REVIEW;
         } else {
             return VIEW_TYPE_MOVIE_OVERVIEW;
-        }
-    }
-
-    @Override
-    public long getItemId(int position) {
-        switch (getItemViewType(position)) {
-            case VIEW_TYPE_MOVIE_INFO:
-                return 0L;
-            case VIEW_TYPE_MOVIE_OVERVIEW:
-                return 1L;
-            case VIEW_TYPE_TRAILER:
-                YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(position);
-                return youTubeTrailer.getId().hashCode();
-            case VIEW_TYPE_REVIEW:
-                Review review = getReviewFromAdapterPosition(position);
-                return review.getId().hashCode();
-            case VIEW_TYPE_FOOTER:
-                return 2L;
-            default:
-                return 0L;
         }
     }
 
@@ -195,16 +186,16 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemCount() {
         return (isShowingMovieInfo ? 1 : 0) + // For movie info
                 1 + //For overview
-                (youTubeTrailerList != null ? youTubeTrailerList.size() : 0) +
-                (reviewList != null ? reviewList.size() : 0);
+                (hasTrailers ? youTubeTrailerList.size() + 1 : 0) +  // 1 for separator
+                (hasReviews ? reviewList.size() + 1 : 0); // 1 for separator
     }
 
     private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
-        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 1 - (isShowingMovieInfo ? 1 : 0));
+        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 2 - (isShowingMovieInfo ? 1 : 0));
     }
 
     private Review getReviewFromAdapterPosition(int position) {
-        return reviewList == null ? null : reviewList.get(position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()) - (isShowingMovieInfo ? 1 : 0));
+        return reviewList == null ? null : reviewList.get(position - 2 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()) - 1 - (isShowingMovieInfo ? 1 : 0));
     }
 
     public void setAdapterItemClickListener(AdapterItemClickListener adapterItemClickListener) {
@@ -213,9 +204,10 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void updateMovieDetail(Movie movie) {
         this.movie = movie;
-        this.youTubeTrailerList = movie.getYouTubeTrailers();
-        this.reviewList = movie.getReviews();
-
+        youTubeTrailerList = movie.getYouTubeTrailers();
+        reviewList = movie.getReviews();
+        hasTrailers = youTubeTrailerList != null && youTubeTrailerList.size() > 0;
+        hasReviews = reviewList != null && reviewList.size() > 0;
         notifyDataSetChanged();
     }
 
@@ -223,20 +215,30 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void onClick(View v, int adapterPosition);
     }
 
-    public static class MovieInfoViewHolder extends RecyclerView.ViewHolder {
+    public static class MovieInfoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView tv_title;
         private final ImageView iv_poster;
         private final TextView tv_release_popularity_rating;
+        private final ViewHolderClickListener viewHolderClickListener;
 
-        public MovieInfoViewHolder(View v) {
+        public MovieInfoViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
             super(v);
+            this.viewHolderClickListener = viewHolderClickListener;
+
             iv_poster = ((ImageView) v.findViewById(R.id.iv_poster));
             tv_release_popularity_rating = ((TextView) v.findViewById(R.id.tv_release_popularity_rating));
             tv_title = ((TextView) v.findViewById(R.id.tv_title));
+            iv_poster.setOnClickListener(this);
         }
 
-        static MovieInfoViewHolder inflate(ViewGroup parent) {
-            return new MovieInfoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_detail_info, parent, false));
+        static MovieInfoViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {
+            return new MovieInfoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_detail_info, parent, false),
+                    viewHolderClickListener);
+        }
+
+        @Override
+        public void onClick(View v) {
+            viewHolderClickListener.onClick(v, getAdapterPosition());
         }
     }
 
@@ -305,17 +307,14 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public static class FooterViewHolder extends RecyclerView.ViewHolder {
+    public static class SeparatorViewHolder extends RecyclerView.ViewHolder {
 
-        private final ProgressWheel pw_main;
-
-        public FooterViewHolder(View itemView) {
+        public SeparatorViewHolder(View itemView) {
             super(itemView);
-            pw_main = ((ProgressWheel) itemView.findViewById(R.id.pw_main));
         }
 
-        static FooterViewHolder inflate(ViewGroup parent) {
-            return new FooterViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie_footer, parent, false));
+        static SeparatorViewHolder inflate(ViewGroup parent) {
+            return new SeparatorViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_separator, parent, false));
         }
     }
 }

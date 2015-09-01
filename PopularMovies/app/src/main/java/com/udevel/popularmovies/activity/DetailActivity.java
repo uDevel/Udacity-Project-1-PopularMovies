@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 
 import com.udevel.popularmovies.R;
@@ -47,6 +48,9 @@ public class DetailActivity extends AppCompatActivity implements OnFragmentInter
                     intent.putExtra(PosterFullscreenActivity.ARG_KEY_POSTER_PATH, (String) asset);
                     startActivity(intent);
                 }
+                break;
+            case OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL:
+                onBackPressed();
                 break;
         }
     }

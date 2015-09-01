@@ -7,15 +7,6 @@
               android:orientation="vertical"
               android:padding="8dp">
 
-    <View
-        android:id="@+id/v_top_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:background="@color/light_gray"/>
-
     <TextView
         android:id="@+id/tv_review"
         android:layout_width="match_parent"

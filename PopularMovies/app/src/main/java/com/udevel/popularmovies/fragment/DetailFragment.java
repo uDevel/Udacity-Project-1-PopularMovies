@@ -165,15 +165,6 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
     }
 
-    public void setMovie(int movieId) {
-        this.movieId = movieId;
-        setMovieInfoUI();
-        Context context = getContext();
-        if (context != null) {
-            AppPreferences.setLastMovieIdDetailViewed(context, movieId);
-        }
-    }
-
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
         iv_poster.setPivotY(iv_poster.getHeight());
@@ -187,6 +178,15 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         setMovieInfoGroupAlpha(1 + expandPercentage);
 
         ll_collapse.setVisibility(expandPercentage <= -0.9f ? View.VISIBLE : View.GONE);
+    }
+
+    public void setMovie(int movieId) {
+        this.movieId = movieId;
+        setMovieInfoUI();
+        Context context = getContext();
+        if (context != null) {
+            AppPreferences.setLastMovieIdDetailViewed(context, movieId);
+        }
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
@@ -344,7 +344,10 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                         getActivity().invalidateOptionsMenu();
                     } else {
                         starred = false;
-                        Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+                        if (onFragmentInteractionListener != null) {
+                            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL, null);
+                        }
                     }
                 }
             }
@@ -395,13 +398,25 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
                 @Override
                 public void adapterItemClick(String action, View v, Object data) {
-                    if (action.equals(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER) && data instanceof String) {
-                        startActivity(Utils.getYouTubeIntent(getActivity().getPackageManager(), ((String) data)));
-                    } else if (action.equals(AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG) && data instanceof Review) {
-                        FragmentManager fm = getChildFragmentManager();
-                        ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
-                        dialogFragment.show(fm, "Review Dialog");
-                        //  Toast.makeText(getActivity(), ((Review) data).getContent(), Toast.LENGTH_SHORT).show();
+                    switch (action) {
+                        case AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER: {
+                            if (data instanceof String) {
+                                startActivity(Utils.getYouTubeIntent(getActivity().getPackageManager(), ((String) data)));
+                            }
+                            break;
+
+                        }
+                        case AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG: {
+                            if (data instanceof Review) {
+                                FragmentManager fm = getChildFragmentManager();
+                                ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
+                                dialogFragment.show(fm, "Review Dialog");
+                            }
+                            break;
+                        }
+                        case AdapterItemClickListener.ACTION_OPEN_POSTER_FULLSCREEN: {
+                            break;
+                        }
                     }
                 }
             });

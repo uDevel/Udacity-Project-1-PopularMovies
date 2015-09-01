@@ -3,21 +3,15 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/list_item_ripple">
-
-    <View
-        android:id="@+id/v_top_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/light_gray"/>
 
     <ImageView
         android:id="@+id/iv_trailer_thumbnail"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/v_top_line"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:adjustViewBounds="true"
@@ -27,7 +21,6 @@
         android:id="@+id/tv_trailer_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/v_top_line"
         android:layout_toEndOf="@id/iv_trailer_thumbnail"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
