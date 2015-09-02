@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="back_to_list_activity_on_landscape_orientation">true</bool>
+</resources>
