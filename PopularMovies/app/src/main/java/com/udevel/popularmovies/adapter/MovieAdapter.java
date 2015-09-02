@@ -75,7 +75,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Glide.with(fragment)//((MovieViewHolder) holder).iv_poster.getContext())
                         .load(uri)
                         .error(R.drawable.ic_image_error)
-                        .centerCrop()
+                        .fitCenter()
                         .animate(R.anim.fade_in_rise)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(movieViewHolder.iv_poster);
