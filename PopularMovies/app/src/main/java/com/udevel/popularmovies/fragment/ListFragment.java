@@ -3,6 +3,7 @@ package com.udevel.popularmovies.fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -45,7 +46,7 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ListFragment extends Fragment implements AdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class ListFragment extends Fragment implements AdapterItemClickListener, SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
     private static final String TAG = ListFragment.class.getSimpleName();
     private static final int LIST_POSITION_TO_MOVE_FAB = 20;
     private static final int LIST_POSITION_TO_HIDE_FAB = 17;
@@ -68,6 +69,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private Snackbar refreshSnackbar;
     private Toast errorToast;
     private boolean hasToolbar;
+    private AppBarLayout abl_popular_movies;
 
     public ListFragment() {
     }
@@ -123,6 +125,22 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (hasToolbar) {
+            abl_popular_movies.addOnOffsetChangedListener(this);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (hasToolbar) {
+            abl_popular_movies.removeOnOffsetChangedListener(this);
+        }
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if (saveMovieDataTask != null) {
@@ -167,6 +185,11 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             refreshSnackbar = null;
         }
         getMovieList(true);
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+        srl_popular_movies.setEnabled(i == 0);
     }
 
     private void checkIfNewerUpdate() {
@@ -301,6 +324,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         cl_root = root.findViewById(R.id.cl_root);
         rv_popular_movies = ((RecyclerView) root.findViewById(R.id.rv_popular_movies));
         tb_popular_movies = ((Toolbar) root.findViewById(R.id.tb_popular_movies));
+        abl_popular_movies = ((AppBarLayout) root.findViewById(R.id.abl_popular_movies));
         tv_empty_view = ((TextView) root.findViewById(R.id.tv_empty_view));
         srl_popular_movies = ((SwipeRefreshLayout) root.findViewById(R.id.srl_popular_movies));
         fab_go_to_top = ((FloatingActionButton) root.findViewById(R.id.fab_go_to_top));
