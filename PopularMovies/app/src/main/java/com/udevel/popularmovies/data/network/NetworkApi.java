@@ -75,12 +75,13 @@ public class NetworkApi {
     }
 
     public static void getMoviesByPopularity(int page, Callback<DiscoverMovieResult> movieResultCallback) {
-        getTheMovieDBService().getMovies(TheMovieDBService.popularSortBy, 0, page, TheMovieDBService.apiKey, movieResultCallback);
+        // page for the api starts with 1
+        getTheMovieDBService().getMovies(TheMovieDBService.popularSortBy, 0, page + 1, TheMovieDBService.apiKey, movieResultCallback);
     }
 
     // Minimum vote count is needed in order to have meaningful list.
     public static void getMoviesByRating(int page, int minimumVoteCount, Callback<DiscoverMovieResult> movieResultCallback) {
-        getTheMovieDBService().getMovies(TheMovieDBService.voteSortBy, minimumVoteCount, page, TheMovieDBService.apiKey, movieResultCallback);
+        getTheMovieDBService().getMovies(TheMovieDBService.voteSortBy, minimumVoteCount, page + 1, TheMovieDBService.apiKey, movieResultCallback);
     }
 
     public static void getMovieById(int id, Callback<MovieDetailInfoResult> movieDetailInfoCallback) {

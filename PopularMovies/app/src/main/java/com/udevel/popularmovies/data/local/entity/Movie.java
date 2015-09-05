@@ -1,5 +1,7 @@
 package com.udevel.popularmovies.data.local.entity;
 
+import android.support.annotation.Nullable;
+
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 
 import java.util.ArrayList;
@@ -126,6 +128,7 @@ public class Movie {
         this.reviews = reviews;
     }
 
+    @Nullable
     public List<YouTubeTrailer> getYouTubeTrailers() {
         return youTubeTrailers;
     }

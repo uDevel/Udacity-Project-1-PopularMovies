@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class DataManager {
     public static void clearData(Context context) {
-        AppPreferences.clearSharedPreferense(context);
+        AppPreferences.clearSharedPreference(context);
     }
 
     @Nullable
@@ -48,16 +48,15 @@ public class DataManager {
         return null;
     }
 
-    public static List<Movie> saveMovies(Context context, List<Movie> movies, int page, int movieListType) {
+    public static List<Movie> saveMovies(Context context, List<Movie> movies, int page) {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(movies);
         AppPreferences.setMoviesJsonStr(context, jsonStr);
         AppPreferences.setMoviePage(context, page);
-        AppPreferences.setLastMovieListType(context, movieListType);
         return movies;
     }
 
-    public static List<Movie> addMovies(Context context, List<Movie> movies, int page, int movieListType) {
+    public static List<Movie> addMovies(Context context, List<Movie> movies, int page) {
         List<Movie> origMovies = getMovies(context);
 
         if (movies == null) {
@@ -83,22 +82,10 @@ public class DataManager {
 
         origMovies.addAll(movies);
 
-        return saveMovies(context, origMovies, page, movieListType);
+        return saveMovies(context, origMovies, page);
     }
 
-    public static Map<Integer, Movie> getFavoriteMovieMap(Context context) {
-        Map<Integer, Movie> movieMap = null;
-        String MoviesJsonStr = AppPreferences.getFavoriteMoviesJsonStr(context);
-        if (MoviesJsonStr != null) {
-            Gson gson = new Gson();
-            Type collectionType = new TypeToken<Map<Integer, Movie>>() {
-            }.getType();
-            movieMap = gson.fromJson(MoviesJsonStr, collectionType);
-        }
-
-        return movieMap;
-    }
-
+    @Nullable
     public static List<Movie> getFavoriteMovieList(Context context) {
         Map<Integer, Movie> favoriteMovies = DataManager.getFavoriteMovieMap(context);
         if (favoriteMovies != null) {
@@ -147,5 +134,18 @@ public class DataManager {
             return favoriteMovies.get(targetId);
         }
         return null;
+    }
+
+    private static Map<Integer, Movie> getFavoriteMovieMap(Context context) {
+        Map<Integer, Movie> movieMap = null;
+        String MoviesJsonStr = AppPreferences.getFavoriteMoviesJsonStr(context);
+        if (MoviesJsonStr != null) {
+            Gson gson = new Gson();
+            Type collectionType = new TypeToken<Map<Integer, Movie>>() {
+            }.getType();
+            movieMap = gson.fromJson(MoviesJsonStr, collectionType);
+        }
+
+        return movieMap;
     }
 }

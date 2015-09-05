@@ -80,10 +80,11 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
     private static List<Movie> updateData(Context context, DiscoverMovieResult discoverMovieResult, int currentPage, int movieListType) {
         List<Movie> movies = Movie.convertDiscoverMovieInfoResults(discoverMovieResult.getResults());
-        if (currentPage == 1) {
-            return DataManager.saveMovies(context, movies, 1, movieListType);
+        if (currentPage == 0) {
+            AppPreferences.setLastMovieListType(context, movieListType);
+            return DataManager.saveMovies(context, movies, currentPage);
         } else {
-            return DataManager.addMovies(context, movies, currentPage, movieListType);
+            return DataManager.addMovies(context, movies, currentPage);
         }
     }
 
@@ -192,10 +193,18 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         srl_popular_movies.setEnabled(i == 0);
     }
 
+    public void setMovieListType(int listType) {
+        if (movieListType != listType) {
+            movieListType = listType;
+            AppPreferences.setLastMovieListType(getActivity(), movieListType);
+            getMovieList(true);
+        }
+    }
+
     private void checkIfNewerUpdate() {
         switch (movieListType) {
             case Movie.MOVIE_LIST_TYPE_POPULARITY:
-                NetworkApi.getMoviesByPopularity(1, new Callback<DiscoverMovieResult>() {
+                NetworkApi.getMoviesByPopularity(0, new Callback<DiscoverMovieResult>() {
                     @Override
                     public void success(DiscoverMovieResult discoverMovieResult, Response response) {
                         if (!isAdded() || getActivity() == null) {
@@ -227,7 +236,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                 });
                 break;
             case Movie.MOVIE_LIST_TYPE_RATING:
-                NetworkApi.getMoviesByRating(1, MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING, new Callback<DiscoverMovieResult>() {
+                NetworkApi.getMoviesByRating(0, MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING, new Callback<DiscoverMovieResult>() {
                     @Override
                     public void success(DiscoverMovieResult discoverMovieResult, Response response) {
                         if (response.getStatus() == 200 && discoverMovieResult != null) {
@@ -270,7 +279,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                         onRefresh();
                     }
                 });
-        refreshSnackbar.show(); // Don’t forget to show!
+        refreshSnackbar.show();
     }
 
     private void setupRecyclerView() {
@@ -410,7 +419,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
     private void getMovieList(boolean isRefresh) {
         if (loadingFromNetwork.compareAndSet(false, true)) {
-            final int currentPage = isRefresh ? 1 : AppPreferences.getMoviePage(getActivity()) + 1;
+            final int currentPage = isRefresh ? 0 : AppPreferences.getMoviePage(getActivity()) + 1;
 
             // This is to avoid over limit of String characters
             if (currentPage > MAX_PAGE_CACHE) {
@@ -510,14 +519,6 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             movieAdapter.setAdapterItemClickListener(this);
         } else {
             movieAdapter.updateMovies(movies, movieListType);
-        }
-    }
-
-    public void setMovieListType(int listType) {
-        if (movieListType != listType) {
-            movieListType = listType;
-            AppPreferences.setLastMovieListType(getActivity(), movieListType);
-            getMovieList(true);
         }
     }
 

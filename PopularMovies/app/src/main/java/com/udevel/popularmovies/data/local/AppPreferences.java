@@ -27,7 +27,7 @@ public class AppPreferences {
         return getSharedPreferences(context).edit();
     }
 
-    public static void clearSharedPreferense(Context context) {
+    public static void clearSharedPreference(Context context) {
         getEditor(context).clear().apply();
     }
 
