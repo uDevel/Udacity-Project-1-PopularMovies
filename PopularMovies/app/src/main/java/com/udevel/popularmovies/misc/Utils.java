@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
+import java.util.UUID;
+
 /**
  * Created by benny on 8/9/2015.
  */
@@ -25,5 +27,13 @@ public class Utils {
         } catch (PackageManager.NameNotFoundException e) {
         }
         return intent;
+    }
+
+    public static String getUniqueStringId() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static int getUniqueIntId() {
+        return UUID.randomUUID().hashCode();
     }
 }

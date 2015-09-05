@@ -1,6 +1,7 @@
 package com.udevel.popularmovies.data.local;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -17,6 +18,11 @@ import java.util.Map;
  * Created by benny on 5/16/2015.
  */
 public class DataManager {
+    public static void clearData(Context context) {
+        AppPreferences.clearSharedPreferense(context);
+    }
+
+    @Nullable
     public static List<Movie> getMovies(Context context) {
         List<Movie> Movies = null;
         String MoviesJsonStr = AppPreferences.getMoviesJsonStr(context);

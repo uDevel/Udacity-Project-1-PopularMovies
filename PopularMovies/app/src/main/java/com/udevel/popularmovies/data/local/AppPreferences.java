@@ -19,13 +19,16 @@ public class AppPreferences {
     private static final int DEF_VALUE_MOVIE_PAGE = 1;
     private static final int DEF_VALUE_MOVIE_TYPE = Movie.MOVIE_LIST_TYPE_POPULARITY;
 
-
     private static SharedPreferences getSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     private static SharedPreferences.Editor getEditor(Context context) {
         return getSharedPreferences(context).edit();
+    }
+
+    public static void clearSharedPreferense(Context context) {
+        getEditor(context).clear().apply();
     }
 
     public static void setLastMovieListType(Context context, int lastMoviesType) {

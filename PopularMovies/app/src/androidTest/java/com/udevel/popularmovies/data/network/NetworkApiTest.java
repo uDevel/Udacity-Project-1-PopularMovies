@@ -1,9 +1,8 @@
-package com.udevel.popularmovies.data;
+package com.udevel.popularmovies.data.network;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
 import com.udevel.popularmovies.data.network.api.ReviewsResult;
