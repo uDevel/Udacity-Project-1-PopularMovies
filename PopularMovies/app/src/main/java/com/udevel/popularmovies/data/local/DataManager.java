@@ -131,6 +131,7 @@ public class DataManager {
         return movieList;
     }
 
+    @Nullable
     public static Long addFavoriteMovie(Context context, Movie movie){
         MovieContentValues movieContentValues = convertToMovieContentValues(movie);
         if (movieContentValues != null) {
@@ -143,6 +144,7 @@ public class DataManager {
         return null;
     }
 
+    @NonNull
     public static List<Review> getReviewsByMovieId(Context context, int movieId) {
         ReviewSelection selection = new ReviewSelection();
         selection.movieMovieId(movieId);
@@ -156,6 +158,7 @@ public class DataManager {
         return reviews;
     }
 
+    @NonNull
     public static List<YouTubeTrailer> getYouTubeTrailerByMovieId(Context context, int movieId) {
         YoutubetrailerSelection selection = new YoutubetrailerSelection();
         selection.movieMovieId(movieId);
@@ -169,7 +172,7 @@ public class DataManager {
         return youTubeTrailers;
     }
 
-    public static void addFavoriteMovieReviewTrailer(Context context, Movie movie, List<Review> reviews, List<YouTubeTrailer> youTubeTrailers) {
+    public static Long addFavoriteMovieReviewTrailer(Context context, Movie movie, List<Review> reviews, List<YouTubeTrailer> youTubeTrailers) {
         MovieContentValues movieContentValues = convertToMovieContentValues(movie);
         List<ReviewContentValues> reviewContentValuesList = convertToReviewContentValuesList(reviews);
         List<YoutubetrailerContentValues> youtubetrailerContentValuesList = convertToYoutubetrailerContentValuesList(youTubeTrailers);
@@ -199,11 +202,17 @@ public class DataManager {
             }
 
             try {
-                context.getContentResolver().applyBatch(MovieContentProvider.AUTHORITY, ops);
+                ContentProviderResult[] contentProviderResults = context.getContentResolver().applyBatch(MovieContentProvider.AUTHORITY, ops);
+                Uri uri = contentProviderResults[0].uri;
+                if (uri != null) {
+                    return ContentUris.parseId(uri);
+                }
             } catch (RemoteException | OperationApplicationException e) {
                 Log.e(TAG, e.getMessage());
             }
         }
+
+        return null;
     }
 
     public static void removeFavoriteMovie(Context context, Movie movie) {

@@ -238,42 +238,5 @@ public class DataManagerTest extends AndroidTestCase {
         }
 
         return movie1.getMovieId() == movie2.getMovieId();
-        /*
-        if (movie1.getMovieId() == movie2.getMovieId()) {
-            List<YouTubeTrailer> youTubeTrailers1 = movie1.getYouTubeTrailers();
-            List<YouTubeTrailer> youTubeTrailers2 = movie2.getYouTubeTrailers();
-            if (youTubeTrailers1 != null && youTubeTrailers2 != null) {
-                if (youTubeTrailers1.size() != youTubeTrailers2.size()) {
-                    return false;
-                }
-
-                for (int i = 0; i < youTubeTrailers1.size(); i++) {
-                    if (!youTubeTrailers1.get(i).getYouTubeTrailerId().equals(youTubeTrailers2.get(i).getYouTubeTrailerId())) {
-                        return false;
-                    }
-                }
-            } else if (youTubeTrailers1 != youTubeTrailers2) {
-                return false;
-            }
-
-            List<Review> reviews1 = movie1.getReviews();
-            List<Review> reviews2 = movie2.getReviews();
-            if (reviews1 != null && reviews2 != null) {
-                if (reviews1.size() != reviews2.size()) {
-                    return false;
-                }
-
-                for (int i = 0; i < reviews1.size(); i++) {
-                    if (!reviews1.get(i).getReviewId().equals(reviews2.get(i).getReviewId())) {
-                        return false;
-                    }
-                }
-            } else if (reviews1 != reviews2) {
-                return false;
-            }
-        }
-
-        return true;*/
-
     }
 }
