@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -109,7 +110,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             List<Movie> movies;
 
             if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                long startNano = System.nanoTime();
                 movies = DataManager.getFavoriteMovieList(context);
+                long finishNano = System.nanoTime();
+                Log.d(TAG, "test speed: " + ((finishNano - startNano) / 1000000f) + " ms");
             } else {
                 movies = DataManager.getMovies(context);
             }
