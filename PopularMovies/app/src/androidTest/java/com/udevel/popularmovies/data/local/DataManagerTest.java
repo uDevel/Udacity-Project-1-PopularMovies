@@ -11,6 +11,7 @@ import com.udevel.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by benny on 9/5/2015.
@@ -39,7 +40,7 @@ public class DataManagerTest extends AndroidTestCase {
         assertNotNull(targetMovies);
         assertTrue(targetMovies.size() == 1);
         assertTrue(targetMovies.get(0).getMovieId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovies.get(0)));
+        assertTrue(compareMovie(expectedMovie, targetMovies.get(0)));
     }
 
     public void testAddMovies() throws Exception {
@@ -71,7 +72,7 @@ public class DataManagerTest extends AndroidTestCase {
         assertNotNull(targetMovies);
         assertTrue(targetMovies.size() == 1);
         assertTrue(targetMovies.get(0).getMovieId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovies.get(0)));
+        assertTrue(compareMovie(expectedMovie, targetMovies.get(0)));
     }
 
     public void testGetMovieById() throws Exception {
@@ -82,7 +83,7 @@ public class DataManagerTest extends AndroidTestCase {
         Movie targetMovie = DataManager.getMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
         assertTrue(targetMovie.getMovieId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+        assertTrue(compareMovie(expectedMovie, targetMovie));
     }
 
     public void testGetFavoriteMovieList() throws Exception {
@@ -102,7 +103,7 @@ public class DataManagerTest extends AndroidTestCase {
         Movie targetMovie = targetMovieList.get(0);
         assertNotNull(targetMovie);
         assertTrue(targetMovie.getMovieId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+        assertTrue(compareMovie(expectedMovie, targetMovie));
     }
 
     public void testAddFavoriteMovieReviewTrailer() throws Exception {
@@ -122,7 +123,7 @@ public class DataManagerTest extends AndroidTestCase {
 
         Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+        assertTrue(compareMovie(expectedMovie, targetMovie));
 
         List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, targetMovie.getMovieId());
         assertNotNull(reviewsByMovieId);
@@ -150,14 +151,14 @@ public class DataManagerTest extends AndroidTestCase {
 
         Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+        assertTrue(compareMovie(expectedMovie, targetMovie));
 
         DataManager.removeFavoriteMovie(context, targetMovie);
         targetMovieList = DataManager.getFavoriteMovieList(context);
         assertTrue(targetMovieList.size() == 0);
 
         List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, targetMovie.getMovieId());
-        assertTrue(reviewsByMovieId == null || reviewsByMovieId.size() == 0);
+        assertTrue(reviewsByMovieId.size() == 0);
 
         List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, targetMovie.getMovieId());
         assertNotNull(youTubeTrailerByMovieId);
@@ -177,7 +178,7 @@ public class DataManagerTest extends AndroidTestCase {
         Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
         assertTrue(targetMovie.getMovieId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+        assertTrue(compareMovie(expectedMovie, targetMovie));
 
     }
 
@@ -192,8 +193,16 @@ public class DataManagerTest extends AndroidTestCase {
 
     @NonNull
     private Movie createMovie(int expectedMovieId) {
+        Random random = new Random();
         Movie movie = new Movie();
         movie.setMovieId(expectedMovieId);
+        movie.setVoteCount(random.nextInt());
+        movie.setVoteAverage(random.nextDouble());
+        movie.setPosterPath(String.valueOf(random.nextInt()));
+        movie.setOriginalTitle(String.valueOf(random.nextInt()));
+        movie.setOverview(String.valueOf(random.nextInt()));
+        movie.setReleaseDate(String.valueOf(random.nextInt()));
+        movie.setPopularity(random.nextDouble());
 
         return movie;
     }
@@ -230,13 +239,7 @@ public class DataManagerTest extends AndroidTestCase {
         return reviews;
     }
 
-    private boolean fuzzyCompareMovie(Movie movie1, Movie movie2) {
-        if (movie1 == null) {
-            return movie2 == null;
-        } else if (movie2 == null) {
-            return false;
-        }
-
-        return movie1.getMovieId() == movie2.getMovieId();
+    private boolean compareMovie(Movie movie1, Movie movie2) {
+        return movie1.equals(movie2);
     }
 }

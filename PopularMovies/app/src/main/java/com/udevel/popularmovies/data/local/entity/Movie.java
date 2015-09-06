@@ -1,6 +1,7 @@
 package com.udevel.popularmovies.data.local.entity;
 
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
+import com.udevel.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,5 +115,23 @@ public class Movie {
 
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (this.getClass() != o.getClass()) return false;
+        // Class name is Employ & have lastname
+        Movie movie = (Movie) o;
+        if (movieId != movie.movieId) return false;
+        if (!Utils.compareString(originalTitle, movie.originalTitle)) return false;
+        if (voteAverage != movie.voteAverage) return false;
+        if (!Utils.compareString(posterPath, movie.posterPath)) return false;
+        if (!Utils.compareString(overview, movie.overview)) return false;
+        if (!Utils.compareString(releaseDate, movie.releaseDate)) return false;
+        if (popularity != movie.popularity) return false;
+        return voteCount == movie.voteCount;
+
     }
 }

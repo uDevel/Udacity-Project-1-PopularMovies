@@ -4,7 +4,8 @@ package com.udevel.popularmovies.data.local.entity;
  * Created by benny on 8/9/2015.
  */
 public class YouTubeTrailer {
-    private static final String URL_YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
+    private static final String URL_YOUTUBE_WEB = "https://www.youtube.com/watch?v=";
+    private static final String URL_YOUTUBE_APP = "vnd.youtube://";
     private static final String URL_YOUTUBE_THUMBNAIL = "https://img.youtube.com/vi/";
     private static final String URL_YOUTUBE_THUMBNAIL_SIZE_FULLSIZE = "/0.jpg";
     private static final String URL_YOUTUBE_THUMBNAIL_SIZE_LARGE = "/1.jpg";
@@ -12,6 +13,14 @@ public class YouTubeTrailer {
     private String size;
     private String name;
     private String youTubeTrailerId;
+
+    public static String getUrlForWeb(String youTubeId) {
+        return URL_YOUTUBE_WEB + youTubeId;
+    }
+
+    public static String getUrlForApp(String youTubeId) {
+        return URL_YOUTUBE_APP + youTubeId;
+    }
 
     public String getYouTubeTrailerId() {
         return youTubeTrailerId;
@@ -35,10 +44,6 @@ public class YouTubeTrailer {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUrl() {
-        return URL_YOUTUBE_WATCH + youTubeTrailerId;
     }
 
     public String getThumbnailUrl() {

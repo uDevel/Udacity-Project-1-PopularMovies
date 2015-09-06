@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.pnikosis.materialishprogress.ProgressWheel;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -76,7 +75,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(adapterPosition);
                         if (youTubeTrailer != null) {
                             if (adapterItemClickListener != null) {
-                                adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER, v, youTubeTrailer.getUrl());
+                                adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER, v, youTubeTrailer.getYouTubeTrailerId());
                             }
                         }
                     }
@@ -189,14 +188,6 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 (hasReviews ? reviewList.size() + 1 : 0); // 1 for separator
     }
 
-    private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
-        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 2 - (isShowingMovieInfo ? 1 : 0));
-    }
-
-    private Review getReviewFromAdapterPosition(int position) {
-        return reviewList == null ? null : reviewList.get(position - 2 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()) - 1 - (isShowingMovieInfo ? 1 : 0));
-    }
-
     public void setAdapterItemClickListener(AdapterItemClickListener adapterItemClickListener) {
         this.adapterItemClickListener = adapterItemClickListener;
     }
@@ -209,6 +200,14 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         hasTrailers = youTubeTrailerList != null && youTubeTrailerList.size() > 0;
         hasReviews = reviewList != null && reviewList.size() > 0;
         notifyDataSetChanged();
+    }
+
+    private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
+        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 2 - (isShowingMovieInfo ? 1 : 0));
+    }
+
+    private Review getReviewFromAdapterPosition(int position) {
+        return reviewList == null ? null : reviewList.get(position - 2 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size()) - 1 - (isShowingMovieInfo ? 1 : 0));
     }
 
     interface ViewHolderClickListener {

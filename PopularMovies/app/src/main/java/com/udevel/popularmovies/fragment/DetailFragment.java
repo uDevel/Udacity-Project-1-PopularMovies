@@ -1,5 +1,6 @@
 package com.udevel.popularmovies.fragment;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,7 +40,6 @@ import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
-import com.udevel.popularmovies.misc.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -162,7 +162,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
             if (shareActionProvider != null && hasTrailer) {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, movie.getOriginalTitle() + "\n" + youTubeTrailers.get(0).getUrl());
+                sendIntent.putExtra(Intent.EXTRA_TEXT, movie.getOriginalTitle() + "\n" + YouTubeTrailer.getUrlForWeb(youTubeTrailers.get(0).getYouTubeTrailerId()));
                 sendIntent.setType("text/plain");
                 shareActionProvider.setShareIntent(sendIntent);
             }
@@ -335,7 +335,9 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     if (context != null) {
                         Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
                         if (favoriteMovieById != null) {
-                            DataManager.addFavoriteMovieReviewTrailer(context, movie, reviews, youTubeTrailers);
+                            if (!movie.equals(favoriteMovieById)) {
+                                DataManager.addFavoriteMovieReviewTrailer(context, movie, reviews, youTubeTrailers);
+                            }
                             starred = true;
                         } else {
                             starred = false;
@@ -426,7 +428,15 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     switch (action) {
                         case AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER: {
                             if (data instanceof String) {
-                                startActivity(Utils.getYouTubeIntent(getActivity().getPackageManager(), ((String) data)));
+                                String youTubeId = ((String) data);
+                                try {
+                                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForApp(youTubeId)));
+                                    startActivity(i);
+                                } catch (ActivityNotFoundException e) {
+                                    // youtube is not installed.  use other app.
+                                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForWeb(youTubeId)));
+                                    startActivity(i);
+                                }
                             }
                             break;
 
@@ -455,5 +465,4 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_popularity.setAlpha(alpha);
         tv_rating.setAlpha(alpha);
     }
-
 }

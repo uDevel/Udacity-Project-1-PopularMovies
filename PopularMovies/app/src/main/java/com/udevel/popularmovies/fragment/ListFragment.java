@@ -1,8 +1,11 @@
 package com.udevel.popularmovies.fragment;
 
 import android.content.Context;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -31,6 +34,7 @@ import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.AppPreferences;
 import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
+import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
@@ -70,6 +74,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private Toast errorToast;
     private boolean hasToolbar;
     private AppBarLayout abl_popular_movies;
+    private FavoriteMoviesObserver favoriteMoviesObserver;
 
     public ListFragment() {
     }
@@ -110,6 +115,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
             if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
                 movies = DataManager.getFavoriteMovieList(context);
+                registerFavoriteMovieListObserver();
             } else {
                 movies = DataManager.getMovies(context);
             }
@@ -161,6 +167,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         fab_go_to_top = null;
         tv_empty_view = null;
         movieAdapter = null;
+        unregisterFavoriteMovieListObserver();
         super.onDestroyView();
     }
 
@@ -174,7 +181,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     public void adapterItemClick(String action, View v, Object data) {
         if (action.equals(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL) && data instanceof Integer) {
             if (onFragmentInteractionListener != null) {
-                onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, ((Integer) data).intValue());
+                onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL, data);
             }
         }
     }
@@ -198,6 +205,28 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             movieListType = listType;
             AppPreferences.setLastMovieListType(getActivity(), movieListType);
             getMovieList(true);
+
+            if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                registerFavoriteMovieListObserver();
+            } else {
+                unregisterFavoriteMovieListObserver();
+            }
+        }
+    }
+
+    private void unregisterFavoriteMovieListObserver() {
+        if (favoriteMoviesObserver != null) {
+            Log.d(TAG, "*** unregistered");
+            getContext().getContentResolver().unregisterContentObserver(favoriteMoviesObserver);
+            favoriteMoviesObserver = null;
+        }
+    }
+
+    private void registerFavoriteMovieListObserver() {
+        if (favoriteMoviesObserver == null) {
+            Log.d(TAG, "*** registered");
+            favoriteMoviesObserver = new FavoriteMoviesObserver(new Handler(), getContext());
+            getContext().getContentResolver().registerContentObserver(MovieColumns.CONTENT_URI, true, favoriteMoviesObserver);
         }
     }
 
@@ -460,8 +489,8 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                     loadingFromNetwork.set(false);
                     srl_popular_movies.setRefreshing(false);
                     tv_empty_view.setText(getText(R.string.msg_error_empty_favorite_movie_list));
-                    tv_empty_view.setVisibility(movies == null || movies.isEmpty() ? View.VISIBLE : View.INVISIBLE);
-                    rv_popular_movies.setVisibility(movies == null || movies.isEmpty() ? View.INVISIBLE : View.VISIBLE);
+                    tv_empty_view.setVisibility(movies.isEmpty() ? View.VISIBLE : View.INVISIBLE);
+                    rv_popular_movies.setVisibility(movies.isEmpty() ? View.INVISIBLE : View.VISIBLE);
                     break;
             }
         } else {
@@ -570,4 +599,25 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         }
     }
 
+    private class FavoriteMoviesObserver extends ContentObserver {
+        private final Context context;
+
+        public FavoriteMoviesObserver(Handler handler, Context context) {
+            super(handler);
+            this.context = context.getApplicationContext();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            Log.d(TAG, "onChange " + selfChange + " " + uri.toString());
+            if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                getMovieList(true);
+            }
+        }
+    }
 }
