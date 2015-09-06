@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin_end">8dp</dimen>
     <dimen name="fab_margin_bottom">0dp</dimen>
+    <dimen name="iv_poster_elevation">12dp</dimen>
 </resources>

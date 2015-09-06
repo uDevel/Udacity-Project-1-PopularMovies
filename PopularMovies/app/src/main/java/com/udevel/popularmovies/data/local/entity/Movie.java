@@ -122,8 +122,8 @@ public class Movie {
         if (this == o) return true;
         if (o == null) return false;
         if (this.getClass() != o.getClass()) return false;
-        // Class name is Employ & have lastname
         Movie movie = (Movie) o;
+
         if (movieId != movie.movieId) return false;
         if (!Utils.compareString(originalTitle, movie.originalTitle)) return false;
         if (voteAverage != movie.voteAverage) return false;
