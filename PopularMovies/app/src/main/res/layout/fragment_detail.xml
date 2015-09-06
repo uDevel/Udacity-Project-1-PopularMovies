@@ -20,7 +20,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:layout_scrollFlags="scroll"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -147,13 +147,13 @@
 
         <TextView
             android:id="@+id/tv_instruction"
-            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textColor="@color/primary"
+            android:background="@color/white"
             android:gravity="center"
             android:text="@string/msg_pick_a_movie"
-            tools:visibility="visible"
-            android:visibility="gone"/>
+            android:textColor="@color/primary"
+            android:visibility="gone"
+            tools:visibility="visible"/>
     </android.support.design.widget.CoordinatorLayout>
 </FrameLayout>

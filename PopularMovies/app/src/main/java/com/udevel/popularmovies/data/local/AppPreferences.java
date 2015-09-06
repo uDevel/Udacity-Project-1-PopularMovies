@@ -11,7 +11,6 @@ import com.udevel.popularmovies.data.local.entity.Movie;
  */
 public class AppPreferences {
 
-    private static final String KEY_FAVOURITE_MOVIES_JSON_STR = "KEY_FAVOURITE_MOVIES_JSON_STR";
     private static final String KEY_MOVIES_JSON_STR = "KEY_MOVIES_JSON_STR";
     private static final String KEY_MOVIES_PAGE = "KEY_MOVIES_PAGE";
     private static final String KEY_LAST_MOVIE_LIST_TYPE = "KEY_LAST_MOVIE_LIST_TYPE";
@@ -45,14 +44,6 @@ public class AppPreferences {
 
     public static String getMoviesJsonStr(Context context) {
         return getSharedPreferences(context).getString(KEY_MOVIES_JSON_STR, null);
-    }
-
-    public static void setFavoriteMoviesJsonStr(Context context, String savingStr) {
-        getEditor(context).putString(KEY_FAVOURITE_MOVIES_JSON_STR, savingStr).apply();
-    }
-
-    public static String getFavoriteMoviesJsonStr(Context context) {
-        return getSharedPreferences(context).getString(KEY_FAVOURITE_MOVIES_JSON_STR, null);
     }
 
     public static void setMoviePage(Context context, int page) {

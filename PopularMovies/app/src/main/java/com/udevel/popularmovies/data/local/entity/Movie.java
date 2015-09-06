@@ -1,7 +1,5 @@
 package com.udevel.popularmovies.data.local.entity;
 
-import android.support.annotation.Nullable;
-
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 
 import java.util.ArrayList;
@@ -26,8 +24,6 @@ public class Movie {
     private String releaseDate;
     private double popularity;
     private int voteCount;
-    private List<YouTubeTrailer> youTubeTrailers;
-    private List<Review> reviews;
 
     public static List<Movie> convertDiscoverMovieInfoResults(List<DiscoverMovieResult.Result> discoverMovieInfoResults) {
         List<Movie> movies = new ArrayList<>(((Double) Math.ceil(discoverMovieInfoResults.size() * 1.5)).intValue());

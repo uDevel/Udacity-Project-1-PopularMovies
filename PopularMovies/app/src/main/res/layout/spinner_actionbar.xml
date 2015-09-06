@@ -6,7 +6,7 @@
 
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/sp_main"
-        style="@style/Widget.MyApp.HeaderBar.Spinner"
+        style="@style/Custom.Spinner"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"

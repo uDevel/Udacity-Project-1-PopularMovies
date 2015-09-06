@@ -480,7 +480,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                 errorToast = Toast.makeText(getActivity(), getString(R.string.msg_error_data_connection_error), Toast.LENGTH_LONG);
                 errorToast.show();
             }
-            if (rv_popular_movies.getAdapter().getItemCount() == 0) {
+            if (rv_popular_movies.getAdapter() == null || rv_popular_movies.getAdapter().getItemCount() == 0) {
                 tv_empty_view.setText(getText(R.string.msg_error_data_connection_error));
                 tv_empty_view.setVisibility(View.VISIBLE);
                 rv_popular_movies.setVisibility(View.INVISIBLE);

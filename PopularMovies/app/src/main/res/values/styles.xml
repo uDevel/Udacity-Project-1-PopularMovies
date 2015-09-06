@@ -4,14 +4,24 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-
+        <item name="listPopupWindowStyle">@style/Custom.listPopup</item>
+        <item name="textAppearanceLargePopupMenu">@style/Custom.ShareActionTextStyle</item>
+        <item name="textAppearanceSmallPopupMenu">@style/Custom.ShareActionTextStyle</item>
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Widget.MyApp.HeaderBar.Spinner" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
+    <style name="Custom.Spinner" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
         <item name="android:background">?android:selectableItemBackground</item>
         <item name="android:dropDownSelector">?android:selectableItemBackground</item>
-        <item name="android:popupBackground">@color/light_gray</item>
+        <item name="android:popupBackground">@color/lighter_gray</item>
         <item name="android:divider">@null</item>
+    </style>
+
+    <style name="Custom.listPopup" parent="Widget.AppCompat.Light.ListPopupWindow">
+        <item name="android:popupBackground">@color/lighter_gray</item>
+    </style>
+
+    <style name="Custom.ShareActionTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Subtitle">
+        <item name="android:textColor">@android:color/secondary_text_light</item>
     </style>
 </resources>

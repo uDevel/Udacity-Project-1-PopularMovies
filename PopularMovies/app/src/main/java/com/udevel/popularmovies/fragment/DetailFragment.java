@@ -1,16 +1,19 @@
 package com.udevel.popularmovies.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,6 +75,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private Movie movie;
     private List<Review> reviews;
     private List<YouTubeTrailer> youTubeTrailers;
+    private ShareActionProvider shareActionProvider;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -135,19 +139,34 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.menu_movie_detail, menu);
-
+        MenuItem menuShare = menu.findItem(R.id.menu_item_share);
+        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShare);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        MenuItem item = menu.findItem(R.id.menu_favorite_toggle);
-        if (item != null) {
-            item.setVisible(movie != null);
-            item.setIcon(starred ? R.drawable.ic_star_filtered : R.drawable.ic_star_outline);
-            item.setTitle(starred ? R.string.menu_item_star : R.string.menu_item_unstar);
+        MenuItem menuFavorite = menu.findItem(R.id.menu_favorite_toggle);
+        MenuItem menuShare = menu.findItem(R.id.menu_item_share);
+
+        if (menuFavorite != null) {
+            menuFavorite.setVisible(movie != null);
+            menuFavorite.setIcon(starred ? R.drawable.ic_star_filtered : R.drawable.ic_star_outline);
+            menuFavorite.setTitle(starred ? R.string.menu_item_star : R.string.menu_item_unstar);
         }
 
+        if (menuShare != null) {
+            boolean hasTrailer = youTubeTrailers != null && youTubeTrailers.size() > 0;
+            menuShare.setVisible(hasTrailer);
+
+            if (shareActionProvider != null && hasTrailer) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, movie.getOriginalTitle() + "\n" + youTubeTrailers.get(0).getUrl());
+                sendIntent.setType("text/plain");
+                shareActionProvider.setShareIntent(sendIntent);
+            }
+        }
     }
 
     @Override
@@ -161,6 +180,9 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 } else {
                     DataManager.removeFavoriteMovie(getActivity(), movie);
                 }
+                break;
+            case R.id.menu_item_share:
+
                 break;
         }
         return true;
@@ -302,6 +324,11 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                             }
                         }
                     }
+                    if (hasToolbar) {
+                        setMovieInfoUIToolbar();
+                    }
+                    updateMovieDetailRecyclerView();
+                    getActivity().invalidateOptionsMenu();
 
                     // Update local storage if it's a favorite movie.
                     Context context = getContext();
@@ -314,14 +341,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                             starred = false;
                         }
                     }
-                    if (hasToolbar) {
-                        setMovieInfoUIToolbar();
-                    }
-
-                    updateMovieDetailRecyclerView();
-                    getActivity().invalidateOptionsMenu();
                 }
-
             }
 
             @Override

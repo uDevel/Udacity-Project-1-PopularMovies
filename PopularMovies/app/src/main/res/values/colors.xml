@@ -9,6 +9,7 @@
     <color name="white">#ffffffff</color>
     <color name="dark_gray">#4a4a4a</color>
     <color name="light_gray">#dfdfdf</color>
+    <color name="lighter_gray">#e8e8e8</color>
     <color name="transparent">#00000000</color>
 
     <color name="star_filter">#ffed00</color>
