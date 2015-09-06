@@ -3,7 +3,7 @@ package com.udevel.popularmovies.data.local.entity;
 /**
  * Created by benny on 8/9/2015.
  */
-public class YoutubeTrailerFix {
+public class YouTubeTrailer {
     private static final String URL_YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
     private static final String URL_YOUTUBE_THUMBNAIL = "https://img.youtube.com/vi/";
     private static final String URL_YOUTUBE_THUMBNAIL_SIZE_FULLSIZE = "/0.jpg";
