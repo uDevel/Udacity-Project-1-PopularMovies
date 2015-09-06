@@ -122,21 +122,22 @@ public class DataManager {
     public static List<Movie> getFavoriteMovieList(Context context) {
         List<Movie> movieList = new ArrayList<>();
         MovieSelection selection = new MovieSelection();
-        MovieCursor movieCursor = selection.query(context);
 
-        while (movieCursor.moveToNext()) {
-            Movie movie = convertToMovie(movieCursor);
-            movieList.add(movie);
+        try (MovieCursor movieCursor = selection.query(context)) {
+            while (movieCursor.moveToNext()) {
+                Movie movie = convertToMovie(movieCursor);
+                movieList.add(movie);
+            }
+            return movieList;
         }
-        return movieList;
     }
 
     @Nullable
-    public static Long addFavoriteMovie(Context context, Movie movie){
+    public static Long addFavoriteMovie(Context context, Movie movie) {
         MovieContentValues movieContentValues = convertToMovieContentValues(movie);
         if (movieContentValues != null) {
             Uri uri = movieContentValues.insert(context);
-            if(uri != null) {
+            if (uri != null) {
                 return ContentUris.parseId(uri);
             }
         }
@@ -148,28 +149,28 @@ public class DataManager {
     public static List<Review> getReviewsByMovieId(Context context, int movieId) {
         ReviewSelection selection = new ReviewSelection();
         selection.movieMovieId(movieId);
-        ReviewCursor reviewCursor = selection.query(context);
+        try (ReviewCursor reviewCursor = selection.query(context)) {
+            List<Review> reviews = new ArrayList<>();
+            while (reviewCursor.moveToNext()) {
+                reviews.add(convertToReview(reviewCursor));
+            }
 
-        List<Review> reviews = new ArrayList<>();
-        while (reviewCursor.moveToNext()) {
-            reviews.add(convertToReview(reviewCursor));
+            return reviews;
         }
-
-        return reviews;
     }
 
     @NonNull
     public static List<YouTubeTrailer> getYouTubeTrailerByMovieId(Context context, int movieId) {
         YoutubetrailerSelection selection = new YoutubetrailerSelection();
         selection.movieMovieId(movieId);
-        YoutubetrailerCursor youtubetrailerCursor = selection.query(context);
+        try (YoutubetrailerCursor youtubetrailerCursor = selection.query(context)) {
+            List<YouTubeTrailer> youTubeTrailers = new ArrayList<>();
+            while (youtubetrailerCursor.moveToNext()) {
+                youTubeTrailers.add(convertToYouTubeTrailers(youtubetrailerCursor));
+            }
 
-        List<YouTubeTrailer> youTubeTrailers = new ArrayList<>();
-        while (youtubetrailerCursor.moveToNext()) {
-            youTubeTrailers.add(convertToYouTubeTrailers(youtubetrailerCursor));
+            return youTubeTrailers;
         }
-
-        return youTubeTrailers;
     }
 
     public static Long addFavoriteMovieReviewTrailer(Context context, Movie movie, List<Review> reviews, List<YouTubeTrailer> youTubeTrailers) {
@@ -229,11 +230,12 @@ public class DataManager {
 
         MovieSelection movieSelection = new MovieSelection();
         movieSelection.movieId(targetId);
-        MovieCursor movieCursor = movieSelection.query(context);
-        if (movieCursor.moveToNext()) {
-            return convertToMovie(movieCursor);
-        } else {
-            return null;
+        try (MovieCursor movieCursor = movieSelection.query(context)) {
+            if (movieCursor.moveToNext()) {
+                return convertToMovie(movieCursor);
+            } else {
+                return null;
+            }
         }
     }
 
