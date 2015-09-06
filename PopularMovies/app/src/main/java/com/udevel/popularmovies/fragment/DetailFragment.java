@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -332,7 +333,12 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 // Try to get find movie from favorite storage
                 Context context = getContext();
                 if (context != null) {
+                    long startNano = System.nanoTime();
+
+
                     Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+                    long finishNano = System.nanoTime();
+                    Log.d(TAG, "test speed: " + ((finishNano - startNano) / 1000000f) + " ms");
                     if (favoriteMovieById != null) {
                         movie = favoriteMovieById;
                         starred = true;
