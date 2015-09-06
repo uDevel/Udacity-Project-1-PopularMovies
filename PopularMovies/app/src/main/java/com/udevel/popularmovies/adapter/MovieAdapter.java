@@ -77,7 +77,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .error(R.drawable.ic_image_error)
                         .fitCenter()
                         .animate(R.anim.fade_in_rise)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(movieViewHolder.iv_poster);
                 break;
             case VIEW_TYPE_FOOTER:
@@ -100,7 +100,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public long getItemId(int position) {
         switch (getItemViewType(position)) {
             case VIEW_TYPE_MOVIE:
-                return movieList.get(position).getId();
+                return movieList.get(position).getMovieId();
             case VIEW_TYPE_FOOTER:
                 return 1L;
             default:
@@ -123,7 +123,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private int getOriginalItemId(int position) {
-        return movieList.get(position).getId();
+        return movieList.get(position).getMovieId();
     }
 
     public void updateMovies(List<Movie> movieList, int movieListType) {

@@ -1,0 +1,13 @@
+{
+  "syntaxVersion": 3,
+  "projectPackageId": "com.udevel.popularmovies",
+  "authority": "com.udevel.popularmovies.provider",
+  "providerJavaPackage": "com.udevel.popularmovies.data.local.provider",
+  "providerClassName": "MovieContentProvider",
+  "sqliteOpenHelperClassName": "MovieSQLiteOpenHelper",
+  "sqliteOpenHelperCallbacksClassName": "MovieSQLiteOpenHelperCallbacks",
+  "databaseFileName": "movie.db",
+  "databaseVersion": 1,
+  "enableForeignKeys": true,
+  "useAnnotations": true
+}

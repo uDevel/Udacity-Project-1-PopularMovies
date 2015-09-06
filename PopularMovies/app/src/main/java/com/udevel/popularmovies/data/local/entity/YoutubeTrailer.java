@@ -11,14 +11,14 @@ public class YouTubeTrailer {
     private static final String SIZE_HD = "HD";
     private String size;
     private String name;
-    private String id;
+    private String youTubeTrailerId;
 
-    public String getId() {
-        return id;
+    public String getYouTubeTrailerId() {
+        return youTubeTrailerId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setYouTubeTrailerId(String youTubeTrailerId) {
+        this.youTubeTrailerId = youTubeTrailerId;
     }
 
     public String getSize() {
@@ -38,11 +38,11 @@ public class YouTubeTrailer {
     }
 
     public String getUrl() {
-        return URL_YOUTUBE_WATCH + id;
+        return URL_YOUTUBE_WATCH + youTubeTrailerId;
     }
 
     public String getThumbnailUrl() {
-        return URL_YOUTUBE_THUMBNAIL + id + URL_YOUTUBE_THUMBNAIL_SIZE_LARGE;
+        return URL_YOUTUBE_THUMBNAIL + youTubeTrailerId + URL_YOUTUBE_THUMBNAIL_SIZE_LARGE;
     }
 
     public boolean isHD() {

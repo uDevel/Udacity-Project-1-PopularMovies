@@ -1,0 +1,35 @@
+{
+  "fields": [
+    {
+      "name": "review_id",
+      "type": "String",
+      "index": true,
+      "nullable": false
+    },
+    {
+      "name": "author",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "content",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "movie_id",
+      "type": "Long",
+      "nullable": false,
+      "foreignKey": {
+        "table": "movie",
+        "onDelete": "CASCADE"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "name": "unique_review_id",
+      "definition": "UNIQUE (review_id) ON CONFLICT REPLACE"
+    }
+  ]
+}

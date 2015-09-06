@@ -219,7 +219,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                                     showSnackBar();
                                 } else {
                                     for (int i = 0; i < newFetchedMovies.size(); i++) {
-                                        if (newFetchedMovies.get(i).getId() != existingMovies.get(i).getId()) {
+                                        if (newFetchedMovies.get(i).getMovieId() != existingMovies.get(i).getMovieId()) {
                                             showSnackBar();
                                             break;
                                         }
@@ -247,7 +247,7 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                                     showSnackBar();
                                 } else {
                                     for (int i = 0; i < newFetchedMovies.size(); i++) {
-                                        if (newFetchedMovies.get(i).getId() != existingMovies.get(i).getId()) {
+                                        if (newFetchedMovies.get(i).getMovieId() != existingMovies.get(i).getMovieId()) {
                                             showSnackBar();
                                             break;
                                         }

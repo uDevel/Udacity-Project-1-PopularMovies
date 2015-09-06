@@ -70,6 +70,8 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private int movieId = -1;
     private boolean starred;
     private Movie movie;
+    private List<Review> reviews;
+    private List<YouTubeTrailer> youTubeTrailers;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -155,7 +157,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 starred = !starred;
                 getActivity().invalidateOptionsMenu();
                 if (starred) {
-                    DataManager.addFavoriteMovie(getActivity(), movie);
+                    DataManager.addFavoriteMovieReviewTrailer(getActivity(), movie, reviews, youTubeTrailers);
                 } else {
                     DataManager.removeFavoriteMovie(getActivity(), movie);
                 }
@@ -261,7 +263,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
                 if (movieDetailInfoResult != null) {
                     movie = new Movie();
-                    movie.setId(movieDetailInfoResult.getId());
+                    movie.setMovieId(movieDetailInfoResult.getId());
                     movie.setOriginalTitle(movieDetailInfoResult.getOriginalTitle());
                     movie.setOverview(movieDetailInfoResult.getOverview());
                     movie.setPopularity(movieDetailInfoResult.getPopularity());
@@ -274,32 +276,30 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     if (trailers != null) {
                         List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
                         if (youtubes != null) {
-                            List<YouTubeTrailer> youTubeTrailerList = new ArrayList<>();
+                            youTubeTrailers = new ArrayList<>();
                             for (MovieDetailInfoResult.Youtube youtube : youtubes) {
 
                                 YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
-                                youTubeTrailer.setId(youtube.getSource());
+                                youTubeTrailer.setYouTubeTrailerId(youtube.getSource());
                                 youTubeTrailer.setSize(youtube.getSize());
                                 youTubeTrailer.setName(youtube.getName());
-                                youTubeTrailerList.add(youTubeTrailer);
+                                youTubeTrailers.add(youTubeTrailer);
                             }
-                            movie.setYouTubeTrailers(youTubeTrailerList);
                         }
                     }
 
-                    MovieDetailInfoResult.Reviews reviews = movieDetailInfoResult.getReviews();
-                    if (reviews != null) {
-                        List<MovieDetailInfoResult.Reviews.Result> results = reviews.getResults();
+                    MovieDetailInfoResult.Reviews reviewsFromNetwork = movieDetailInfoResult.getReviews();
+                    if (reviewsFromNetwork != null) {
+                        List<MovieDetailInfoResult.Reviews.Result> results = reviewsFromNetwork.getResults();
                         if (results != null) {
-                            List<Review> reviewList = new ArrayList<>();
+                            reviews = new ArrayList<>();
                             for (MovieDetailInfoResult.Reviews.Result result : results) {
                                 Review review = new Review();
-                                review.setId(result.getId());
+                                review.setReviewId(result.getId());
                                 review.setAuthor(result.getAuthor());
                                 review.setContent(result.getContent());
-                                reviewList.add(review);
+                                reviews.add(review);
                             }
-                            movie.setReviews(reviewList);
                         }
                     }
 
@@ -308,7 +308,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                     if (context != null) {
                         Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
                         if (favoriteMovieById != null) {
-                            DataManager.addFavoriteMovie(context, movie);
+                            DataManager.addFavoriteMovieReviewTrailer(context, movie, reviews, youTubeTrailers);
                             starred = true;
                         } else {
                             starred = false;
@@ -333,8 +333,13 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 Context context = getContext();
                 if (context != null) {
                     Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+                    List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, movieId);
+                    List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, movieId);
                     if (favoriteMovieById != null) {
                         movie = favoriteMovieById;
+                        youTubeTrailers = youTubeTrailerByMovieId;
+                        reviews = reviewsByMovieId;
+
                         starred = true;
                         if (hasToolbar) {
                             setMovieInfoUIToolbar();
@@ -360,7 +365,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 .load(uri)
                 .error(R.drawable.ic_image_error)
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(iv_poster);
         tv_title.setText(movie.getOriginalTitle());
         tv_title_collapse.setText(movie.getOriginalTitle());
@@ -390,10 +395,10 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
             if (adapter == null) {
-                adapter = new MovieDetailAdapter(movie, this, !hasToolbar);
+                adapter = new MovieDetailAdapter(movie, youTubeTrailers, reviews, this, !hasToolbar);
                 rv_movie_detail.setAdapter(adapter);
             } else {
-                adapter.updateMovieDetail(movie);
+                adapter.updateMovieDetail(movie, youTubeTrailers, reviews);
             }
             adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
                 @Override

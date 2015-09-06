@@ -91,7 +91,7 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                     }
                 })
                 .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(iv_poster);
     }
 

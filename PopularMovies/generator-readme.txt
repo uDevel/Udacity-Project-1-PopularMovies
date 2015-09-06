@@ -1,0 +1,1 @@
+java -jar android_contentprovider_generator-1.9.3-bundle.jar -i C:\Users\benny\AndroidStudioProjects\Udacity-Project-1-PopularMovies\PopularMovies -o C:\Users\benny\AndroidStudioProjects\Udacity-Project-1-PopularMovies\PopularMovies\app\src\main\java

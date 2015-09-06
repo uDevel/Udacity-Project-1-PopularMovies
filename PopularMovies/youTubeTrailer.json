@@ -1,0 +1,35 @@
+{
+  "fields": [
+    {
+      "name": "you_tube_trailer_id",
+      "type": "String",
+      "index": true,
+      "nullable": false
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "defaultValue": "no name"
+    },
+    {
+      "name": "size",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "movie_id",
+      "type": "Long",
+      "nullable": false,
+      "foreignKey": {
+        "table": "movie",
+        "onDelete": "CASCADE"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "name": "unique_you_tube_trailer_id",
+      "definition": "UNIQUE (you_tube_trailer_id) ON CONFLICT REPLACE"
+    }
+  ]
+}

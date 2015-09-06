@@ -4,16 +4,16 @@ package com.udevel.popularmovies.data.local.entity;
  * Created by benny on 8/9/2015.
  */
 public class Review {
-    private String id;
+    private String reviewId;
     private String author;
     private String content;
 
-    public String getId() {
-        return id;
+    public String getReviewId() {
+        return reviewId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setReviewId(String reviewId) {
+        this.reviewId = reviewId;
     }
 
     public String getAuthor() {

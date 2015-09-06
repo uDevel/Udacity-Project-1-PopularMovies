@@ -18,7 +18,7 @@ public class Movie {
     public static final int MOVIE_LIST_TYPE_RATING = 1;
     public static final int MOVIE_LIST_TYPE_LOCAL_FAVOURITE = 2;
 
-    private int id;
+    private int movieId;
     private String originalTitle;
     private double voteAverage;
     private String posterPath;
@@ -45,7 +45,7 @@ public class Movie {
         }
 
         Movie movie = new Movie();
-        movie.setId(sourceMovieInfo.getId());
+        movie.setMovieId(sourceMovieInfo.getId());
         movie.setOriginalTitle(sourceMovieInfo.getOriginalTitle());
         movie.setPosterPath(sourceMovieInfo.getPosterPath());
         movie.setVoteAverage(sourceMovieInfo.getVoteAverage());
@@ -56,12 +56,12 @@ public class Movie {
         return movie;
     }
 
-    public int getId() {
-        return id;
+    public int getMovieId() {
+        return movieId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMovieId(int movieId) {
+        this.movieId = movieId;
     }
 
     public String getOriginalTitle() {
@@ -118,22 +118,5 @@ public class Movie {
 
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    @Nullable
-    public List<YouTubeTrailer> getYouTubeTrailers() {
-        return youTubeTrailers;
-    }
-
-    public void setYouTubeTrailers(List<YouTubeTrailer> youTubeTrailers) {
-        this.youTubeTrailers = youTubeTrailers;
     }
 }

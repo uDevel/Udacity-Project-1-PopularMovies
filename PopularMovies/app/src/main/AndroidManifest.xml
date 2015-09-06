@@ -39,5 +39,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.DetailActivity"/>
         </activity>
+        <provider
+            android:name="com.udevel.popularmovies.data.local.provider.MovieContentProvider"
+            android:authorities="com.udevel.popularmovies.provider"
+            android:exported="false" />
     </application>
 </manifest>

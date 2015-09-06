@@ -1,0 +1,51 @@
+{
+  "fields": [
+    {
+      "name": "movie_id",
+      "type": "Integer",
+      "index": true,
+      "nullable": false
+    },
+    {
+      "name": "original_title",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "vote_average",
+      "type": "Double",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "poster_path",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "overview",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "release_date",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
+      "name": "popularity",
+      "type": "Double",
+      "defaultValue": "0.0"
+    },
+    {
+      "name": "vote_count",
+      "type": "Integer",
+      "defaultValue": "0"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "unique_movie_id",
+      "definition": "UNIQUE (movie__movie_id) ON CONFLICT REPLACE"
+    }
+  ]
+}

@@ -10,9 +10,7 @@ import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 import com.udevel.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by benny on 9/5/2015.
@@ -40,7 +38,7 @@ public class DataManagerTest extends AndroidTestCase {
         List<Movie> targetMovies = DataManager.getMovies(context);
         assertNotNull(targetMovies);
         assertTrue(targetMovies.size() == 1);
-        assertTrue(targetMovies.get(0).getId() == expectedMovieId);
+        assertTrue(targetMovies.get(0).getMovieId() == expectedMovieId);
         assertTrue(fuzzyCompareMovie(expectedMovie, targetMovies.get(0)));
     }
 
@@ -61,7 +59,7 @@ public class DataManagerTest extends AndroidTestCase {
         List<Movie> targetMovies = DataManager.getMovies(context);
         assertNotNull(targetMovies);
         assertTrue(targetMovies.size() == 2);
-        assertTrue(targetMovies.get(1).getId() == movieId2);
+        assertTrue(targetMovies.get(1).getMovieId() == movieId2);
     }
 
     public void testGetMovies() throws Exception {
@@ -72,7 +70,7 @@ public class DataManagerTest extends AndroidTestCase {
         List<Movie> targetMovies = DataManager.getMovies(context);
         assertNotNull(targetMovies);
         assertTrue(targetMovies.size() == 1);
-        assertTrue(targetMovies.get(0).getId() == expectedMovieId);
+        assertTrue(targetMovies.get(0).getMovieId() == expectedMovieId);
         assertTrue(fuzzyCompareMovie(expectedMovie, targetMovies.get(0)));
     }
 
@@ -83,69 +81,87 @@ public class DataManagerTest extends AndroidTestCase {
 
         Movie targetMovie = DataManager.getMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
-        assertTrue(targetMovie.getId() == expectedMovieId);
+        assertTrue(targetMovie.getMovieId() == expectedMovieId);
         assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
-    }
-
-    public void testSaveFavoriteMovieMap() throws Exception {
-        Context context = getContext();
-        int expectedMovieId = Utils.getUniqueIntId();
-        createMovieAndSaveFavorite(context, expectedMovieId);
-
-        List<Movie> targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNotNull(targetMovieList);
-        assertTrue(targetMovieList.size() == 1);
     }
 
     public void testGetFavoriteMovieList() throws Exception {
         Context context = getContext();
-        int expectedMovieId = Utils.getUniqueIntId();
-        Movie expectedMovie = createMovieAndSaveFavorite(context, expectedMovieId);
+        final int expectedMovieId = Utils.getUniqueIntId();
+        Movie expectedMovie = createMovie(expectedMovieId);
 
         List<Movie> targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNotNull(targetMovieList);
+        assertTrue(targetMovieList.size() == 0);
+
+        Long rowId = DataManager.addFavoriteMovie(context, expectedMovie);
+        assertNotNull(rowId);
+
+        targetMovieList = DataManager.getFavoriteMovieList(context);
         assertTrue(targetMovieList.size() == 1);
+
         Movie targetMovie = targetMovieList.get(0);
         assertNotNull(targetMovie);
-        assertTrue(targetMovie.getId() == expectedMovieId);
+        assertTrue(targetMovie.getMovieId() == expectedMovieId);
         assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
     }
 
-    public void testAddFavoriteMovie() throws Exception {
+    public void testAddFavoriteMovieReviewTrailer() throws Exception {
         Context context = getContext();
         int expectedMovieId = Utils.getUniqueIntId();
+        final int numOfReviews = 5;
+        final int numOfYouTubeTrailers = 4;
 
         List<Movie> targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNull(targetMovieList);
+        assertTrue(targetMovieList.size() == 0);
 
         Movie expectedMovie = createMovie(expectedMovieId);
-        DataManager.addFavoriteMovie(context, expectedMovie);
+        List<Review> reviews = createReviews(numOfReviews);
+        List<YouTubeTrailer> youTubeTrailers = createYouTubeTrailers(numOfYouTubeTrailers);
 
-        targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNotNull(targetMovieList);
-        assertTrue(targetMovieList.size() == 1);
-        assertTrue(targetMovieList.get(0).getId() == expectedMovieId);
-        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovieList.get(0)));
+        DataManager.addFavoriteMovieReviewTrailer(context, expectedMovie, reviews, youTubeTrailers);
 
+        Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
+        assertNotNull(targetMovie);
+        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
+
+        List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, targetMovie.getMovieId());
+        assertNotNull(reviewsByMovieId);
+        assertTrue(reviewsByMovieId.size() == numOfReviews);
+
+        List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, targetMovie.getMovieId());
+        assertNotNull(youTubeTrailerByMovieId);
+        assertTrue(youTubeTrailerByMovieId.size() == numOfYouTubeTrailers);
     }
 
     public void testRemoveFavoriteMovie() throws Exception {
         Context context = getContext();
         int expectedMovieId = Utils.getUniqueIntId();
+        final int numOfReviews = 5;
+        final int numOfYouTubeTrailers = 4;
 
         List<Movie> targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNull(targetMovieList);
+        assertTrue(targetMovieList.size() == 0);
 
-        Movie targetMovie = createMovie(expectedMovieId);
-        DataManager.addFavoriteMovie(context, targetMovie);
+        Movie expectedMovie = createMovie(expectedMovieId);
+        List<Review> reviews = createReviews(numOfReviews);
+        List<YouTubeTrailer> youTubeTrailers = createYouTubeTrailers(numOfYouTubeTrailers);
 
-        targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNotNull(targetMovieList);
-        assertTrue(targetMovieList.size() == 1);
+        DataManager.addFavoriteMovieReviewTrailer(context, expectedMovie, reviews, youTubeTrailers);
+
+        Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
+        assertNotNull(targetMovie);
+        assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
 
         DataManager.removeFavoriteMovie(context, targetMovie);
         targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertTrue(targetMovieList == null || targetMovieList.size() == 0);
+        assertTrue(targetMovieList.size() == 0);
+
+        List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, targetMovie.getMovieId());
+        assertTrue(reviewsByMovieId == null || reviewsByMovieId.size() == 0);
+
+        List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, targetMovie.getMovieId());
+        assertNotNull(youTubeTrailerByMovieId);
+        assertTrue(youTubeTrailerByMovieId.size() == 0);
     }
 
     public void testGetFavoriteMovieById() throws Exception {
@@ -153,14 +169,14 @@ public class DataManagerTest extends AndroidTestCase {
         int expectedMovieId = Utils.getUniqueIntId();
 
         List<Movie> targetMovieList = DataManager.getFavoriteMovieList(context);
-        assertNull(targetMovieList);
+        assertTrue(targetMovieList.size() == 0);
 
         Movie expectedMovie = createMovie(expectedMovieId);
         DataManager.addFavoriteMovie(context, expectedMovie);
 
         Movie targetMovie = DataManager.getFavoriteMovieById(context, expectedMovieId);
         assertNotNull(targetMovie);
-        assertTrue(targetMovie.getId() == expectedMovieId);
+        assertTrue(targetMovie.getMovieId() == expectedMovieId);
         assertTrue(fuzzyCompareMovie(expectedMovie, targetMovie));
 
     }
@@ -175,19 +191,43 @@ public class DataManagerTest extends AndroidTestCase {
     }
 
     @NonNull
-    private Movie createMovieAndSaveFavorite(Context context, int expectedMovieId) {
-        Map<Integer, Movie> movies = new HashMap<>();
-        Movie movie = createMovie(expectedMovieId);
-        movies.put(movie.getId(), movie);
-        DataManager.saveFavoriteMovieMap(context, movies);
+    private Movie createMovie(int expectedMovieId) {
+        Movie movie = new Movie();
+        movie.setMovieId(expectedMovieId);
+
         return movie;
     }
 
     @NonNull
-    private Movie createMovie(int expectedMovieId) {
-        Movie movie = new Movie();
-        movie.setId(expectedMovieId);
-        return movie;
+    private YouTubeTrailer createYouTubeTrailer() {
+        YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
+        youTubeTrailer.setYouTubeTrailerId(Utils.getUniqueStringId());
+        return youTubeTrailer;
+    }
+
+    @NonNull
+    private List<YouTubeTrailer> createYouTubeTrailers(int numOfYouTubeTrailer) {
+        List<YouTubeTrailer> youTubeTrailers = new ArrayList<>();
+        for (int i = 0; i < numOfYouTubeTrailer; i++) {
+            youTubeTrailers.add(createYouTubeTrailer());
+        }
+        return youTubeTrailers;
+    }
+
+    @NonNull
+    private Review createReview() {
+        Review review = new Review();
+        review.setReviewId(Utils.getUniqueStringId());
+        return review;
+    }
+
+    @NonNull
+    private List<Review> createReviews(int numOfReviews) {
+        List<Review> reviews = new ArrayList<>();
+        for (int i = 0; i < numOfReviews; i++) {
+            reviews.add(createReview());
+        }
+        return reviews;
     }
 
     private boolean fuzzyCompareMovie(Movie movie1, Movie movie2) {
@@ -197,7 +237,9 @@ public class DataManagerTest extends AndroidTestCase {
             return false;
         }
 
-        if (movie1.getId() == movie2.getId()) {
+        return movie1.getMovieId() == movie2.getMovieId();
+        /*
+        if (movie1.getMovieId() == movie2.getMovieId()) {
             List<YouTubeTrailer> youTubeTrailers1 = movie1.getYouTubeTrailers();
             List<YouTubeTrailer> youTubeTrailers2 = movie2.getYouTubeTrailers();
             if (youTubeTrailers1 != null && youTubeTrailers2 != null) {
@@ -206,7 +248,7 @@ public class DataManagerTest extends AndroidTestCase {
                 }
 
                 for (int i = 0; i < youTubeTrailers1.size(); i++) {
-                    if (!youTubeTrailers1.get(i).getId().equals(youTubeTrailers2.get(i).getId())) {
+                    if (!youTubeTrailers1.get(i).getYouTubeTrailerId().equals(youTubeTrailers2.get(i).getYouTubeTrailerId())) {
                         return false;
                     }
                 }
@@ -222,7 +264,7 @@ public class DataManagerTest extends AndroidTestCase {
                 }
 
                 for (int i = 0; i < reviews1.size(); i++) {
-                    if (!reviews1.get(i).getId().equals(reviews2.get(i).getId())) {
+                    if (!reviews1.get(i).getReviewId().equals(reviews2.get(i).getReviewId())) {
                         return false;
                     }
                 }
@@ -231,7 +273,7 @@ public class DataManagerTest extends AndroidTestCase {
             }
         }
 
-        return true;
+        return true;*/
 
     }
 }

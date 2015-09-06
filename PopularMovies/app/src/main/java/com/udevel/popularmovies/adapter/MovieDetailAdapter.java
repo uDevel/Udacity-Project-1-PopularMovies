@@ -46,10 +46,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private boolean hasReviews;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MovieDetailAdapter(Movie movie, Fragment fragment, boolean isShowingMovieInfo) {
+    public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailers, List<Review> reviews, Fragment fragment, boolean isShowingMovieInfo) {
         this.fragment = fragment;
-
-        updateMovieDetail(movie);
+        updateMovieDetail(movie, youTubeTrailers, reviews);
         this.isShowingMovieInfo = isShowingMovieInfo;
     }
 
@@ -129,7 +128,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(movieInfoViewHolder.iv_poster);
                 break;
             case VIEW_TYPE_MOVIE_OVERVIEW:
@@ -202,10 +201,11 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.adapterItemClickListener = adapterItemClickListener;
     }
 
-    public void updateMovieDetail(Movie movie) {
+    public void updateMovieDetail(Movie movie, List<YouTubeTrailer> youTubeTrailers, List<Review> reviews) {
         this.movie = movie;
-        youTubeTrailerList = movie.getYouTubeTrailers();
-        reviewList = movie.getReviews();
+        this.youTubeTrailerList = youTubeTrailers;
+        this.reviewList = reviews;
+
         hasTrailers = youTubeTrailerList != null && youTubeTrailerList.size() > 0;
         hasReviews = reviewList != null && reviewList.size() > 0;
         notifyDataSetChanged();
