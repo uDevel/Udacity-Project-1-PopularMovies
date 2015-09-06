@@ -3,15 +3,15 @@
     <item>
         <selector>
             <item
-                android:drawable="@color/selector_color"
+                android:drawable="@color/pressed_color"
                 android:state_selected="true"/>
             <item android:drawable="@android:color/transparent"/>
         </selector>
     </item>
     <item>
-        <ripple android:color="@color/selector_color">
+        <ripple android:color="@color/pressed_ripple_color">
             <item android:id="@android:id/mask">
-                <color android:color="@android:color/white"/>
+                <color android:color="@color/transparent_white"/>
             </item>
         </ripple>
     </item>

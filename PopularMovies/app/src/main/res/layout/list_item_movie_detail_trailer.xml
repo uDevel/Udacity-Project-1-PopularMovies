@@ -3,10 +3,10 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/list_item_ripple">
+                android:layout_marginTop="8dp"
+                android:background="@drawable/selector_list_item_movie_detail"
+                android:padding="8dp">
 
     <ImageView
         android:id="@+id/iv_trailer_thumbnail"

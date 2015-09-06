@@ -59,10 +59,6 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private static final int MAX_PAGE_CACHE = 500;
     private static final int MINIMUM_VOTE_COUNT_FOR_SORT_BY_RATING = 200;  // This allows api to return meaningful data instead of 1-vote wonders.
     private final AtomicBoolean loadingFromNetwork = new AtomicBoolean(false);
-    private int movieListType;
-    private OnFragmentInteractionListener onFragmentInteractionListener;
-    private SaveMovieDataTask saveMovieDataTask;
-    private MovieAdapter movieAdapter;
     private Toolbar tb_popular_movies;
     private RecyclerView rv_popular_movies;
     private View root;
@@ -72,9 +68,14 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     private View cl_root;
     private Snackbar refreshSnackbar;
     private Toast errorToast;
-    private boolean hasToolbar;
     private AppBarLayout abl_popular_movies;
     private FavoriteMoviesObserver favoriteMoviesObserver;
+
+    private int movieListType;
+    private OnFragmentInteractionListener onFragmentInteractionListener;
+    private SaveMovieDataTask saveMovieDataTask;
+    private MovieAdapter movieAdapter;
+    private boolean hasToolbar;
 
     public ListFragment() {
     }
