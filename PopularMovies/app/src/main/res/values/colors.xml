@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#ffc40139</color>
-    <color name="primary_dark">#b60139</color>
+    <color name="primary_dark">#ac0136</color>
     <color name="accent">#e8993f</color>
     <color name="refresh_progress_1">@color/primary</color>
     <color name="refresh_progress_2">@color/accent</color>
@@ -12,7 +12,7 @@
     <color name="lighter_gray">#e8e8e8</color>
     <color name="transparent">#00000000</color>
     <color name="transparent_white">#daffffff</color>
-    <color name="transparent_primary">#813c0105</color>
+    <color name="transparent_black">#14000000</color>
 
     <color name="star_filter">#ffed00</color>
     <color name="pressed_ripple_color">#fba842</color>

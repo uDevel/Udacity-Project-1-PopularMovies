@@ -2,7 +2,6 @@ package com.udevel.popularmovies.activity;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -79,7 +78,7 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         pw_main.stopSpinning();
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
-                                int backgroundColor = p.getMutedColor(getResources().getColor(R.color.dark_gray));
+                                int backgroundColor = p.getMutedColor(getResources().getColor(R.color.dark_gray, null));
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     reveal();
                                 }

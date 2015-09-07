@@ -11,7 +11,7 @@
     </style>
 
     <style name="AppTheme.TransparentStatusBar" parent="AppTheme">
-        <item name="colorPrimaryDark">@color/transparent_primary</item>
+        <item name="colorPrimaryDark">@color/transparent_black</item>
     </style>
 
     <style name="Custom.Spinner" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
