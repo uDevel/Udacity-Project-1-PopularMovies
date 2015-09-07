@@ -251,6 +251,7 @@ public class DataManager {
         values.putOverview(movie.getOverview());
         values.putPopularity(movie.getPopularity());
         values.putPosterPath(movie.getPosterPath());
+        values.putBackdropPath(movie.getBackdropPath());
         values.putReleaseDate(movie.getReleaseDate());
         values.putVoteAverage(movie.getVoteAverage());
         values.putVoteCount(movie.getVoteCount());
@@ -308,6 +309,7 @@ public class DataManager {
             movie.setOverview(movieCursor.getOverview());
             movie.setPopularity(movieCursor.getPopularity());
             movie.setPosterPath(movieCursor.getPosterPath());
+            movie.setBackdropPath(movieCursor.getBackdropPath());
             movie.setReleaseDate(movieCursor.getReleaseDate());
             movie.setVoteAverage(movieCursor.getVoteAverage());
             movie.setVoteCount(movieCursor.getVoteCount());

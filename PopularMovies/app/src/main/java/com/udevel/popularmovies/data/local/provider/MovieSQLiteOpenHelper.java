@@ -15,14 +15,7 @@ import com.udevel.popularmovies.data.local.provider.review.ReviewColumns;
 import com.udevel.popularmovies.data.local.provider.youtubetrailer.YoutubetrailerColumns;
 
 public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
-    private static final String TAG = MovieSQLiteOpenHelper.class.getSimpleName();
-
     public static final String DATABASE_FILE_NAME = "movie.db";
-    private static final int DATABASE_VERSION = 1;
-    private static MovieSQLiteOpenHelper sInstance;
-    private final Context mContext;
-    private final MovieSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
-
     // @formatter:off
     public static final String SQL_CREATE_TABLE_MOVIE = "CREATE TABLE IF NOT EXISTS "
             + MovieColumns.TABLE_NAME + " ( "
@@ -31,16 +24,15 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
             + MovieColumns.ORIGINAL_TITLE + " TEXT, "
             + MovieColumns.VOTE_AVERAGE + " REAL DEFAULT 0.0, "
             + MovieColumns.POSTER_PATH + " TEXT, "
+            + MovieColumns.BACKDROP_PATH + " TEXT, "
             + MovieColumns.OVERVIEW + " TEXT, "
             + MovieColumns.RELEASE_DATE + " TEXT, "
             + MovieColumns.POPULARITY + " REAL DEFAULT 0.0, "
             + MovieColumns.VOTE_COUNT + " INTEGER DEFAULT 0 "
             + ", CONSTRAINT unique_movie_id UNIQUE (movie__movie_id) ON CONFLICT REPLACE"
             + " );";
-
     public static final String SQL_CREATE_INDEX_MOVIE_MOVIE_ID = "CREATE INDEX IDX_MOVIE_MOVIE_ID "
             + " ON " + MovieColumns.TABLE_NAME + " ( " + MovieColumns.MOVIE_ID + " );";
-
     public static final String SQL_CREATE_TABLE_REVIEW = "CREATE TABLE IF NOT EXISTS "
             + ReviewColumns.TABLE_NAME + " ( "
             + ReviewColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -51,10 +43,8 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
             + ", CONSTRAINT fk_movie_id FOREIGN KEY (" + ReviewColumns.MOVIE_ID + ") REFERENCES movie (_id) ON DELETE CASCADE"
             + ", CONSTRAINT unique_review_id UNIQUE (review_id) ON CONFLICT REPLACE"
             + " );";
-
     public static final String SQL_CREATE_INDEX_REVIEW_REVIEW_ID = "CREATE INDEX IDX_REVIEW_REVIEW_ID "
             + " ON " + ReviewColumns.TABLE_NAME + " ( " + ReviewColumns.REVIEW_ID + " );";
-
     public static final String SQL_CREATE_TABLE_YOUTUBETRAILER = "CREATE TABLE IF NOT EXISTS "
             + YoutubetrailerColumns.TABLE_NAME + " ( "
             + YoutubetrailerColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -65,11 +55,28 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
             + ", CONSTRAINT fk_movie_id FOREIGN KEY (" + YoutubetrailerColumns.MOVIE_ID + ") REFERENCES movie (_id) ON DELETE CASCADE"
             + ", CONSTRAINT unique_you_tube_trailer_id UNIQUE (you_tube_trailer_id) ON CONFLICT REPLACE"
             + " );";
-
     public static final String SQL_CREATE_INDEX_YOUTUBETRAILER_YOU_TUBE_TRAILER_ID = "CREATE INDEX IDX_YOUTUBETRAILER_YOU_TUBE_TRAILER_ID "
             + " ON " + YoutubetrailerColumns.TABLE_NAME + " ( " + YoutubetrailerColumns.YOU_TUBE_TRAILER_ID + " );";
+    private static final String TAG = MovieSQLiteOpenHelper.class.getSimpleName();
+    private static final int DATABASE_VERSION = 2;
+    private static MovieSQLiteOpenHelper sInstance;
+    private final Context mContext;
+    private final MovieSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
 
     // @formatter:on
+
+    private MovieSQLiteOpenHelper(Context context) {
+        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
+        mContext = context;
+        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private MovieSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
+        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
+        mContext = context;
+        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
+    }
 
     public static MovieSQLiteOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -88,20 +95,12 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
         return newInstancePostHoneycomb(context);
     }
 
-
     /*
      * Pre Honeycomb.
      */
     private static MovieSQLiteOpenHelper newInstancePreHoneycomb(Context context) {
         return new MovieSQLiteOpenHelper(context);
     }
-
-    private MovieSQLiteOpenHelper(Context context) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
-        mContext = context;
-        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
-    }
-
 
     /*
      * Post Honeycomb.
@@ -110,14 +109,6 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
     private static MovieSQLiteOpenHelper newInstancePostHoneycomb(Context context) {
         return new MovieSQLiteOpenHelper(context, new DefaultDatabaseErrorHandler());
     }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private MovieSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
-        mContext = context;
-        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
-    }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -130,6 +121,11 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_TABLE_YOUTUBETRAILER);
         db.execSQL(SQL_CREATE_INDEX_YOUTUBETRAILER_YOU_TUBE_TRAILER_ID);
         mOpenHelperCallbacks.onPostCreate(mContext, db);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        mOpenHelperCallbacks.onUpgrade(mContext, db, oldVersion, newVersion);
     }
 
     @Override
@@ -156,10 +152,5 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void setForeignKeyConstraintsEnabledPostJellyBean(SQLiteDatabase db) {
         db.setForeignKeyConstraintsEnabled(true);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        mOpenHelperCallbacks.onUpgrade(mContext, db, oldVersion, newVersion);
     }
 }

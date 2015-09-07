@@ -1,14 +1,12 @@
 package com.udevel.popularmovies.data.local.provider.review;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
 import com.udevel.popularmovies.data.local.provider.base.AbstractSelection;
-import com.udevel.popularmovies.data.local.provider.movie.*;
+import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
 
 /**
  * Selection for the {@code review} table.
@@ -396,6 +394,46 @@ public class ReviewSelection extends AbstractSelection<ReviewSelection> {
 
     public ReviewSelection orderByMoviePosterPath() {
         orderBy(MovieColumns.POSTER_PATH, false);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPath(String... value) {
+        addEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPathNot(String... value) {
+        addNotEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPathLike(String... value) {
+        addLike(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPathContains(String... value) {
+        addContains(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPathStartsWith(String... value) {
+        addStartsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection movieBackdropPathEndsWith(String... value) {
+        addEndsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public ReviewSelection orderByMovieBackdropPath(boolean desc) {
+        orderBy(MovieColumns.BACKDROP_PATH, desc);
+        return this;
+    }
+
+    public ReviewSelection orderByMovieBackdropPath() {
+        orderBy(MovieColumns.BACKDROP_PATH, false);
         return this;
     }
 

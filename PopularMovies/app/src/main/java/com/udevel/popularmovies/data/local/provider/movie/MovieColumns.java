@@ -4,9 +4,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 import com.udevel.popularmovies.data.local.provider.MovieContentProvider;
-import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
-import com.udevel.popularmovies.data.local.provider.review.ReviewColumns;
-import com.udevel.popularmovies.data.local.provider.youtubetrailer.YoutubetrailerColumns;
 
 /**
  * Columns for the {@code movie} table.
@@ -28,6 +25,8 @@ public class MovieColumns implements BaseColumns {
 
     public static final String POSTER_PATH = "poster_path";
 
+    public static final String BACKDROP_PATH = "backdrop_path";
+
     public static final String OVERVIEW = "overview";
 
     public static final String RELEASE_DATE = "release_date";
@@ -46,6 +45,7 @@ public class MovieColumns implements BaseColumns {
             ORIGINAL_TITLE,
             VOTE_AVERAGE,
             POSTER_PATH,
+            BACKDROP_PATH,
             OVERVIEW,
             RELEASE_DATE,
             POPULARITY,
@@ -60,6 +60,7 @@ public class MovieColumns implements BaseColumns {
             if (c.equals(ORIGINAL_TITLE) || c.contains("." + ORIGINAL_TITLE)) return true;
             if (c.equals(VOTE_AVERAGE) || c.contains("." + VOTE_AVERAGE)) return true;
             if (c.equals(POSTER_PATH) || c.contains("." + POSTER_PATH)) return true;
+            if (c.equals(BACKDROP_PATH) || c.contains("." + BACKDROP_PATH)) return true;
             if (c.equals(OVERVIEW) || c.contains("." + OVERVIEW)) return true;
             if (c.equals(RELEASE_DATE) || c.contains("." + RELEASE_DATE)) return true;
             if (c.equals(POPULARITY) || c.contains("." + POPULARITY)) return true;

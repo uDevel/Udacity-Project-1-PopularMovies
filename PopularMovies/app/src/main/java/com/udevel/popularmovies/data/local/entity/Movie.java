@@ -1,6 +1,7 @@
 package com.udevel.popularmovies.data.local.entity;
 
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
+import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
 import com.udevel.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class Movie {
     private String originalTitle;
     private double voteAverage;
     private String posterPath;
+    private String backdropPath;
     private String overview;
     private String releaseDate;
     private double popularity;
@@ -45,6 +47,25 @@ public class Movie {
         movie.setMovieId(sourceMovieInfo.getId());
         movie.setOriginalTitle(sourceMovieInfo.getOriginalTitle());
         movie.setPosterPath(sourceMovieInfo.getPosterPath());
+        movie.setBackdropPath(sourceMovieInfo.getBackdropPath());
+        movie.setVoteAverage(sourceMovieInfo.getVoteAverage());
+        movie.setOverview(sourceMovieInfo.getOverview());
+        movie.setReleaseDate(sourceMovieInfo.getReleaseDate());
+        movie.setPopularity(sourceMovieInfo.getPopularity());
+        movie.setVoteCount(sourceMovieInfo.getVoteCount());
+        return movie;
+    }
+
+    public static Movie convertMovieDetailInfoResult(MovieDetailInfoResult sourceMovieInfo) {
+        if (sourceMovieInfo == null) {
+            return null;
+        }
+
+        Movie movie = new Movie();
+        movie.setMovieId(sourceMovieInfo.getId());
+        movie.setOriginalTitle(sourceMovieInfo.getOriginalTitle());
+        movie.setPosterPath(sourceMovieInfo.getPosterPath());
+        movie.setBackdropPath(sourceMovieInfo.getBackdropPath());
         movie.setVoteAverage(sourceMovieInfo.getVoteAverage());
         movie.setOverview(sourceMovieInfo.getOverview());
         movie.setReleaseDate(sourceMovieInfo.getReleaseDate());
@@ -83,6 +104,14 @@ public class Movie {
 
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
+    }
+
+    public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public void setBackdropPath(String backdropPath) {
+        this.backdropPath = backdropPath;
     }
 
     public String getOverview() {
@@ -128,6 +157,7 @@ public class Movie {
         if (!Utils.compareString(originalTitle, movie.originalTitle)) return false;
         if (voteAverage != movie.voteAverage) return false;
         if (!Utils.compareString(posterPath, movie.posterPath)) return false;
+        if (!Utils.compareString(backdropPath, movie.backdropPath)) return false;
         if (!Utils.compareString(overview, movie.overview)) return false;
         if (!Utils.compareString(releaseDate, movie.releaseDate)) return false;
         if (popularity != movie.popularity) return false;

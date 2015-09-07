@@ -1,11 +1,10 @@
 package com.udevel.popularmovies.data.local.provider.base;
 
-import java.util.Date;
-import java.util.HashMap;
-
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import android.provider.BaseColumns;
+
+import java.util.Date;
+import java.util.HashMap;
 
 public abstract class AbstractCursor extends CursorWrapper {
     private final HashMap<String, Integer> mColumnIndexes;
@@ -15,8 +14,6 @@ public abstract class AbstractCursor extends CursorWrapper {
         mColumnIndexes = new HashMap<String, Integer>(cursor.getColumnCount() * 4 / 3, .75f);
     }
 
-    public abstract long getId();
-
     protected int getCachedColumnIndexOrThrow(String colName) {
         Integer index = mColumnIndexes.get(colName);
         if (index == null) {
@@ -25,6 +22,8 @@ public abstract class AbstractCursor extends CursorWrapper {
         }
         return index;
     }
+
+    public abstract long getId();
 
     public String getStringOrNull(String colName) {
         int index = getCachedColumnIndexOrThrow(colName);

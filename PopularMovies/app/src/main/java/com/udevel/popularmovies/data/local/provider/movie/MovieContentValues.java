@@ -1,11 +1,8 @@
 package com.udevel.popularmovies.data.local.provider.movie;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.udevel.popularmovies.data.local.provider.base.AbstractContentValues;
@@ -32,7 +29,7 @@ public class MovieContentValues extends AbstractContentValues {
     /**
      * Update row(s) using the values stored by this object and the given selection.
      *
-     * @param contentResolver The content resolver to use.
+     * @param context The content resolver to use.
      * @param where The selection to use (can be {@code null}).
      */
     public int update(Context context, @Nullable MovieSelection where) {
@@ -72,6 +69,16 @@ public class MovieContentValues extends AbstractContentValues {
 
     public MovieContentValues putPosterPathNull() {
         mContentValues.putNull(MovieColumns.POSTER_PATH);
+        return this;
+    }
+
+    public MovieContentValues putBackdropPath(@Nullable String value) {
+        mContentValues.put(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieContentValues putBackdropPathNull() {
+        mContentValues.putNull(MovieColumns.BACKDROP_PATH);
         return this;
     }
 

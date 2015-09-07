@@ -1,13 +1,13 @@
 package com.udevel.popularmovies.data.local.provider.base;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import android.content.Context;
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.net.Uri;
 
 public abstract class AbstractSelection<T extends AbstractSelection<?>> {
     private static final String EQ = "=?";
@@ -178,51 +178,6 @@ public abstract class AbstractSelection<T extends AbstractSelection<?>> {
         mSelectionArgs.add(valueOf(value));
     }
 
-    public void addRaw(String raw, Object... args) {
-        mSelection.append(" ");
-        mSelection.append(raw);
-        mSelection.append(" ");
-        for (Object arg : args) {
-            mSelectionArgs.add(valueOf(arg));
-        }
-    }
-
-    private String valueOf(Object obj) {
-        if (obj instanceof Date) {
-            return String.valueOf(((Date) obj).getTime());
-        } else if (obj instanceof Boolean) {
-            return (Boolean) obj ? "1" : "0";
-        } else if (obj instanceof Enum) {
-            return String.valueOf(((Enum<?>) obj).ordinal());
-        }
-        return String.valueOf(obj);
-    }
-
-    @SuppressWarnings("unchecked")
-    public T openParen() {
-        mSelection.append(PAREN_OPEN);
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T closeParen() {
-        mSelection.append(PAREN_CLOSE);
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T and() {
-        mSelection.append(AND);
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T or() {
-        mSelection.append(OR);
-        return (T) this;
-    }
-
-
     protected Object[] toObjectArray(int... array) {
         Object[] res = new Object[array.length];
         for (int i = 0; i < array.length; i++) {
@@ -259,6 +214,40 @@ public abstract class AbstractSelection<T extends AbstractSelection<?>> {
         return new Object[] { value };
     }
 
+    protected abstract Uri baseUri();
+
+    public void addRaw(String raw, Object... args) {
+        mSelection.append(" ");
+        mSelection.append(raw);
+        mSelection.append(" ");
+        for (Object arg : args) {
+            mSelectionArgs.add(valueOf(arg));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public T openParen() {
+        mSelection.append(PAREN_OPEN);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T closeParen() {
+        mSelection.append(PAREN_CLOSE);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T and() {
+        mSelection.append(AND);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T or() {
+        mSelection.append(OR);
+        return (T) this;
+    }
 
     /**
      * Returns the selection produced by this object.
@@ -294,8 +283,6 @@ public abstract class AbstractSelection<T extends AbstractSelection<?>> {
         if (mLimit != null) uri = BaseContentProvider.limit(uri, String.valueOf(mLimit));
         return uri;
     }
-
-    protected abstract Uri baseUri();
 
     /**
      * Deletes row(s) specified by this selection.
@@ -369,5 +356,16 @@ public abstract class AbstractSelection<T extends AbstractSelection<?>> {
         } finally {
             cursor.close();
         }
+    }
+
+    private String valueOf(Object obj) {
+        if (obj instanceof Date) {
+            return String.valueOf(((Date) obj).getTime());
+        } else if (obj instanceof Boolean) {
+            return (Boolean) obj ? "1" : "0";
+        } else if (obj instanceof Enum) {
+            return String.valueOf(((Enum<?>) obj).ordinal());
+        }
+        return String.valueOf(obj);
     }
 }

@@ -5,8 +5,6 @@ import android.provider.BaseColumns;
 
 import com.udevel.popularmovies.data.local.provider.MovieContentProvider;
 import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
-import com.udevel.popularmovies.data.local.provider.review.ReviewColumns;
-import com.udevel.popularmovies.data.local.provider.youtubetrailer.YoutubetrailerColumns;
 
 /**
  * Columns for the {@code review} table.
@@ -40,6 +38,7 @@ public class ReviewColumns implements BaseColumns {
             MOVIE_ID
     };
     // @formatter:on
+    public static final String PREFIX_MOVIE = TABLE_NAME + "__" + MovieColumns.TABLE_NAME;
 
     public static boolean hasColumns(String[] projection) {
         if (projection == null) return true;
@@ -51,6 +50,4 @@ public class ReviewColumns implements BaseColumns {
         }
         return false;
     }
-
-    public static final String PREFIX_MOVIE = TABLE_NAME + "__" + MovieColumns.TABLE_NAME;
 }

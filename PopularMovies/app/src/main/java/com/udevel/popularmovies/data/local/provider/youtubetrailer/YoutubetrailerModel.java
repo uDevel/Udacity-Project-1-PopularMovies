@@ -1,11 +1,9 @@
 package com.udevel.popularmovies.data.local.provider.youtubetrailer;
 
-import com.udevel.popularmovies.data.local.provider.base.BaseModel;
-
-import java.util.Date;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.udevel.popularmovies.data.local.provider.base.BaseModel;
 
 /**
  * Data model for the {@code youtubetrailer} table.

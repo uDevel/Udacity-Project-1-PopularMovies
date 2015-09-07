@@ -289,16 +289,18 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 }
 
                 if (movieDetailInfoResult != null) {
-                    movie = new Movie();
+                    movie = Movie.convertMovieDetailInfoResult(movieDetailInfoResult);
+                   /* movie = new Movie();
                     movie.setMovieId(movieDetailInfoResult.getId());
                     movie.setOriginalTitle(movieDetailInfoResult.getOriginalTitle());
                     movie.setOverview(movieDetailInfoResult.getOverview());
                     movie.setPopularity(movieDetailInfoResult.getPopularity());
                     movie.setPosterPath(movieDetailInfoResult.getPosterPath());
+                    movie.setBackdropPath(movieDetailInfoResult.getBackdropPath());
                     movie.setReleaseDate(movieDetailInfoResult.getReleaseDate());
                     movie.setVoteAverage(movieDetailInfoResult.getVoteAverage());
                     movie.setVoteCount(movieDetailInfoResult.getVoteCount());
-
+*/
                     MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
                     if (trailers != null) {
                         List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();

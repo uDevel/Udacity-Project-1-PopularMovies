@@ -1,13 +1,11 @@
 package com.udevel.popularmovies.data.local.provider.youtubetrailer;
 
-import java.util.Date;
-
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.udevel.popularmovies.data.local.provider.base.AbstractCursor;
-import com.udevel.popularmovies.data.local.provider.movie.*;
+import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
 
 /**
  * Cursor wrapper for the {@code youtubetrailer} table.
@@ -106,6 +104,16 @@ public class YoutubetrailerCursor extends AbstractCursor implements Youtubetrail
     @Nullable
     public String getMoviePosterPath() {
         String res = getStringOrNull(MovieColumns.POSTER_PATH);
+        return res;
+    }
+
+    /**
+     * Get the {@code backdrop_path} value.
+     * Can be {@code null}.
+     */
+    @Nullable
+    public String getMovieBackdropPath() {
+        String res = getStringOrNull(MovieColumns.BACKDROP_PATH);
         return res;
     }
 

@@ -1,14 +1,12 @@
 package com.udevel.popularmovies.data.local.provider.youtubetrailer;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
 import com.udevel.popularmovies.data.local.provider.base.AbstractSelection;
-import com.udevel.popularmovies.data.local.provider.movie.*;
+import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
 
 /**
  * Selection for the {@code youtubetrailer} table.
@@ -396,6 +394,46 @@ public class YoutubetrailerSelection extends AbstractSelection<YoutubetrailerSel
 
     public YoutubetrailerSelection orderByMoviePosterPath() {
         orderBy(MovieColumns.POSTER_PATH, false);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPath(String... value) {
+        addEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPathNot(String... value) {
+        addNotEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPathLike(String... value) {
+        addLike(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPathContains(String... value) {
+        addContains(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPathStartsWith(String... value) {
+        addStartsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection movieBackdropPathEndsWith(String... value) {
+        addEndsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public YoutubetrailerSelection orderByMovieBackdropPath(boolean desc) {
+        orderBy(MovieColumns.BACKDROP_PATH, desc);
+        return this;
+    }
+
+    public YoutubetrailerSelection orderByMovieBackdropPath() {
+        orderBy(MovieColumns.BACKDROP_PATH, false);
         return this;
     }
 

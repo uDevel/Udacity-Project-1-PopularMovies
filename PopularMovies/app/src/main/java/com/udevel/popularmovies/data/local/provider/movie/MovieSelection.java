@@ -1,9 +1,7 @@
 package com.udevel.popularmovies.data.local.provider.movie;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -235,6 +233,46 @@ public class MovieSelection extends AbstractSelection<MovieSelection> {
 
     public MovieSelection orderByPosterPath() {
         orderBy(MovieColumns.POSTER_PATH, false);
+        return this;
+    }
+
+    public MovieSelection backdropPath(String... value) {
+        addEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection backdropPathNot(String... value) {
+        addNotEquals(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection backdropPathLike(String... value) {
+        addLike(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection backdropPathContains(String... value) {
+        addContains(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection backdropPathStartsWith(String... value) {
+        addStartsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection backdropPathEndsWith(String... value) {
+        addEndsWith(MovieColumns.BACKDROP_PATH, value);
+        return this;
+    }
+
+    public MovieSelection orderByBackdropPath(boolean desc) {
+        orderBy(MovieColumns.BACKDROP_PATH, desc);
+        return this;
+    }
+
+    public MovieSelection orderByBackdropPath() {
+        orderBy(MovieColumns.BACKDROP_PATH, false);
         return this;
     }
 

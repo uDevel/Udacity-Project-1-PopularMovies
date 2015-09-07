@@ -1,11 +1,8 @@
 package com.udevel.popularmovies.data.local.provider.movie;
 
-import com.udevel.popularmovies.data.local.provider.base.BaseModel;
-
-import java.util.Date;
-
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.udevel.popularmovies.data.local.provider.base.BaseModel;
 
 /**
  * Data model for the {@code movie} table.
@@ -37,6 +34,13 @@ public interface MovieModel extends BaseModel {
      */
     @Nullable
     String getPosterPath();
+
+    /**
+     * Get the {@code backdrop_path} value.
+     * Can be {@code null}.
+     */
+    @Nullable
+    String getBackdropPath();
 
     /**
      * Get the {@code overview} value.

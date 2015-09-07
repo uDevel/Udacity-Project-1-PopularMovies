@@ -84,7 +84,6 @@ public class DiscoverMovieResult {
         private String backdropPath;
         @SerializedName("genre_ids")
         @Expose
-
         private List<Integer> genreIds = new ArrayList<>();
         @Expose
         private Integer id;

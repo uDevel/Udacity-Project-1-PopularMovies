@@ -199,6 +199,7 @@ public class DataManagerTest extends AndroidTestCase {
         movie.setVoteCount(random.nextInt());
         movie.setVoteAverage(random.nextDouble());
         movie.setPosterPath(String.valueOf(random.nextInt()));
+        movie.setBackdropPath(String.valueOf(random.nextInt()));
         movie.setOriginalTitle(String.valueOf(random.nextInt()));
         movie.setOverview(String.valueOf(random.nextInt()));
         movie.setReleaseDate(String.valueOf(random.nextInt()));

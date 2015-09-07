@@ -22,6 +22,11 @@
       "defaultValue": ""
     },
     {
+      "name": "backdrop_path",
+      "type": "String",
+      "defaultValue": ""
+    },
+    {
       "name": "overview",
       "type": "String",
       "defaultValue": ""
