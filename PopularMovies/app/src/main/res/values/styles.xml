@@ -10,6 +10,10 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppTheme.TransparentStatusBar" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/transparent_primary</item>
+    </style>
+
     <style name="Custom.Spinner" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
         <item name="android:background">?android:selectableItemBackground</item>
         <item name="android:dropDownSelector">?android:selectableItemBackground</item>

@@ -24,9 +24,9 @@
         </activity>
         <activity
             android:name=".activity.DetailActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_movie_detail"
-            android:parentActivityName=".activity.ListActivity">
+            android:parentActivityName=".activity.ListActivity"
+            android:theme="@style/AppTheme.TransparentStatusBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.ListActivity"/>
@@ -39,9 +39,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.DetailActivity"/>
         </activity>
+
         <provider
             android:name="com.udevel.popularmovies.data.local.provider.MovieContentProvider"
             android:authorities="com.udevel.popularmovies.provider"
-            android:exported="false" />
+            android:exported="false"/>
     </application>
 </manifest>

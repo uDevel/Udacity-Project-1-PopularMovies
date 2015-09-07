@@ -4,10 +4,12 @@ import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -61,6 +63,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
 
     private TextView tv_title;
+    private ImageView iv_backdrop;
     private ImageView iv_poster;
     private View root;
     private TextView tv_release_year;
@@ -68,6 +71,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     private TextView tv_rating;
     private TextView tv_popularity;
     private Toolbar tb_movie_detail;
+    private CollapsingToolbarLayout ctl_movie_detail;
     private AppBarLayout abl_movie_detail;
     private LinearLayout ll_collapse;
     private TextView tv_title_collapse;
@@ -128,6 +132,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Glide.clear(iv_backdrop);
         if (abl_movie_detail != null) {
             abl_movie_detail.removeOnOffsetChangedListener(this);
         }
@@ -220,23 +225,19 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
+        iv_backdrop = ((ImageView) root.findViewById(R.id.iv_backdrop));
         iv_poster = ((ImageView) root.findViewById(R.id.iv_poster));
         tv_title = ((TextView) root.findViewById(R.id.tv_title));
         rv_movie_detail = ((RecyclerView) root.findViewById(R.id.rv_movie_detail));
-        tv_release_year = ((TextView) root.findViewById(R.id.tv_release_year));
-        tv_release_month_date = ((TextView) root.findViewById(R.id.tv_release_month_date));
-        tv_popularity = ((TextView) root.findViewById(R.id.tv_popularity));
-        tv_rating = ((TextView) root.findViewById(R.id.tv_rating));
+
         abl_movie_detail = ((AppBarLayout) root.findViewById(R.id.abl_movie_detail));
 
         hasToolbar = abl_movie_detail != null;
 
         if (hasToolbar) {
             tb_movie_detail = ((Toolbar) root.findViewById(R.id.tb_movie_detail));
-            ll_collapse = ((LinearLayout) root.findViewById(R.id.ll_collapse));
-            tv_title_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_title_collapse));
-            tv_release_runtime_rating_collapse = ((TextView) ll_collapse.findViewById(R.id.tv_release_popularity_rating_collapse));
-
+            ctl_movie_detail = ((CollapsingToolbarLayout) root.findViewById(R.id.ctl_movie_detail));
+/*
             if (iv_poster != null) {
                 iv_poster.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -253,7 +254,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                 });
             }
 
-            abl_movie_detail.addOnOffsetChangedListener(this);
+            abl_movie_detail.addOnOffsetChangedListener(this);*/
             setupToolbar();
         }
         return root;
@@ -290,17 +291,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
                 if (movieDetailInfoResult != null) {
                     movie = Movie.convertMovieDetailInfoResult(movieDetailInfoResult);
-                   /* movie = new Movie();
-                    movie.setMovieId(movieDetailInfoResult.getId());
-                    movie.setOriginalTitle(movieDetailInfoResult.getOriginalTitle());
-                    movie.setOverview(movieDetailInfoResult.getOverview());
-                    movie.setPopularity(movieDetailInfoResult.getPopularity());
-                    movie.setPosterPath(movieDetailInfoResult.getPosterPath());
-                    movie.setBackdropPath(movieDetailInfoResult.getBackdropPath());
-                    movie.setReleaseDate(movieDetailInfoResult.getReleaseDate());
-                    movie.setVoteAverage(movieDetailInfoResult.getVoteAverage());
-                    movie.setVoteCount(movieDetailInfoResult.getVoteCount());
-*/
+
                     MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
                     if (trailers != null) {
                         List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
@@ -389,9 +380,11 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
     }
 
     private void setMovieInfoUIToolbar() {
-        Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
-        Glide.with(this)
-                .load(uri)
+        ctl_movie_detail.setTitle(movie.getOriginalTitle());
+        Uri posterUrl = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
+        Uri backdropUrl = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.FULLSIZE_IMAGE_WIDTH).appendEncodedPath(movie.getBackdropPath()).build();
+/*        Glide.with(this)
+                .load(posterUrl)
                 .error(R.drawable.ic_image_error)
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
@@ -410,8 +403,14 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
                         return false;
                     }
                 })
-                .into(iv_poster);
-        tv_title.setText(movie.getOriginalTitle());
+                .into(iv_poster);*/
+
+        Glide.with(this)
+                .load(backdropUrl)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(iv_backdrop);
+        /*tv_title.setText(movie.getOriginalTitle());
         tv_title_collapse.setText(movie.getOriginalTitle());
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         try {
@@ -428,7 +427,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
         tv_release_runtime_rating_collapse.setText(tv_release_year.getText() +
                 "" + tv_release_month_date.getText() +
                 " - " + tv_popularity.getText() +
-                " - " + tv_rating.getText());
+                " - " + tv_rating.getText());*/
     }
 
     private void updateMovieDetailRecyclerView() {
@@ -439,7 +438,7 @@ public class DetailFragment extends Fragment implements AppBarLayout.OnOffsetCha
 
             MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
             if (adapter == null) {
-                adapter = new MovieDetailAdapter(movie, youTubeTrailers, reviews, this, !hasToolbar);
+                adapter = new MovieDetailAdapter(movie, youTubeTrailers, reviews, this, true);
                 rv_movie_detail.setAdapter(adapter);
             } else {
                 adapter.updateMovieDetail(movie, youTubeTrailers, reviews);
