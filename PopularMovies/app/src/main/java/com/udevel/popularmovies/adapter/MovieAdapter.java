@@ -30,10 +30,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean showFooter = true;
     private List<Movie> movieList;
     private AdapterItemClickListener adapterItemClickListener;
-    private int selectedMovieId = -1;
-    private int selectedMoviePosition = -1;
 
-    // Provide a suitable constructor (depends on the kind of dataset)
+    // Provide a suitable constructor (depends on the kind of data set)
     public MovieAdapter(List<Movie> movieList, Fragment fragment, int movieListType) {
         this.fragment = fragment;
         setHasStableIds(true);
@@ -49,16 +47,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     @Override
                     public void onClick(View v, int adapterPosition) {
                         if (adapterItemClickListener != null) {
-                            int movieId = getOriginalItemId(adapterPosition);
-                            adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL, v, movieId);
-
-                            if (selectedMoviePosition != -1) {
-                                notifyItemChanged(selectedMoviePosition);
-                            }
-
-                            selectedMovieId = movieId;
-                            selectedMoviePosition = adapterPosition;
-                            notifyItemChanged(selectedMoviePosition);
+                            adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL, v, getOriginalItemId(adapterPosition));
                         }
                     }
                 });
@@ -90,11 +79,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .animate(R.anim.fade_in_rise)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(movieViewHolder.iv_poster);
-                boolean selected = movieInfo.getMovieId() == selectedMovieId;
-                movieViewHolder.v_overlay.setSelected(selected);
-                if (selected) {
-                    selectedMoviePosition = position;
-                }
                 break;
             case VIEW_TYPE_FOOTER:
                 ProgressWheel pw_main = ((FooterViewHolder) holder).pw_main;
@@ -158,7 +142,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     // you provide access to all the views for a data item in a view holder
     public static class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView iv_poster;
-        private final View v_overlay;
         private final ViewHolderClickListener viewHolderClickListener;
         private AtomicInteger position = new AtomicInteger(-1);
         // each data item is just a string in this case
@@ -167,8 +150,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(v);
             this.viewHolderClickListener = viewHolderClickListener;
             iv_poster = ((ImageView) v.findViewById(R.id.iv_poster));
-            v_overlay = v.findViewById(R.id.v_overlay);
-            v_overlay.setOnClickListener(this);
+            v.setOnClickListener(this);
         }
 
         static MovieViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {

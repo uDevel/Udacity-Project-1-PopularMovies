@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:padding="1px">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:foreground="@drawable/selector_list_item_movie_background"
+             android:padding="1px">
 
     <com.udevel.popularmovies.view.PosterImageView
         android:id="@+id/iv_poster"
@@ -12,9 +13,4 @@
         android:layout_gravity="center"
         android:scaleType="center"
         tools:src="@drawable/ic_image_error"/>
-    <View
-        android:id="@+id/v_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/selector_list_item_movie_background"/>
 </FrameLayout>

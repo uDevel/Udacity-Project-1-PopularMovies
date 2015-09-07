@@ -11,7 +11,7 @@
     <color name="light_gray">#dfdfdf</color>
     <color name="lighter_gray">#e8e8e8</color>
     <color name="transparent">#00000000</color>
-    <color name="transparent_white">#8dffffff</color>
+    <color name="transparent_white">#daffffff</color>
 
     <color name="star_filter">#ffed00</color>
     <color name="pressed_ripple_color">#fba842</color>
