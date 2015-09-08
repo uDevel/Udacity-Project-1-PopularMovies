@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.view.View;
@@ -78,7 +79,7 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         pw_main.stopSpinning();
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
-                                int backgroundColor = p.getMutedColor(getResources().getColor(R.color.dark_gray, null));
+                                int backgroundColor = p.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_gray));
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     reveal();
                                 }

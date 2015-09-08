@@ -12,7 +12,7 @@
     <color name="lighter_gray">#e8e8e8</color>
     <color name="transparent">#00000000</color>
     <color name="transparent_white">#daffffff</color>
-    <color name="transparent_black">#14000000</color>
+    <color name="transparent_black">#2e000000</color>
 
     <color name="star_filter">#ffed00</color>
     <color name="pressed_ripple_color">#fba842</color>

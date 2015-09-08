@@ -215,6 +215,26 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
         }
     }
 
+    /***
+     * This method is for activity to call, because users always mistakenly back out of the app when they are in favorite list.
+     *
+     * @return true if back press is absorbed by this method.  False if this fragment let the caller to this method to handle the back press action.
+     */
+    public boolean onBackPressed() {
+        // User always mistakenly back out of the app when they are in favorite list, so we let fragment to decide if we really back out the app.
+        if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+            if (root != null) {
+                Spinner spinner = (Spinner) root.findViewById(R.id.sp_main);
+                if (spinner != null) {
+                    spinner.setSelection(Movie.MOVIE_LIST_TYPE_POPULARITY);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void unregisterFavoriteMovieListObserver() {
         if (favoriteMoviesObserver != null) {
             Log.d(TAG, "*** unregistered");

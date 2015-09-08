@@ -1,9 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.udevel.popularmovies.fragment.DetailFragment">
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/cl_movie_detail"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.udevel.popularmovies.fragment.DetailFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movie_detail"
@@ -12,4 +14,4 @@
         android:overScrollMode="never"
         android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

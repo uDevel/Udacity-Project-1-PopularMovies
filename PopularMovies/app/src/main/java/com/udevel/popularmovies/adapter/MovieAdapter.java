@@ -71,7 +71,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
 
                 Movie movieInfo = movieList.get(position);
-                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.POSTER_THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movieInfo.getPosterPath()).build();
                 Glide.with(fragment)//((MovieViewHolder) holder).iv_poster.getContext())
                         .load(uri)
                         .error(R.drawable.ic_image_error)

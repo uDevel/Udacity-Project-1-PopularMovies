@@ -12,7 +12,9 @@ import java.util.List;
  */
 public class Movie {
     public static final String BASE_URL_FOR_IMAGE = DiscoverMovieResult.BASE_URL_FOR_IMAGE;
-    public static final String THUMBNAIL_IMAGE_WIDTH = "w185";
+    public static final String POSTER_THUMBNAIL_IMAGE_WIDTH = "w185";
+    public static final String SMALL_BACKDROP_IMAGE_WIDTH = "w300";
+    public static final String MEDIUM_BACKDROP_IMAGE_WIDTH = "w780";
     public static final String FULLSIZE_IMAGE_WIDTH = "original";
     public static final int MOVIE_LIST_TYPE_POPULARITY = 0;
     public static final int MOVIE_LIST_TYPE_RATING = 1;

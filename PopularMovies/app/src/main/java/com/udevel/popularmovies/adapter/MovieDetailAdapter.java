@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,6 +43,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private AdapterItemClickListener adapterItemClickListener;
     private boolean hasTrailers;
     private boolean hasReviews;
+    private boolean animatedEntry;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailers, List<Review> reviews, Fragment fragment) {
@@ -115,13 +118,35 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 movieInfoViewHolder.tv_popularity.setText(applicationContext.getString(R.string.format_popularity, movie.getPopularity()));
                 movieInfoViewHolder.tv_overview.setText(movie.getOverview());
 
-                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
+                Uri uri = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.POSTER_THUMBNAIL_IMAGE_WIDTH).appendEncodedPath(movie.getPosterPath()).build();
                 Glide.with(fragment)
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .dontAnimate()
                         .into(movieInfoViewHolder.iv_poster);
+
+                if (!animatedEntry) {
+                    movieInfoViewHolder.fl_poster.setTranslationX(-1000);
+                    movieInfoViewHolder.tv_title.setTranslationX(1000);
+                    movieInfoViewHolder.tv_release_year.setTranslationX(1000);
+                    movieInfoViewHolder.tv_release_month_date.setTranslationX(1000);
+                    movieInfoViewHolder.tv_rating.setTranslationX(1000);
+                    movieInfoViewHolder.tv_popularity.setTranslationX(1000);
+                    movieInfoViewHolder.tv_overview.setScaleX(0.0f);
+                    movieInfoViewHolder.tv_overview.setScaleY(0.0f);
+
+                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(700).setInterpolator(new DecelerateInterpolator(2)).start();
+
+                    animatedEntry = true;
+                }
                 break;
             case VIEW_TYPE_TRAILER:
                 TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
@@ -131,6 +156,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 Glide.with(fragment)
                         .load(thumbnailUrl)
                         .fitCenter()
+                        .crossFade(1000)
                         .error(R.drawable.ic_image_error)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(trailerViewHolder.iv_trailer_thumbnail);
@@ -185,11 +211,29 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
-        return youTubeTrailerList == null ? null : youTubeTrailerList.get(position - 2);
+        if (youTubeTrailerList == null) {
+            return null;
+        }
+
+        int youTubeTrailerPosition = position - 2;
+        if (youTubeTrailerPosition < 0 || youTubeTrailerPosition >= youTubeTrailerList.size()) {
+            return null;
+        }
+
+        return youTubeTrailerList.get(youTubeTrailerPosition);
     }
 
     private Review getReviewFromAdapterPosition(int position) {
-        return reviewList == null ? null : reviewList.get(position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size() + 1) - 1);
+        if (reviewList == null) {
+            return null;
+        }
+
+        int reviewPosition = position - 1 - (youTubeTrailerList == null ? 0 : youTubeTrailerList.size() + 1) - 1;
+        if (reviewPosition < 0 || reviewPosition >= reviewList.size()) {
+            return null;
+        }
+
+        return reviewList.get(reviewPosition);
     }
 
     interface ViewHolderClickListener {
@@ -197,6 +241,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public static class MovieInfoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final FrameLayout fl_poster;
         private final TextView tv_title;
         private final TextView tv_release_year;
         private final TextView tv_release_month_date;
@@ -209,15 +254,15 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public MovieInfoViewHolder(View v, ViewHolderClickListener viewHolderClickListener) {
             super(v);
             this.viewHolderClickListener = viewHolderClickListener;
-
             iv_poster = ((ImageView) v.findViewById(R.id.iv_poster));
+            fl_poster = ((FrameLayout) v.findViewById(R.id.fl_poster));
             tv_title = ((TextView) v.findViewById(R.id.tv_title));
             tv_release_year = ((TextView) v.findViewById(R.id.tv_release_year));
             tv_release_month_date = ((TextView) v.findViewById(R.id.tv_release_month_date));
             tv_popularity = ((TextView) v.findViewById(R.id.tv_popularity));
             tv_rating = ((TextView) v.findViewById(R.id.tv_rating));
             tv_overview = ((TextView) v.findViewById(R.id.tv_overview));
-            v.setOnClickListener(this);
+            fl_poster.setOnClickListener(this);
         }
 
         static MovieInfoViewHolder inflate(ViewGroup parent, ViewHolderClickListener viewHolderClickListener) {

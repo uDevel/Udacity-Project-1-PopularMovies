@@ -5,28 +5,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_list_item_movie_detail"
+    android:clipChildren="false"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/iv_poster"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/cd_cannot_get_movie_poster"
-        android:elevation="4dp"
-        android:outlineProvider="bounds"
-        android:scaleType="center"
-        tools:ignore="UnusedAttribute"/>
+    <View
+        android:id="@+id/v_underline_title"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tv_title"
+        android:layout_marginTop="3dp"
+        android:background="@color/accent"/>
 
-    <TextView
-        android:id="@+id/tv_title"
+    <FrameLayout
+        android:id="@+id/fl_poster"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:foreground="@drawable/selector_list_item_movie_detail"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_poster"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            android:contentDescription="@string/cd_cannot_get_movie_poster"
+            android:scaleType="center"/>
+    </FrameLayout>
+
+    <TextView
+        android:id="@id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
-        android:layout_toEndOf="@id/iv_poster"
+        android:layout_toEndOf="@id/fl_poster"
         android:gravity="center_vertical"
-        android:singleLine="true"
+        android:maxLines="2"
         android:textSize="26dp"
         tools:text="title "/>
 
@@ -35,11 +48,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_title"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
-        android:layout_toEndOf="@id/iv_poster"
+        android:layout_toEndOf="@id/fl_poster"
         android:fontFamily="sans-serif-light"
-        android:textSize="20sp"
+        android:textSize="20dp"
         tools:text="release_date"/>
 
     <TextView
@@ -49,7 +62,7 @@
         android:layout_alignBaseline="@id/tv_release_year"
         android:layout_toEndOf="@id/tv_release_year"
         android:fontFamily="sans-serif-light"
-        android:textSize="16sp"
+        android:textSize="16dp"
         tools:text="month_date"/>
 
     <TextView
@@ -57,11 +70,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_release_year"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
-        android:layout_toEndOf="@id/iv_poster"
+        android:layout_toEndOf="@id/fl_poster"
         android:fontFamily="sans-serif-light"
-        android:textSize="16sp"
+        android:textSize="16dp"
         android:textStyle="italic"
         tools:text="runtime"/>
 
@@ -70,11 +83,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_popularity"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
-        android:layout_toEndOf="@id/iv_poster"
+        android:layout_toEndOf="@id/fl_poster"
         android:fontFamily="sans-serif-light"
-        android:textSize="16sp"
+        android:textSize="16dp"
         android:textStyle="italic"
         tools:text="rating"/>
 
@@ -82,9 +95,9 @@
         android:id="@+id/tv_overview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/iv_poster"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_below="@id/fl_poster"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:fontFamily="sans-serif-light"
         android:textSize="18sp"

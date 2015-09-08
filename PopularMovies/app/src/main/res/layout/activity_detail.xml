@@ -1,5 +1,5 @@
 <fragment
-    android:id="@+id/fragment_detail"
+    android:id="@+id/fragment_detail_holder"
     android:name="com.udevel.popularmovies.fragment.DetailFragment"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

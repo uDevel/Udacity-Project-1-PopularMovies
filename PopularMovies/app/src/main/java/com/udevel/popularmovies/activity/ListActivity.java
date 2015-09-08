@@ -54,6 +54,38 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        // User always mistakenly back out of the app when they are in favorite list, so we let fragment to decide if we really back out the app.
+        ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_list);
+        if (!listFragment.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(String action, Object asset) {
+        switch (action) {
+            case OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL:
+                if (asset != null && asset instanceof Integer) {
+                    if (isTwoPanes) {
+                        showDetailFragment((int) asset);
+                    } else {
+                        Intent intent = DetailActivity.createIntent(this, (int) asset);
+                        startActivity(intent);
+                    }
+                    break;
+                }
+            case OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER:
+                if (asset != null) {
+                    Intent intent = new Intent(this, PosterFullscreenActivity.class);
+                    intent.putExtra(PosterFullscreenActivity.ARG_KEY_POSTER_PATH, (String) asset);
+                    startActivity(intent);
+                }
+                break;
+        }
+    }
+
     private void setupSpinner(ViewGroup tb_main) {
         int movieListType = AppPreferences.getLastMovieListType(this);
         View spinnerContainer = LayoutInflater.from(this).inflate(R.layout.spinner_actionbar, tb_main, false);
@@ -84,22 +116,6 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
 
             }
         });
-    }
-
-    @Override
-    public void onFragmentInteraction(String action, Object asset) {
-        switch (action) {
-            case OnFragmentInteractionListener.ACTION_OPEN_MOVIE_DETAIL:
-                if (asset != null && asset instanceof Integer) {
-                    if (isTwoPanes) {
-                        showDetailFragment((int) asset);
-                    } else {
-                        Intent intent = DetailActivity.createIntent(this, (int) asset);
-                        startActivity(intent);
-                    }
-                    break;
-                }
-        }
     }
 
     private void showDetailFragment(int movieId) {

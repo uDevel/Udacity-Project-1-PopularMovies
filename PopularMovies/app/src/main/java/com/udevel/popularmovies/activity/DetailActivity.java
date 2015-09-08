@@ -1,19 +1,17 @@
 package com.udevel.popularmovies.activity;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.fragment.DetailFragment;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 
 public class DetailActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+    private static final String TAG = DetailActivity.class.getSimpleName();
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
     private boolean dismissOnOrientationChange;
 
@@ -34,7 +32,7 @@ public class DetailActivity extends AppCompatActivity implements OnFragmentInter
         if (dismissOnOrientationChange && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             onBackPressed();
         } else {
-            DetailFragment detailFragment = ((DetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_detail));
+            DetailFragment detailFragment = ((DetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_detail_holder));
             detailFragment.setMovie(movieId);
         }
     }

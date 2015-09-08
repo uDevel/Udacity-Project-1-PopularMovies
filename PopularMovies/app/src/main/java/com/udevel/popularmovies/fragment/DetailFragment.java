@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,9 +14,11 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
@@ -27,13 +30,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.udevel.popularmovies.R;
@@ -120,7 +121,9 @@ public class DetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Glide.clear(iv_backdrop);
+        if (iv_backdrop != null) {
+            Glide.clear(iv_backdrop);
+        }
     }
 
     @Override
@@ -331,33 +334,39 @@ public class DetailFragment extends Fragment {
 
     private void setMovieInfoUIToolbar() {
         ctl_movie_detail.setTitle(movie.getOriginalTitle());
-        Uri backdropUrl = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.FULLSIZE_IMAGE_WIDTH).appendEncodedPath(movie.getBackdropPath()).build();
+        Uri backdropUrl = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.MEDIUM_BACKDROP_IMAGE_WIDTH).appendEncodedPath(movie.getBackdropPath()).build();
         Glide.with(this)
                 .load(backdropUrl)
+                .asBitmap()
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .listener(new RequestListener<Uri, GlideDrawable>() {
+                .listener(new RequestListener<Uri, Bitmap>() {
                     @Override
-                    public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                            public void onGenerated(Palette p) {
+                                int backgroundColor = p.getDarkMutedColor(ContextCompat.getColor(getContext(), R.color.primary));
+                                if (ctl_movie_detail != null) {
+                                    ctl_movie_detail.setContentScrimColor(backgroundColor);
+                                }
+                            }
+                        });
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             reveal();
                         }
                         return false;
                     }
-                })
-                .into(iv_backdrop);
 
+                }).into(iv_backdrop);
     }
 
     private void updateMovieDetailRecyclerView() {
         if (rv_movie_detail != null) {
-            rv_movie_detail.setTranslationY(rv_movie_detail.getHeight());
-            rv_movie_detail.animate().translationY(0f).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
             if (rv_movie_detail.getLayoutManager() == null) {
                 rv_movie_detail.setLayoutManager(new LinearLayoutManager(getActivity()));
             }
@@ -415,12 +424,14 @@ public class DetailFragment extends Fragment {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reveal() {
-        View targetView = iv_backdrop;
-        int cx = (targetView.getLeft() + targetView.getRight()) / 2;
-        int cy = (targetView.getTop() + targetView.getBottom()) / 2;
+        if (iv_backdrop != null) {
+            View targetView = iv_backdrop;
+            int cx = (targetView.getLeft() + targetView.getRight()) / 2;
+            int cy = (targetView.getTop() + targetView.getBottom()) / 2;
 
-        int finalRadius = Math.max(targetView.getWidth(), targetView.getHeight());
-        Animator anim = ViewAnimationUtils.createCircularReveal(targetView, cx, cy, 0, finalRadius);
-        anim.start();
+            int finalRadius = Math.max(targetView.getWidth(), targetView.getHeight());
+            Animator anim = ViewAnimationUtils.createCircularReveal(targetView, cx, cy, 0, finalRadius);
+            anim.start();
+        }
     }
 }
