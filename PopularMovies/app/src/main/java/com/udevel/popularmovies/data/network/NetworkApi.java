@@ -30,6 +30,7 @@ public class NetworkApi {
         if (theMovieDBServiceCache == null) {
             RestAdapter restAdapter = new RestAdapter.Builder()
                     .setEndpoint(TheMovieDBService.endPoint)
+                    .setLogLevel(RestAdapter.LogLevel.FULL)
                     .setClient(new OkClient(getRetryOkHttpClient()))
                     .build();
             theMovieDBServiceCache = restAdapter.create(TheMovieDBService.class);

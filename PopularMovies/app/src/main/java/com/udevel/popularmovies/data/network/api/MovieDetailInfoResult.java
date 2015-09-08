@@ -50,7 +50,7 @@ public class MovieDetailInfoResult {
     @Expose
     private String releaseDate;
     @Expose
-    private Integer revenue;
+    private Long revenue;
     @Expose
     private Integer runtime;
     @SerializedName("spoken_languages")
@@ -302,14 +302,14 @@ public class MovieDetailInfoResult {
     /**
      * @return The revenue
      */
-    public Integer getRevenue() {
+    public Long getRevenue() {
         return revenue;
     }
 
     /**
      * @param revenue The revenue
      */
-    public void setRevenue(Integer revenue) {
+    public void setRevenue(Long revenue) {
         this.revenue = revenue;
     }
 
@@ -667,7 +667,7 @@ public class MovieDetailInfoResult {
         @Expose
         private Integer page;
         @Expose
-        private List<Result> results = new ArrayList<Result>();
+        private List<Result> results = new ArrayList<>();
         @SerializedName("total_pages")
         @Expose
         private Integer totalPages;
@@ -805,9 +805,9 @@ public class MovieDetailInfoResult {
     public class Trailers {
 
         @Expose
-        private List<Object> quicktime = new ArrayList<Object>();
+        private List<Object> quicktime = new ArrayList<>();
         @Expose
-        private List<Youtube> youtube = new ArrayList<Youtube>();
+        private List<Youtube> youtube = new ArrayList<>();
 
         /**
          * @return The quicktime

@@ -359,7 +359,8 @@ public class DetailFragment extends Fragment {
                     public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
-                                int backgroundColor = p.getDarkMutedColor(ContextCompat.getColor(getContext(), R.color.primary));
+                                int backupColor = p.getDarkMutedColor(ContextCompat.getColor(getContext(), R.color.primary));
+                                int backgroundColor = p.getDarkVibrantColor(backupColor);
                                 if (ctl_movie_detail != null) {
                                     ctl_movie_detail.setContentScrimColor(backgroundColor);
                                 }
