@@ -21,6 +21,7 @@ import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.fragment.DetailFragment;
 import com.udevel.popularmovies.fragment.ListFragment;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
+import com.udevel.popularmovies.misc.Utils;
 
 import java.util.Arrays;
 
@@ -28,6 +29,7 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
 
     private static final String TAG_DETAIL_FRAGMENT = "TAG_DETAIL_FRAGMENT";
     private boolean isTwoPanes = false;
+    private int movieListType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +58,25 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
 
     @Override
     public void onBackPressed() {
-        // User always mistakenly back out of the app when they are in favorite list, so we let fragment to decide if we really back out the app.
-        ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_list);
-        if (!listFragment.onBackPressed()) {
-            super.onBackPressed();
+        if (!isTwoPanes) {
+            // User always mistakenly back out of the app when they are in favorite list, so we let fragment to decide if we really back out the app.
+            ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_list);
+            if (listFragment.onBackPressed()) {
+                return;
+            }
+        } else {
+            if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                Spinner spinner = (Spinner) findViewById(R.id.sp_main);
+                if (spinner != null) {
+                    if (Utils.isNetworkConnected(this)) {
+                        spinner.setSelection(Movie.MOVIE_LIST_TYPE_POPULARITY);
+                        return;
+                    }
+                }
+            }
+
         }
+        super.onBackPressed();
     }
 
     @Override
@@ -87,7 +103,7 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     private void setupSpinner(ViewGroup tb_main) {
-        int movieListType = AppPreferences.getLastMovieListType(this);
+        movieListType = AppPreferences.getLastMovieListType(this);
         View spinnerContainer = LayoutInflater.from(this).inflate(R.layout.spinner_actionbar, tb_main, false);
         ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         lp.gravity = Gravity.END;
@@ -104,6 +120,8 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
                 if (view == null) {
                     return;
                 }
+
+                movieListType = position;
 
                 ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_list);
                 if (listFragment != null) {
@@ -123,9 +141,15 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
         if (tv_instruction != null) {
             tv_instruction.setVisibility(View.GONE);
         }
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fl_fragment_holder, DetailFragment.newInstance(movieId), TAG_DETAIL_FRAGMENT)
-                .commit();
+
+        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
+        if (detailFragment != null) {
+            detailFragment.setMovie(movieId);
+        } else {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fl_fragment_holder, DetailFragment.newInstance(movieId), TAG_DETAIL_FRAGMENT)
+                    .commit();
+        }
     }
 }

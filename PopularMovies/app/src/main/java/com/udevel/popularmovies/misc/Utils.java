@@ -1,5 +1,9 @@
 package com.udevel.popularmovies.misc;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.UUID;
 
 /**
@@ -16,5 +20,11 @@ public class Utils {
 
     public static boolean compareString(String str1, String str2) {
         return (str1 == null ? str2 == null : str1.equals(str2));
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }

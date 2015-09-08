@@ -46,7 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 return MovieViewHolder.inflate(parent, new MovieViewHolder.ViewHolderClickListener() {
                     @Override
                     public void onClick(View v, int adapterPosition) {
-                        if (adapterItemClickListener != null) {
+                        if (adapterItemClickListener != null && adapterPosition != RecyclerView.NO_POSITION) {
                             adapterItemClickListener.adapterItemClick(AdapterItemClickListener.ACTION_OPEN_MOVIE_DETAIL, v, getOriginalItemId(adapterPosition));
                         }
                     }

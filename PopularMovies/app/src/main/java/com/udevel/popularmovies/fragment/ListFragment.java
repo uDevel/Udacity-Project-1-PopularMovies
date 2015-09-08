@@ -38,6 +38,7 @@ import com.udevel.popularmovies.data.local.provider.movie.MovieColumns;
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.DiscoverMovieResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
+import com.udevel.popularmovies.misc.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -226,9 +227,12 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             if (root != null) {
                 Spinner spinner = (Spinner) root.findViewById(R.id.sp_main);
                 if (spinner != null) {
-                    spinner.setSelection(Movie.MOVIE_LIST_TYPE_POPULARITY);
-                    return true;
+                    if (Utils.isNetworkConnected(getContext())) {
+                        spinner.setSelection(Movie.MOVIE_LIST_TYPE_POPULARITY);
+                        return true;
+                    }
                 }
+
             }
         }
 
@@ -342,8 +346,8 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (layoutManager.getItemCount() > 0) {
-                    if (layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING) {
-
+                    if (layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - NUM_LAST_ITEM_BEFORE_LOADING
+                            && movieListType != Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
                         getMovieList(false);
                     }
 
@@ -600,6 +604,15 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             if (movies == null) {
                 Toast.makeText(context, "Unable to save data to local storage.", Toast.LENGTH_SHORT).show();
             } else {
+                if (currentPage == 0) {
+                    // Reset scroll position.
+                    if (rv_popular_movies != null) {
+                        rv_popular_movies.scrollToPosition(0);
+                        if (abl_popular_movies != null) {
+                            abl_popular_movies.setExpanded(true, true);
+                        }
+                    }
+                }
                 updateRecyclerView(movies);
             }
 

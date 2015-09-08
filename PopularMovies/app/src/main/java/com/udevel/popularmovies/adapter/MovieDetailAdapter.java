@@ -2,6 +2,7 @@ package com.udevel.popularmovies.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private AdapterItemClickListener adapterItemClickListener;
     private boolean hasTrailers;
     private boolean hasReviews;
-    private boolean animatedEntry;
+    private boolean animateEntry = true;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MovieDetailAdapter(Movie movie, List<YouTubeTrailer> youTubeTrailers, List<Review> reviews, Fragment fragment) {
@@ -127,30 +128,33 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .dontAnimate()
                         .into(movieInfoViewHolder.iv_poster);
 
-                if (!animatedEntry) {
+                if (animateEntry) {
                     movieInfoViewHolder.fl_poster.setTranslationX(-1000);
                     movieInfoViewHolder.tv_title.setTranslationX(1000);
                     movieInfoViewHolder.tv_release_year.setTranslationX(1000);
                     movieInfoViewHolder.tv_release_month_date.setTranslationX(1000);
                     movieInfoViewHolder.tv_rating.setTranslationX(1000);
                     movieInfoViewHolder.tv_popularity.setTranslationX(1000);
-                    movieInfoViewHolder.tv_overview.setScaleX(0.0f);
-                    movieInfoViewHolder.tv_overview.setScaleY(0.0f);
+                    movieInfoViewHolder.tv_overview.setScaleX(0.7f);
+                    movieInfoViewHolder.tv_overview.setScaleY(0.7f);
 
-                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(400).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(700).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
 
-                    animatedEntry = true;
+                    animateEntry = false;
                 }
                 break;
             case VIEW_TYPE_TRAILER:
                 TrailerViewHolder trailerViewHolder = (TrailerViewHolder) holder;
                 YouTubeTrailer youTubeTrailer = getYouTubeTrailerFromAdapterPosition(position);
+                if (youTubeTrailer == null) {
+                    return;
+                }
                 trailerViewHolder.tv_trailer_name.setText(youTubeTrailer.getName());
                 String thumbnailUrl = youTubeTrailer.getThumbnailUrl();
                 Glide.with(fragment)
@@ -165,6 +169,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case VIEW_TYPE_REVIEW:
                 ReviewViewHolder reviewViewHolder = (ReviewViewHolder) holder;
                 Review review = getReviewFromAdapterPosition(position);
+                if (review == null) {
+                    return;
+                }
                 reviewViewHolder.tv_review.setText(review.getContent());
                 reviewViewHolder.tv_reviewer.setText(fragment.getString(R.string.reviewed_by, review.getAuthor()));
                 break;
@@ -204,12 +211,14 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.movie = movie;
         this.youTubeTrailerList = youTubeTrailers;
         this.reviewList = reviews;
+        this.animateEntry = true;
 
         hasTrailers = youTubeTrailerList != null && youTubeTrailerList.size() > 0;
         hasReviews = reviewList != null && reviewList.size() > 0;
         notifyDataSetChanged();
     }
 
+    @Nullable
     private YouTubeTrailer getYouTubeTrailerFromAdapterPosition(int position) {
         if (youTubeTrailerList == null) {
             return null;
@@ -223,6 +232,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return youTubeTrailerList.get(youTubeTrailerPosition);
     }
 
+    @Nullable
     private Review getReviewFromAdapterPosition(int position) {
         if (reviewList == null) {
             return null;
