@@ -529,6 +529,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
     }
 
     private void processNetworkFailureResult(RetrofitError error) {
+        if (!isAdded() || getActivity() == null) {
+            return;
+        }
+
         loadingFromNetwork.set(false);
         srl_popular_movies.setRefreshing(false);
 

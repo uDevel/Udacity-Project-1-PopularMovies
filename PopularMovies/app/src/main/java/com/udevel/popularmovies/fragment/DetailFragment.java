@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -249,7 +250,7 @@ public class DetailFragment extends Fragment {
             NetworkApi.getMovieById(movieId, new Callback<MovieDetailInfoResult>() {
                 @Override
                 public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
-                    if (getActivity() == null) {
+                    if (getActivity() == null || !isAdded()) {
                         return;
                     }
 
@@ -313,7 +314,7 @@ public class DetailFragment extends Fragment {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    if (isDetached()) {
+                    if (getActivity() == null || !isAdded()) {
                         return;
                     }
                     // Try to get find movie from favorite storage
@@ -322,7 +323,6 @@ public class DetailFragment extends Fragment {
                 }
             });
         } else {
-            pw_movie_detail.stopSpinning();
             tryToLocalStorageNetworkFails();
         }
     }
@@ -345,9 +345,17 @@ public class DetailFragment extends Fragment {
             if (hasToolbar) {
                 setMovieInfoUIToolbar();
             }
-
-            updateMovieDetailRecyclerView();
             getActivity().invalidateOptionsMenu();
+
+            // This is needed to avoid choppy animation.
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isAdded()) {
+                        updateMovieDetailRecyclerView();
+                    }
+                }
+            }, 300);
         } else {
             starred = false;
             Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
@@ -359,7 +367,10 @@ public class DetailFragment extends Fragment {
 
     private void setMovieInfoUIToolbar() {
         ctl_movie_detail.setTitle(movie.getOriginalTitle());
+
+        iv_backdrop.setVisibility(View.INVISIBLE);
         Uri backdropUrl = Uri.parse(Movie.BASE_URL_FOR_IMAGE).buildUpon().appendPath(Movie.MEDIUM_BACKDROP_IMAGE_WIDTH).appendEncodedPath(movie.getBackdropPath()).build();
+
         Glide.with(this)
                 .load(backdropUrl)
                 .asBitmap()
@@ -373,6 +384,10 @@ public class DetailFragment extends Fragment {
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        if (getActivity() == null || !isAdded()) {
+                            return true;
+                        }
+
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
                                 int backupColor = p.getDarkMutedColor(ContextCompat.getColor(getContext(), R.color.primary));
@@ -380,14 +395,12 @@ public class DetailFragment extends Fragment {
                                 if (ctl_movie_detail != null) {
                                     ctl_movie_detail.setContentScrimColor(backgroundColor);
                                 }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    reveal();
+                                }
+                                iv_backdrop.setVisibility(View.VISIBLE);
                             }
                         });
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            // Flickering if many things load too fast at the same time, remove animation when it's straight from ram.
-                            if (!isFromMemoryCache) {
-                                reveal();
-                            }
-                        }
                         return false;
                     }
 
