@@ -48,6 +48,16 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+    <com.pnikosis.materialishprogress.ProgressWheel
+        android:id="@+id/pw_movie_detail"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        app:matProg_barColor="@color/accent"
+        app:matProg_barWidth="1dp"
+        app:matProg_progressIndeterminate="true"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movie_detail"
         android:layout_width="match_parent"
@@ -63,7 +73,7 @@
         android:background="@color/white"
         android:gravity="center"
         android:text="@string/msg_pick_a_movie"
-        android:textColor="@color/primary"
+        android:textColor="@color/accent"
         android:visibility="gone"
         tools:visibility="visible"/>
 </android.support.design.widget.CoordinatorLayout>

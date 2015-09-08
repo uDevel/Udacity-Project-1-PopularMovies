@@ -37,6 +37,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.pnikosis.materialishprogress.ProgressWheel;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.MovieDetailAdapter;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
@@ -67,6 +68,7 @@ public class DetailFragment extends Fragment {
     private CollapsingToolbarLayout ctl_movie_detail;
     private AppBarLayout abl_movie_detail;
     private RecyclerView rv_movie_detail;
+    private ProgressWheel pw_movie_detail;
     private boolean hasToolbar;
     private OnFragmentInteractionListener onFragmentInteractionListener;
     private int movieId = -1;
@@ -124,6 +126,10 @@ public class DetailFragment extends Fragment {
         super.onDestroyView();
         if (iv_backdrop != null) {
             Glide.clear(iv_backdrop);
+        }
+
+        if (pw_movie_detail != null) {
+            pw_movie_detail.stopSpinning();
         }
     }
 
@@ -201,11 +207,11 @@ public class DetailFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_detail, container, false);
         iv_backdrop = ((ImageView) root.findViewById(R.id.iv_backdrop));
         rv_movie_detail = ((RecyclerView) root.findViewById(R.id.rv_movie_detail));
-
+        pw_movie_detail = ((com.pnikosis.materialishprogress.ProgressWheel) root.findViewById(R.id.pw_movie_detail));
         abl_movie_detail = ((AppBarLayout) root.findViewById(R.id.abl_movie_detail));
 
         hasToolbar = abl_movie_detail != null;
-
+        pw_movie_detail.setInstantProgress(0.0f);
         if (hasToolbar) {
             tb_movie_detail = ((Toolbar) root.findViewById(R.id.tb_movie_detail));
             ctl_movie_detail = ((CollapsingToolbarLayout) root.findViewById(R.id.ctl_movie_detail));
@@ -237,6 +243,8 @@ public class DetailFragment extends Fragment {
 
     private void setMovieInfoUI() {
         if (Utils.isNetworkConnected(getContext())) {
+            pw_movie_detail.spin();
+
             NetworkApi.getMovieById(movieId, new Callback<MovieDetailInfoResult>() {
                 @Override
                 public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
@@ -277,6 +285,9 @@ public class DetailFragment extends Fragment {
                                 }
                             }
                         }
+
+                        pw_movie_detail.stopSpinning();
+
                         if (hasToolbar) {
                             setMovieInfoUIToolbar();
                         }
@@ -305,10 +316,12 @@ public class DetailFragment extends Fragment {
                         return;
                     }
                     // Try to get find movie from favorite storage
+                    pw_movie_detail.stopSpinning();
                     tryToLocalStorageNetworkFails();
                 }
             });
         } else {
+            pw_movie_detail.stopSpinning();
             tryToLocalStorageNetworkFails();
         }
     }

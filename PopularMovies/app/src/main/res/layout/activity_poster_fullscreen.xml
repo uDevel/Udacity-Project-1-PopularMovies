@@ -8,11 +8,12 @@
 
     <com.pnikosis.materialishprogress.ProgressWheel
         android:id="@+id/pw_main"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="center_vertical|center_horizontal"
         android:layout_margin="10dp"
         wheel:matProg_barColor="@color/accent"
+        wheel:matProg_barWidth="1dp"
         wheel:matProg_progressIndeterminate="true"/>
 
     <ImageView

@@ -29,6 +29,7 @@
                 android:fontFamily="sans-serif-light"
                 android:gravity="center"
                 android:text="@string/msg_pick_a_movie"
+                android:textColor="@color/accent"
                 android:textSize="20sp"/>
 
             <FrameLayout

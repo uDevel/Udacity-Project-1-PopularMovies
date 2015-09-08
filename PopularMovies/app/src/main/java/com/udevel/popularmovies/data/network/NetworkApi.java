@@ -22,8 +22,8 @@ import retrofit.client.OkClient;
  */
 public class NetworkApi {
     public static final int RETRY_COUNT = 6;
-    private static final long CONNECT_TIMEOUT_MILLIS = 3000;
-    private static final long READ_TIMEOUT_MILLIS = 1000;
+    private static final long CONNECT_TIMEOUT_MILLIS = 5000;
+    private static final long READ_TIMEOUT_MILLIS = 3000;
     private static TheMovieDBService theMovieDBServiceCache;
 
     private static TheMovieDBService getTheMovieDBService() {

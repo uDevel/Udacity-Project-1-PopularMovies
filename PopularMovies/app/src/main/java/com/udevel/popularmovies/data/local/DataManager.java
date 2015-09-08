@@ -122,7 +122,7 @@ public class DataManager {
     public static List<Movie> getFavoriteMovieList(Context context) {
         List<Movie> movieList = new ArrayList<>();
         MovieSelection selection = new MovieSelection();
-
+        selection.orderById(true);
         try (MovieCursor movieCursor = selection.query(context)) {
             while (movieCursor.moveToNext()) {
                 Movie movie = convertToMovie(movieCursor);
@@ -313,11 +313,13 @@ public class DataManager {
             movie.setReleaseDate(movieCursor.getReleaseDate());
             movie.setVoteAverage(movieCursor.getVoteAverage());
             movie.setVoteCount(movieCursor.getVoteCount());
+            return movie;
+
         } catch (NullPointerException ex) {
             Log.e(TAG, ex.getMessage());
-        } finally {
-            return movie;
         }
+
+        return null;
     }
 
     private static Review convertToReview(ReviewCursor reviewCursor) {

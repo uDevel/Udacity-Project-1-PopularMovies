@@ -480,6 +480,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                 return;
             }
 
+            if (isRefresh) {
+                srl_popular_movies.setRefreshing(true);
+            }
+
             final int thisMovieListType = movieListType;
             switch (thisMovieListType) {
                 case Movie.MOVIE_LIST_TYPE_POPULARITY:
