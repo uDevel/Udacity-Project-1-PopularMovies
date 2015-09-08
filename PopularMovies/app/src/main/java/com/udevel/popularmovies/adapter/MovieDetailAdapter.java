@@ -124,7 +124,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .load(uri)
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .dontAnimate()
                         .into(movieInfoViewHolder.iv_poster);
 
@@ -140,10 +140,10 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                     movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(400).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(550).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
 
                     animateEntry = false;
@@ -162,7 +162,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .fitCenter()
                         .crossFade(1000)
                         .error(R.drawable.ic_image_error)
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .into(trailerViewHolder.iv_trailer_thumbnail);
                 trailerViewHolder.iv_hd.setVisibility(youTubeTrailer.isHD() ? View.VISIBLE : View.GONE);
                 break;

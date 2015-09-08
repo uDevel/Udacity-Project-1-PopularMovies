@@ -77,7 +77,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .error(R.drawable.ic_image_error)
                         .fitCenter()
                         .animate(R.anim.fade_in_rise)
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .into(movieViewHolder.iv_poster);
                 break;
             case VIEW_TYPE_FOOTER:

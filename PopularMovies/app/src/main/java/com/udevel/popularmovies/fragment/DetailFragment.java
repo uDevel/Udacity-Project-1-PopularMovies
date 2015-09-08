@@ -48,6 +48,7 @@ import com.udevel.popularmovies.data.local.entity.YouTubeTrailer;
 import com.udevel.popularmovies.data.network.NetworkApi;
 import com.udevel.popularmovies.data.network.api.MovieDetailInfoResult;
 import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
+import com.udevel.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -235,101 +236,109 @@ public class DetailFragment extends Fragment {
     }
 
     private void setMovieInfoUI() {
-        NetworkApi.getMovieById(movieId, new Callback<MovieDetailInfoResult>() {
-            @Override
-            public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
-                if (getActivity() == null) {
-                    return;
-                }
+        if (Utils.isNetworkConnected(getContext())) {
+            NetworkApi.getMovieById(movieId, new Callback<MovieDetailInfoResult>() {
+                @Override
+                public void success(MovieDetailInfoResult movieDetailInfoResult, Response response) {
+                    if (getActivity() == null) {
+                        return;
+                    }
 
-                if (movieDetailInfoResult != null) {
-                    movie = Movie.convertMovieDetailInfoResult(movieDetailInfoResult);
+                    if (movieDetailInfoResult != null) {
+                        movie = Movie.convertMovieDetailInfoResult(movieDetailInfoResult);
 
-                    MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
-                    if (trailers != null) {
-                        List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
-                        if (youtubes != null) {
-                            youTubeTrailers = new ArrayList<>();
-                            for (MovieDetailInfoResult.Youtube youtube : youtubes) {
+                        MovieDetailInfoResult.Trailers trailers = movieDetailInfoResult.getTrailers();
+                        if (trailers != null) {
+                            List<MovieDetailInfoResult.Youtube> youtubes = trailers.getYoutube();
+                            if (youtubes != null) {
+                                youTubeTrailers = new ArrayList<>();
+                                for (MovieDetailInfoResult.Youtube youtube : youtubes) {
 
-                                YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
-                                youTubeTrailer.setYouTubeTrailerId(youtube.getSource());
-                                youTubeTrailer.setSize(youtube.getSize());
-                                youTubeTrailer.setName(youtube.getName());
-                                youTubeTrailers.add(youTubeTrailer);
+                                    YouTubeTrailer youTubeTrailer = new YouTubeTrailer();
+                                    youTubeTrailer.setYouTubeTrailerId(youtube.getSource());
+                                    youTubeTrailer.setSize(youtube.getSize());
+                                    youTubeTrailer.setName(youtube.getName());
+                                    youTubeTrailers.add(youTubeTrailer);
+                                }
                             }
                         }
-                    }
 
-                    MovieDetailInfoResult.Reviews reviewsFromNetwork = movieDetailInfoResult.getReviews();
-                    if (reviewsFromNetwork != null) {
-                        List<MovieDetailInfoResult.Reviews.Result> results = reviewsFromNetwork.getResults();
-                        if (results != null) {
-                            reviews = new ArrayList<>();
-                            for (MovieDetailInfoResult.Reviews.Result result : results) {
-                                Review review = new Review();
-                                review.setReviewId(result.getId());
-                                review.setAuthor(result.getAuthor());
-                                review.setContent(result.getContent());
-                                reviews.add(review);
+                        MovieDetailInfoResult.Reviews reviewsFromNetwork = movieDetailInfoResult.getReviews();
+                        if (reviewsFromNetwork != null) {
+                            List<MovieDetailInfoResult.Reviews.Result> results = reviewsFromNetwork.getResults();
+                            if (results != null) {
+                                reviews = new ArrayList<>();
+                                for (MovieDetailInfoResult.Reviews.Result result : results) {
+                                    Review review = new Review();
+                                    review.setReviewId(result.getId());
+                                    review.setAuthor(result.getAuthor());
+                                    review.setContent(result.getContent());
+                                    reviews.add(review);
+                                }
                             }
                         }
-                    }
-                    if (hasToolbar) {
-                        setMovieInfoUIToolbar();
-                    }
-                    updateMovieDetailRecyclerView();
-                    getActivity().invalidateOptionsMenu();
-
-                    // Update local storage if it's a favorite movie.
-                    Context context = getContext();
-                    if (context != null) {
-                        Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
-                        if (favoriteMovieById != null) {
-                            if (!movie.equals(favoriteMovieById)) {
-                                DataManager.addFavoriteMovieReviewTrailer(context, movie, reviews, youTubeTrailers);
-                            }
-                            starred = true;
-                        } else {
-                            starred = false;
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (isDetached()) {
-                    return;
-                }
-                // Try to get find movie from favorite storage
-                Context context = getContext();
-                if (context != null) {
-                    Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
-                    List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, movieId);
-                    List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, movieId);
-                    if (favoriteMovieById != null) {
-                        movie = favoriteMovieById;
-                        youTubeTrailers = youTubeTrailerByMovieId;
-                        reviews = reviewsByMovieId;
-
-                        starred = true;
                         if (hasToolbar) {
                             setMovieInfoUIToolbar();
                         }
-
                         updateMovieDetailRecyclerView();
                         getActivity().invalidateOptionsMenu();
-                    } else {
-                        starred = false;
-                        Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
-                        if (onFragmentInteractionListener != null) {
-                            onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL, null);
+
+                        // Update local storage if it's a favorite movie.
+                        Context context = getContext();
+                        if (context != null) {
+                            Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+                            if (favoriteMovieById != null) {
+                                if (!movie.equals(favoriteMovieById)) {
+                                    DataManager.addFavoriteMovieReviewTrailer(context, movie, reviews, youTubeTrailers);
+                                }
+                                starred = true;
+                            } else {
+                                starred = false;
+                            }
                         }
                     }
                 }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    if (isDetached()) {
+                        return;
+                    }
+                    // Try to get find movie from favorite storage
+                    tryToLocalStorageNetworkFails();
+                }
+            });
+        } else {
+            tryToLocalStorageNetworkFails();
+        }
+    }
+
+    private void tryToLocalStorageNetworkFails() {
+        Context context = getContext();
+        if (context != null) {
+            Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+            List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, movieId);
+            List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, movieId);
+            if (favoriteMovieById != null) {
+                movie = favoriteMovieById;
+                youTubeTrailers = youTubeTrailerByMovieId;
+                reviews = reviewsByMovieId;
+
+                starred = true;
+                if (hasToolbar) {
+                    setMovieInfoUIToolbar();
+                }
+
+                updateMovieDetailRecyclerView();
+                getActivity().invalidateOptionsMenu();
+            } else {
+                starred = false;
+                Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+                if (onFragmentInteractionListener != null) {
+                    onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL, null);
+                }
             }
-        });
+        }
     }
 
     private void setMovieInfoUIToolbar() {
