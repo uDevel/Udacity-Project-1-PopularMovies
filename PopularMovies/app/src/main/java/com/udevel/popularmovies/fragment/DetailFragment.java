@@ -420,7 +420,10 @@ public class DetailFragment extends Fragment {
                         if (data instanceof String) {
                             String youTubeId = ((String) data);
                             try {
-                                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForApp(youTubeId)));
+                                String urlForApp = YouTubeTrailer.getUrlForApp(youTubeId);
+                                Uri parse = Uri.parse(urlForApp);
+
+                                Intent i = new Intent(Intent.ACTION_VIEW, parse);
                                 startActivity(i);
                             } catch (ActivityNotFoundException e) {
                                 // youtube is not installed.  use other app.

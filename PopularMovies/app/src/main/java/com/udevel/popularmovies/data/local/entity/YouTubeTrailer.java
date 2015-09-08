@@ -1,5 +1,7 @@
 package com.udevel.popularmovies.data.local.entity;
 
+import android.util.Log;
+
 /**
  * Created by benny on 8/9/2015.
  */
@@ -27,6 +29,13 @@ public class YouTubeTrailer {
     }
 
     public void setYouTubeTrailerId(String youTubeTrailerId) {
+        //Remove "&"
+        int indexOfAppend = youTubeTrailerId.indexOf("&");
+        if (indexOfAppend != -1) {
+            Log.d("YouTubeTrailer", "indexOfAppend:" + indexOfAppend);
+            youTubeTrailerId = youTubeTrailerId.substring(0, indexOfAppend);
+        }
+
         this.youTubeTrailerId = youTubeTrailerId;
     }
 
