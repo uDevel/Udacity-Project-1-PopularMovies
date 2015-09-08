@@ -366,7 +366,10 @@ public class DetailFragment extends Fragment {
                             }
                         });
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            reveal();
+                            // Flickering if many things load too fast at the same time, remove animation when it's straight from ram.
+                            if (!isFromMemoryCache) {
+                                reveal();
+                            }
                         }
                         return false;
                     }
