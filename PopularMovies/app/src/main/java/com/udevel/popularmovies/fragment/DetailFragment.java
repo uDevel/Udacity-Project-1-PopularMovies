@@ -196,6 +196,7 @@ public class DetailFragment extends Fragment {
 
     public void setMovie(int movieId) {
         this.movieId = movieId;
+
         setMovieInfoUI();
         Context context = getContext();
         if (context != null) {
@@ -328,28 +329,30 @@ public class DetailFragment extends Fragment {
 
     private void tryToLocalStorageNetworkFails() {
         Context context = getContext();
-        if (context != null) {
-            Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
-            List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, movieId);
-            List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, movieId);
-            if (favoriteMovieById != null) {
-                movie = favoriteMovieById;
-                youTubeTrailers = youTubeTrailerByMovieId;
-                reviews = reviewsByMovieId;
+        if (context == null) {
+            return;
+        }
 
-                starred = true;
-                if (hasToolbar) {
-                    setMovieInfoUIToolbar();
-                }
+        Movie favoriteMovieById = DataManager.getFavoriteMovieById(context, movieId);
+        List<YouTubeTrailer> youTubeTrailerByMovieId = DataManager.getYouTubeTrailerByMovieId(context, movieId);
+        List<Review> reviewsByMovieId = DataManager.getReviewsByMovieId(context, movieId);
+        if (favoriteMovieById != null) {
+            movie = favoriteMovieById;
+            youTubeTrailers = youTubeTrailerByMovieId;
+            reviews = reviewsByMovieId;
 
-                updateMovieDetailRecyclerView();
-                getActivity().invalidateOptionsMenu();
-            } else {
-                starred = false;
-                Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
-                if (onFragmentInteractionListener != null) {
-                    onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL, null);
-                }
+            starred = true;
+            if (hasToolbar) {
+                setMovieInfoUIToolbar();
+            }
+
+            updateMovieDetailRecyclerView();
+            getActivity().invalidateOptionsMenu();
+        } else {
+            starred = false;
+            Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
+            if (onFragmentInteractionListener != null) {
+                onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL, null);
             }
         }
     }
@@ -392,60 +395,64 @@ public class DetailFragment extends Fragment {
     }
 
     private void updateMovieDetailRecyclerView() {
-        if (rv_movie_detail != null) {
-            if (rv_movie_detail.getLayoutManager() == null) {
-                rv_movie_detail.setLayoutManager(new LinearLayoutManager(getActivity()));
-            }
+        if (rv_movie_detail == null) {
+            return;
+        }
 
-            MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
-            if (adapter == null) {
-                adapter = new MovieDetailAdapter(movie, youTubeTrailers, reviews, this);
-                rv_movie_detail.setAdapter(adapter);
-            } else {
-                adapter.updateMovieDetail(movie, youTubeTrailers, reviews);
-            }
-            adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
-                @Override
-                public void adapterItemClick(String action, View v, Object data) {
-                    switch (action) {
-                        case AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER: {
-                            if (data instanceof String) {
-                                String youTubeId = ((String) data);
-                                try {
-                                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForApp(youTubeId)));
-                                    startActivity(i);
-                                } catch (ActivityNotFoundException e) {
-                                    // youtube is not installed.  use other app.
-                                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForWeb(youTubeId)));
-                                    startActivity(i);
+        if (rv_movie_detail.getLayoutManager() == null) {
+            rv_movie_detail.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+
+        rv_movie_detail.scrollToPosition(0);
+
+        MovieDetailAdapter adapter = (MovieDetailAdapter) rv_movie_detail.getAdapter();
+        if (adapter == null) {
+            adapter = new MovieDetailAdapter(movie, youTubeTrailers, reviews, this);
+            rv_movie_detail.setAdapter(adapter);
+        } else {
+            adapter.updateMovieDetail(movie, youTubeTrailers, reviews);
+        }
+        adapter.setAdapterItemClickListener(new AdapterItemClickListener() {
+            @Override
+            public void adapterItemClick(String action, View v, Object data) {
+                switch (action) {
+                    case AdapterItemClickListener.ACTION_OPEN_YOUTUBE_TRAILER: {
+                        if (data instanceof String) {
+                            String youTubeId = ((String) data);
+                            try {
+                                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForApp(youTubeId)));
+                                startActivity(i);
+                            } catch (ActivityNotFoundException e) {
+                                // youtube is not installed.  use other app.
+                                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(YouTubeTrailer.getUrlForWeb(youTubeId)));
+                                startActivity(i);
+                            }
+                        }
+                        break;
+
+                    }
+                    case AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG: {
+                        if (data instanceof Review) {
+                            FragmentManager fm = getChildFragmentManager();
+                            ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
+                            dialogFragment.show(fm, "Review Dialog");
+                        }
+                        break;
+                    }
+                    case AdapterItemClickListener.ACTION_OPEN_POSTER_FULLSCREEN: {
+                        if (movie != null) {
+                            String posterPath = movie.getPosterPath();
+                            if (posterPath != null) {
+                                if (onFragmentInteractionListener != null) {
+                                    onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER, posterPath);
                                 }
                             }
-                            break;
-
                         }
-                        case AdapterItemClickListener.ACTION_OPEN_REVIEW_DIALOG: {
-                            if (data instanceof Review) {
-                                FragmentManager fm = getChildFragmentManager();
-                                ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
-                                dialogFragment.show(fm, "Review Dialog");
-                            }
-                            break;
-                        }
-                        case AdapterItemClickListener.ACTION_OPEN_POSTER_FULLSCREEN: {
-                            if (movie != null) {
-                                String posterPath = movie.getPosterPath();
-                                if (posterPath != null) {
-                                    if (onFragmentInteractionListener != null) {
-                                        onFragmentInteractionListener.onFragmentInteraction(OnFragmentInteractionListener.ACTION_OPEN_FULLSCREEN_POSTER, posterPath);
-                                    }
-                                }
-                            }
-                            break;
-                        }
+                        break;
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
