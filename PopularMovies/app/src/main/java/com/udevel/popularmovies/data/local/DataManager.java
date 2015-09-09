@@ -122,7 +122,7 @@ public class DataManager {
     public static List<Movie> getFavoriteMovieList(Context context) {
         List<Movie> movieList = new ArrayList<>();
         MovieSelection selection = new MovieSelection();
-        selection.orderById(true);
+        selection.orderByOriginalTitle();
         try (MovieCursor movieCursor = selection.query(context)) {
             while (movieCursor.moveToNext()) {
                 Movie movie = convertToMovie(movieCursor);
@@ -214,6 +214,16 @@ public class DataManager {
         }
 
         return null;
+    }
+
+    public static void updateFavoriteMovieById(Context context, Movie movie) {
+        MovieContentValues movieContentValues = convertToMovieContentValues(movie);
+        if (movieContentValues != null) {
+            context.getContentResolver().update(MovieColumns.CONTENT_URI,
+                    movieContentValues.values(),
+                    MovieColumns.MOVIE_ID + " = ?",
+                    new String[]{String.valueOf(movie.getMovieId())});
+        }
     }
 
     public static void removeFavoriteMovie(Context context, Movie movie) {

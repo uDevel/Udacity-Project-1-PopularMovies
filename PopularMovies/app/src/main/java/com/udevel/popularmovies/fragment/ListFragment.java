@@ -456,11 +456,6 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
                     return;
                 }
 
-                if (refreshSnackbar != null) {
-                    refreshSnackbar.dismiss();
-                    refreshSnackbar = null;
-                }
-
                 setMovieListType(position);
             }
 
