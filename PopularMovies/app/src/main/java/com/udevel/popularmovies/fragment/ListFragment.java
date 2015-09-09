@@ -116,10 +116,23 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
             List<Movie> movies;
 
             if (movieListType == Movie.MOVIE_LIST_TYPE_LOCAL_FAVOURITE) {
+                // Benchmark code to test.
+                // Ideally, we should put this in async, but this is less than 16ms for 20 favorite movies, so there is no need.
+                // long start = System.nanoTime();
                 movies = DataManager.getFavoriteMovieList(context);
+                /*long end = System.nanoTime();
+                Log.d(TAG, "**** (end - start) / 100000f: " + ((end - start) / 1000000f));
+                Log.d(TAG, "**** movies:" + movies.size());*/
                 registerFavoriteMovieListObserver();
             } else {
+                // Benchmark code to test.
+                // long start = System.nanoTime();
+                // Ideally, we should put this in async, but this is less than 38ms for 166 popular movies, so there is no need.
+                // If it's less than 500ms and there is no animation or movement, we do not need async task.
                 movies = DataManager.getMovies(context);
+                /*long end = System.nanoTime();
+                Log.d(TAG, "**** (end - start) / 100000f: " + ((end - start) / 1000000f));
+                Log.d(TAG, "**** movies:" + movies.size());*/
             }
 
             if (movies == null || movies.isEmpty()) {
