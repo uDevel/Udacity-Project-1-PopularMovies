@@ -103,7 +103,11 @@ public class DetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (getArguments() != null) {
+        if (savedInstanceState != null) {
+            movieId = savedInstanceState.getInt(ARG_KEY_MOVIE_ID, -1);
+        }
+
+        if (movieId == -1 && getArguments() != null) {
             movieId = getArguments().getInt(ARG_KEY_MOVIE_ID);
         }
     }
@@ -118,6 +122,12 @@ public class DetailFragment extends Fragment {
             }
         }
         return root;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ARG_KEY_MOVIE_ID, movieId);
     }
 
     @Override
