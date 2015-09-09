@@ -11,11 +11,11 @@
     <color name="light_gray">#dfdfdf</color>
     <color name="lighter_gray">#e8e8e8</color>
     <color name="transparent">#00000000</color>
-    <color name="transparent_white">#daffffff</color>
+    <color name="transparent_white">#a7ffffff</color>
     <color name="transparent_black">#2e000000</color>
 
     <color name="star_filter">#ffed00</color>
-    <color name="pressed_ripple_color">#fba842</color>
+    <color name="pressed_ripple_color">#ffc171</color>
     <color name="pressed_color">#8afba842</color>
     <color name="separator">@color/light_gray</color>
 </resources>

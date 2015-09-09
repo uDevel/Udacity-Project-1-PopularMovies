@@ -482,6 +482,10 @@ public class ListFragment extends Fragment implements AdapterItemClickListener, 
 
             if (isRefresh) {
                 srl_popular_movies.setRefreshing(true);
+                if (refreshSnackbar != null) {
+                    refreshSnackbar.dismiss();
+                    refreshSnackbar = null;
+                }
             }
 
             final int thisMovieListType = movieListType;

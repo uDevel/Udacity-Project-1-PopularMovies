@@ -129,22 +129,22 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .into(movieInfoViewHolder.iv_poster);
 
                 if (animateEntry) {
-                    movieInfoViewHolder.fl_poster.setTranslationX(-1000);
-                    movieInfoViewHolder.tv_title.setTranslationX(1000);
-                    movieInfoViewHolder.tv_release_year.setTranslationX(1000);
-                    movieInfoViewHolder.tv_release_month_date.setTranslationX(1000);
-                    movieInfoViewHolder.tv_rating.setTranslationX(1000);
-                    movieInfoViewHolder.tv_popularity.setTranslationX(1000);
+                    movieInfoViewHolder.fl_poster.setTranslationX(-1000f);
+                    movieInfoViewHolder.tv_title.setTranslationX(1000f);
+                    movieInfoViewHolder.tv_release_year.setTranslationX(1000f);
+                    movieInfoViewHolder.tv_release_month_date.setTranslationX(1000f);
+                    movieInfoViewHolder.tv_rating.setTranslationX(1000f);
+                    movieInfoViewHolder.tv_popularity.setTranslationX(1000f);
                     movieInfoViewHolder.tv_overview.setScaleX(0.7f);
                     movieInfoViewHolder.tv_overview.setScaleY(0.7f);
 
-                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(400).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(600).setInterpolator(new DecelerateInterpolator(2)).start();
-                    movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(500).setInterpolator(new DecelerateInterpolator()).start();
+                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(500l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
+                    movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(50l).setInterpolator(new DecelerateInterpolator()).start();
 
                     animateEntry = false;
                 }

@@ -16,13 +16,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,6 +60,7 @@ import retrofit.client.Response;
 public class DetailFragment extends Fragment {
     private static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
+    private static final String TAG_REVIEW_DIALOG = "TAG_REVIEW_DIALOG";
 
     private ImageView iv_backdrop;
     private View root;
@@ -77,7 +76,6 @@ public class DetailFragment extends Fragment {
     private Movie movie;
     private List<Review> reviews;
     private List<YouTubeTrailer> youTubeTrailers;
-    private ShareActionProvider shareActionProvider;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -143,10 +141,7 @@ public class DetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
         inflater.inflate(R.menu.menu_movie_detail, menu);
-        MenuItem menuShare = menu.findItem(R.id.menu_item_share);
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShare);
     }
 
     @Override
@@ -164,14 +159,6 @@ public class DetailFragment extends Fragment {
         if (menuShare != null) {
             boolean hasTrailer = youTubeTrailers != null && youTubeTrailers.size() > 0;
             menuShare.setVisible(hasTrailer);
-
-            if (shareActionProvider != null && hasTrailer) {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, movie.getOriginalTitle() + "\n" + YouTubeTrailer.getUrlForWeb(youTubeTrailers.get(0).getYouTubeTrailerId()));
-                sendIntent.setType("text/plain");
-                shareActionProvider.setShareIntent(sendIntent);
-            }
         }
     }
 
@@ -188,7 +175,7 @@ public class DetailFragment extends Fragment {
                 }
                 break;
             case R.id.menu_item_share:
-
+                launchShareActivity();
                 break;
         }
         return true;
@@ -203,6 +190,14 @@ public class DetailFragment extends Fragment {
         if (context != null) {
             AppPreferences.setLastMovieIdDetailViewed(context, movieId);
         }
+    }
+
+    private void launchShareActivity() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, movie.getOriginalTitle() + "\n" + YouTubeTrailer.getUrlForWeb(youTubeTrailers.get(0).getYouTubeTrailerId()));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "select"));
     }
 
     private View setupViews(LayoutInflater inflater, ViewGroup container) {
@@ -451,7 +446,7 @@ public class DetailFragment extends Fragment {
                         if (data instanceof Review) {
                             FragmentManager fm = getChildFragmentManager();
                             ReviewDialogFragment dialogFragment = ReviewDialogFragment.newInstance(((Review) data));
-                            dialogFragment.show(fm, "Review Dialog");
+                            dialogFragment.show(fm, TAG_REVIEW_DIALOG);
                         }
                         break;
                     }

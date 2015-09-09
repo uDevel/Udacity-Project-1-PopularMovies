@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="min_height_movie_detail_iv_backdrop">220dp</dimen>
+    <dimen name="margin_horizontal_movie_detail_trailer_review">48dp</dimen>
+</resources>

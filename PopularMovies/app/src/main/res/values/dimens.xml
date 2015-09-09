@@ -5,4 +5,6 @@
     <dimen name="fab_margin_end">8dp</dimen>
     <dimen name="fab_margin_bottom">0dp</dimen>
     <dimen name="iv_poster_elevation">12dp</dimen>
+    <dimen name="min_height_movie_detail_iv_backdrop">300dp</dimen>
+    <dimen name="margin_horizontal_movie_detail_trailer_review">0dp</dimen>
 </resources>

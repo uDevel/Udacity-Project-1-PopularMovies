@@ -3,6 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:layout_marginEnd="@dimen/margin_horizontal_movie_detail_trailer_review"
+              android:layout_marginStart="@dimen/margin_horizontal_movie_detail_trailer_review"
               android:background="@drawable/selector_list_item_movie_detail"
               android:orientation="vertical"
               android:padding="8dp">
