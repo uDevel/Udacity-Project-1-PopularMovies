@@ -67,12 +67,12 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <TextView
-        android:id="@+id/tv_instruction"
+        android:id="@+id/tv_error_msg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:gravity="center"
-        android:text="@string/msg_pick_a_movie"
+        android:text="@string/msg_error_cannot_load_movie_detail"
         android:textColor="@color/accent"
         android:visibility="gone"
         tools:visibility="visible"/>

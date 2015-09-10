@@ -2,10 +2,10 @@ package com.udevel.popularmovies.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +17,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.listener.AdapterItemClickListener;
 import com.udevel.popularmovies.data.local.entity.Movie;
@@ -127,7 +130,18 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .error(R.drawable.ic_image_error)
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .dontAnimate()
+                        .listener(new RequestListener<Uri, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(500l).setInterpolator(new DecelerateInterpolator(2)).start();
+                                return false;
+                            }
+                        })
                         .into(movieInfoViewHolder.iv_poster);
 
                 if (animateEntry) {
@@ -140,7 +154,6 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     movieInfoViewHolder.tv_overview.setScaleX(0.7f);
                     movieInfoViewHolder.tv_overview.setScaleY(0.7f);
 
-                    movieInfoViewHolder.fl_poster.animate().translationX(0f).setDuration(500l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_title.animate().translationX(0f).setDuration(500l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_release_year.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_release_month_date.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
@@ -148,18 +161,18 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(50l).setInterpolator(new DecelerateInterpolator()).start();
 
-                    movieInfoViewHolder.fl_poster.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            movieInfoViewHolder.fl_poster.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                            Log.d(TAG, "*** movieInfoViewHolder.fl_poster.getWidth():" + movieInfoViewHolder.fl_poster.getWidth());
-                            Log.d(TAG, "*** movieInfoViewHolder.fl_poster.getHeight():" + movieInfoViewHolder.fl_poster.getHeight());
-                            movieInfoViewHolder.fl_poster.setPivotX(movieInfoViewHolder.fl_poster.getWidth() / 2f);
-                            movieInfoViewHolder.fl_poster.setPivotY(movieInfoViewHolder.fl_poster.getHeight() / 2f);
-                            movieInfoViewHolder.fl_poster.setRotationX(5f);
-                            movieInfoViewHolder.fl_poster.setRotationY(5f);
-                        }
-                    });
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        movieInfoViewHolder.fl_poster.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                movieInfoViewHolder.fl_poster.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                movieInfoViewHolder.fl_poster.setPivotX(movieInfoViewHolder.fl_poster.getWidth() / 2f);
+                                movieInfoViewHolder.fl_poster.setPivotY(movieInfoViewHolder.fl_poster.getHeight() / 2f);
+                                movieInfoViewHolder.fl_poster.setRotationX(5f);
+                                movieInfoViewHolder.fl_poster.setRotationY(5f);
+                            }
+                        });
+                    }
 
                     animateEntry = false;
                 }

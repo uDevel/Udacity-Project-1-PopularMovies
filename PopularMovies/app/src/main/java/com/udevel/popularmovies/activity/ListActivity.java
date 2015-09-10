@@ -3,6 +3,7 @@ package com.udevel.popularmovies.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +17,6 @@ import android.widget.Spinner;
 import com.udevel.popularmovies.R;
 import com.udevel.popularmovies.adapter.SpinnerAdapter;
 import com.udevel.popularmovies.data.local.AppPreferences;
-import com.udevel.popularmovies.data.local.DataManager;
 import com.udevel.popularmovies.data.local.entity.Movie;
 import com.udevel.popularmovies.fragment.DetailFragment;
 import com.udevel.popularmovies.fragment.ListFragment;
@@ -43,10 +43,7 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
 
             int lastMovieIdDetailViewed = AppPreferences.getLastMovieIdDetailViewed(this);
             if (lastMovieIdDetailViewed != -1) {
-                Movie movieById = DataManager.getMovieById(this, lastMovieIdDetailViewed);
-                if (movieById != null) {
-                    showDetailFragment(lastMovieIdDetailViewed);
-                }
+                showDetailFragment(lastMovieIdDetailViewed);
             }
         } else {
             Fragment detailFragment = getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
@@ -99,6 +96,15 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
                     startActivity(intent);
                 }
                 break;
+            case OnFragmentInteractionListener.ACTION_CLOSE_MOVIE_DETAIL:
+                FragmentManager supportFragmentManager = getSupportFragmentManager();
+                Fragment fragmentByTag = supportFragmentManager.findFragmentByTag(TAG_DETAIL_FRAGMENT);
+                supportFragmentManager.beginTransaction().remove(fragmentByTag).commit();
+                View tv_instruction = findViewById(R.id.tv_error_msg);
+                if (tv_instruction != null) {
+                    tv_instruction.setVisibility(View.VISIBLE);
+                }
+                break;
         }
     }
 
@@ -137,7 +143,7 @@ public class ListActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     private void showDetailFragment(int movieId) {
-        View tv_instruction = findViewById(R.id.tv_instruction);
+        View tv_instruction = findViewById(R.id.tv_error_msg);
         if (tv_instruction != null) {
             tv_instruction.setVisibility(View.GONE);
         }

@@ -12,6 +12,7 @@
     <string name="msg_error_empty_favorite_movie_list">Empty favorite movie list</string>
     <string name="msg_movies_update_available">New list available</string>
     <string name="msg_pick_a_movie">pick a movie to see detail</string>
+    <string name="msg_error_cannot_load_movie_detail">unable to load movie detail</string>
     <string name="menu_item_star">Toggle favorite</string>
     <string name="menu_item_share">Share</string>
     <string name="menu_item_unstar">Remove from favorite</string>
