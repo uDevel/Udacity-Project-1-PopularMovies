@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -228,6 +227,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void setupToolbar() {
+        iv_backdrop.setVisibility(View.INVISIBLE);
         FragmentActivity activity = getActivity();
         if (activity != null && activity instanceof AppCompatActivity) {
             ((AppCompatActivity) activity).setSupportActionBar(tb_movie_detail);
@@ -351,16 +351,7 @@ public class DetailFragment extends Fragment {
                 setMovieInfoUIToolbar();
             }
             getActivity().invalidateOptionsMenu();
-
-            // This is needed to avoid choppy animation.
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isAdded()) {
-                        updateMovieDetailRecyclerView();
-                    }
-                }
-            }, 300);
+            updateMovieDetailRecyclerView();
         } else {
             starred = false;
             Toast.makeText(context, getString(R.string.msg_error_data_connection_error), Toast.LENGTH_SHORT).show();
@@ -395,6 +386,10 @@ public class DetailFragment extends Fragment {
 
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
+                                if (getActivity() == null || !isAdded()) {
+                                    return;
+                                }
+
                                 int backupColor = p.getDarkMutedColor(ContextCompat.getColor(getContext(), R.color.primary));
                                 int backgroundColor = p.getDarkVibrantColor(backupColor);
                                 if (ctl_movie_detail != null) {
@@ -404,6 +399,7 @@ public class DetailFragment extends Fragment {
                                     reveal();
                                 }
                                 iv_backdrop.setVisibility(View.VISIBLE);
+
                             }
                         });
                         return false;

@@ -79,6 +79,10 @@ public class PosterFullscreenActivity extends AppCompatActivity {
                         pw_main.stopSpinning();
                         Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette p) {
+                                if (isDestroyed() || isFinishing()) {
+                                    return;
+                                }
+
                                 int backgroundColor = p.getMutedColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_gray));
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     reveal();

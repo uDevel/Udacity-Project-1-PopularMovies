@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -103,7 +105,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case VIEW_TYPE_MOVIE_INFO:
-                MovieInfoViewHolder movieInfoViewHolder = (MovieInfoViewHolder) holder;
+                final MovieInfoViewHolder movieInfoViewHolder = (MovieInfoViewHolder) holder;
                 movieInfoViewHolder.tv_title.setText(movie.getOriginalTitle());
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                 try {
@@ -145,6 +147,19 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     movieInfoViewHolder.tv_rating.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_popularity.animate().translationX(0f).setDuration(600l).setInterpolator(new DecelerateInterpolator(2)).start();
                     movieInfoViewHolder.tv_overview.animate().scaleX(1f).scaleY(1f).setDuration(50l).setInterpolator(new DecelerateInterpolator()).start();
+
+                    movieInfoViewHolder.fl_poster.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            movieInfoViewHolder.fl_poster.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            Log.d(TAG, "*** movieInfoViewHolder.fl_poster.getWidth():" + movieInfoViewHolder.fl_poster.getWidth());
+                            Log.d(TAG, "*** movieInfoViewHolder.fl_poster.getHeight():" + movieInfoViewHolder.fl_poster.getHeight());
+                            movieInfoViewHolder.fl_poster.setPivotX(movieInfoViewHolder.fl_poster.getWidth() / 2f);
+                            movieInfoViewHolder.fl_poster.setPivotY(movieInfoViewHolder.fl_poster.getHeight() / 2f);
+                            movieInfoViewHolder.fl_poster.setRotationX(5f);
+                            movieInfoViewHolder.fl_poster.setRotationY(5f);
+                        }
+                    });
 
                     animateEntry = false;
                 }
