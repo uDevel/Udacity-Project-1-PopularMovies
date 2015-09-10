@@ -13,7 +13,6 @@ import com.udevel.popularmovies.fragment.listener.OnFragmentInteractionListener;
 public class DetailActivity extends AppCompatActivity implements OnFragmentInteractionListener {
     private static final String TAG = DetailActivity.class.getSimpleName();
     private static final String ARG_KEY_MOVIE_ID = "ARG_KEY_MOVIE_ID";
-    private boolean dismissOnOrientationChange;
 
     public static Intent createIntent(Context context, int movieId) {
         Intent startIntent = new Intent(context, DetailActivity.class);
@@ -28,12 +27,14 @@ public class DetailActivity extends AppCompatActivity implements OnFragmentInter
         int movieId = intent.getIntExtra(ARG_KEY_MOVIE_ID, -1);
 
         setContentView(R.layout.activity_detail);
-        dismissOnOrientationChange = getResources().getBoolean(R.bool.back_to_list_activity_on_landscape_orientation);
+        boolean dismissOnOrientationChange = getResources().getBoolean(R.bool.back_to_list_activity_on_landscape_orientation);
         if (dismissOnOrientationChange && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             onBackPressed();
         } else {
-            DetailFragment detailFragment = ((DetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_detail_holder));
-            detailFragment.setMovie(movieId);
+            if (savedInstanceState == null) {
+                DetailFragment detailFragment = ((DetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_detail_holder));
+                detailFragment.setMovie(movieId);
+            }
         }
     }
 
