@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="spinner_items_array">
-        <item>Sort by popularity</item>
-        <item>Sort by rating</item>
-        <item>My favorites</item>
+        <item>Sort by Popularity</item>
+        <item>Sort by Rating</item>
+        <item>Saved Favorites</item>
     </string-array>
 </resources>
